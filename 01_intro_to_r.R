@@ -121,6 +121,10 @@ mean(num_vec)
 # и у него есть такой же аргумент na.rm
 mean(x = num_vec, na.rm = TRUE)
 
+# Задание
+# Посчитайте стандартное отклонение для вектора num_vec при помощи функции sd()
+
+
 # Пользовательская функция
 my_mean1 <- function(A){
   # Функция рассчитывает среднее значение аргумента A (число, вектор)
@@ -137,22 +141,24 @@ my_mean2 <- function(A){
   return(result)
 }
 
+# Датафрейм - один из способов хранения табличных данных в R
+
 # Векторы
 len <- 1:9 # числовой
 col <- c(rep("green", 4), rep("red", 5)) # текстовый
 wid <- seq(from = 2, by = 2, to = 18) # числовой
 
-# Датафрейм - один из способов хранения табличных данных в R
-my_worms <- data.frame(len, wid, col)
+# Создаем датафрейм
+my_worms <- data.frame(Length = len, Width = wid, Colour = col)
 class(my_worms) # смотрим, действительно датафрейм
-my_worms # печать
+my_worms # печать датафрейма
 View(my_worms) # просмотр в RStudio
 # fix(my_worms) # ручное редактирование. осторожно! избегайте его использовать, никаких документов о нем не останется.
 
 # Навигация внутри датафреймов
 # Вывод столбца-переменной при помощи оператора $ и имени переменной
-my_worms$len
-my_worms$wid
+my_worms$Length
+my_worms$Width
 # У каждой ячейки в датафрейме есть координаты вида [строка, столбец]
 my_worms[2, 3] # вторая строка в 3 столбце
 my_worms[2, ] # вторая строка целиком
@@ -161,8 +167,50 @@ my_worms[, 2] # второй столбец целиком
 
 # Базовые графики
 # по оси х и y непрерывные числовые величины - точечный график
-plot(x = my_worms$len, y = my_worms$wid)
+plot(x = my_worms$Width, y = my_worms$Length)
 # по оси х дискретная величина - боксплот
-plot(x = my_worms$col, y = my_worms$wid)
+plot(x = my_worms$Colour, y = my_worms$Length)
 # Для настройки внешнего вида см graphical parameters в help
 # На самом деле, мы не будем пользоваться этой системой графики, но об этом в следующих сериях
+
+# Нарисуем те же самые графики при помощи пакета ggplot2
+library(ggplot2)
+
+ggplot(data = my_worms) +
+  geom_point(aes(x = Width, y = Length))
+
+ggplot(data = my_worms) +
+  geom_boxplot(aes(x = Colour, y = Length))
+
+# Добавляем для точек эстетику цвет (colour) из переменной col
+ggplot(data = my_worms) +
+  geom_point(aes(x = Width, y = Length, colour = Colour))
+
+# Графики можно сохранять в переменных, и использовать потом
+gg <- ggplot(data = my_worms) +
+  geom_point(aes(x = Width, y = Length, colour = Colour))
+# Чтобы вывести график, нужно напечатать название переменной.
+gg
+
+# Можно менять темы оформления графика.
+# Если тема нужна только один раз, то прибавляем ее к графику
+gg + theme_dark()
+gg + theme_light()
+gg + theme_classic()
+
+# Можно установить нужную тему до конца сессии.
+theme_set(theme_bw())
+gg
+
+# Подписи осей и легенд задает функция labs()
+gg + labs(x = "Ширина", y = "Длина", colour = "Цвет")
+
+# Графики можно делить на фасеты при помощи facet_wrap или facet_grid
+gg + facet_wrap(~Colour, nrow = 1)
+
+# (Чтобы изменить подписи цветов, нужно изменить уровни соотв. фактора)
+my_worms$col_rus <- factor(my_worms$Colour, levels = c("green", "red"), labels = c("Зеленый", "Красный"))
+ggplot(data = my_worms) +
+  geom_point(aes(x = Width, y = Length, colour = col_rus)) +
+  labs(x = "Ширина", y = "Длина", colour = "Цвет") +
+  facet_wrap(~col_rus, nrow = 1)

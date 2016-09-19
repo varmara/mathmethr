@@ -4,17 +4,18 @@ title: Презентации и данные
 
 ## 1.Знакомство с R 
 
+```{r eval=FALSE}
+install.packages("ggplot2")
+```
+
 - Конспект [html](01_intro_to_r.html)
-- [код R](01_code_intro_to_r.R)
+- [код R](01_intro_to_r.R)
 - [Примеры вопросов следующего теста]
 
 
 ## 2.Анализ мощности
 
-```{r eval=FALSE}
-install.packages("ggplot2")
-```
-- Презентация [html] |  [pdf]
+- Презентация [html] | [pdf]
 - [код R]
 - Данные
 - [Примеры вопросов следующего теста]
