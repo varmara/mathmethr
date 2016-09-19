@@ -1,0 +1,3 @@
+Fundamental difference between PCA and DA. (a) The diagram shows the essential difference between Principal Component Analysis (PCA) and Discriminant Analysis (DA). Individuals (dots) and groups (colours and ellipses) are positioned on the plane using their values for two variables. In this space, PCA searches for the direction showing the largest total variance (doted arrow), whereas DA maximizes the separation between groups (plain arrow) while minimizing variation within group. As a result, PCA fails to discriminate the groups (b), while DA adequately displays group differences.
+
+Jombart et al. BMC Genetics 2010 11:94   doi:10.1186/1471-2156-11-94

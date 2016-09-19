@@ -1,0 +1,160 @@
+/* <style type="text/css">*/
+
+/* Format title slide */
+
+/*.title-slide {
+     
+}  */
+   
+.learning {
+  background: #FFFFCC;  
+}
+
+.prompt {
+  background: #CCFFCC;  
+}
+   
+.footnote {
+  position: absolute;
+  bottom: 28px;
+  left: 60px;
+  z-index: 10;
+  font-size: 18px;
+}
+
+/* Reduce Space between Title and Body */
+
+slides > slide > hgroup + article {
+  margin-top: 5px;
+}
+
+/* Remove Border, Margins and Padding from iframe */
+iframe {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+slide.fill {
+  background-repeat: no-repeat;
+  @include background-size(cover);
+}
+
+slide.fill img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  min-width: 100%;
+  min-height: 100%;
+  
+  z-index: -1;
+}
+
+article p, article li, article li.build{
+  font-family: 'Helvetica', 'Crimson Text', 'Garamond',  'Palatino', sans-serif;
+  text-align: justify;
+  font-size:22px;
+  line-height: 1.2em;
+  color: #454545;
+}
+
+/* line 848, ../scss/default.scss */
+
+.segue h1 {
+  color: #CC2904;
+  font-size: 48px;
+}
+
+.segue h2 {
+  color: #CC2904;
+  font-size: 40px;
+}
+
+.prompt h1 {
+  font-size: 32px;
+  letter-spacing: -1px;
+  line-height: 2em;
+  color: #006600;
+}
+
+slide:not(.segue):not(.prompt) h1{
+  font-size: 32px;
+  letter-spacing: -1px;
+  line-height: 1.2em;
+  margin-top: 10px;
+  margin-bottom: 10px;
+/*  color: #193441;*/
+/*  color: #02574D;*/
+  color: #CC2904;
+}
+
+slide:not(.segue):not(.prompt) h2{
+  font-size: 28px;
+  letter-spacing: -1px;
+  line-height: 2em;
+/*  color: #193441;*/
+/*  color: #02574D;*/
+  color: #CC2904;
+}
+
+/* line 323, ../scss/default.scss */
+h3:not(.segue) {
+  font-size: 26px;
+  letter-spacing: -1px;
+  line-height: 2;
+  font-weight: inherit;
+/*  color: #797979;*/
+  color: #CC2904;
+}
+
+.prompt p{
+font-size: 28px;
+}
+
+/* Format code and body */
+
+body, td {
+   font-size: 24px;
+   font-family: Times;
+}
+
+code.r{
+  font-size: 18px;
+  text-align: left;
+}
+pre {
+  font-size: 20px;
+  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+  line-height: 22px;
+  margin-bottom: 12px;
+  text-align:left;
+}
+pre code {
+  font-size: 20px;
+  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+  line-height: 22px;
+  margin-bottom: -18px;
+  text-align: left;
+  border: 1px solid #ccc;
+}
+code {
+  font-size: 20px;
+  font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+  line-height: 22px;
+  margin-bottom: -18px;
+  text-align:left;
+}
+
+em {
+  font-style: italic;
+}
+
+strong {
+  font-weight: bold;
+}
+
+small {
+  font-size: 0.8em;
+}
+
+/*</style>*/

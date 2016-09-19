@@ -1,0 +1,647 @@
+---
+title       : Анализ главных компонент
+subtitle    : Математические методы в зоологии - на R, осень 2015
+author      : Марина Варфоломеева
+output:
+  ioslides_presentation:
+    css: my_styles.css
+    highlight: espresso
+    widescreen: yes
+---
+
+
+## Знакомимся с ординацией на примере метода главных компонент
+
+- Снижение размерности многомерных данных
+- Анализ главных компонент в R
+
+### Вы сможете
+
+- Проводить анализ главных компонент
+- Снижать размерность данных, отбирая меньшее число главных компонент
+- Оценивать долю объясненной изменчивости
+- Интерпретировать компоненты по факторным нагрузкам
+- Строить ординацию объектов в пространстве главных компонент
+- Извлекать значения факторов объектов для дальнейшего использования с другими видами анализов
+
+
+```{r setup, include = FALSE, cache = FALSE}
+#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
+# to configure markdown parsing
+options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
+#
+# output options
+options(width = 70, scipen = 6, digits = 3)
+
+# to render cyrillics in plots use cairo pdf
+options(device = function(file, width = 7, height = 7, ...) {
+  cairo_pdf(tempfile(), width = width, height = height, ...)
+  })
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = TRUE, fig.width = 7, fig.height = 3, tidy.opts=list(blank=FALSE), warning=FALSE, message=FALSE)
+```
+
+# Снижение размерности многомерных данных
+
+## Анализ главных компонент - способ снижения размерности
+
+### Многомерные исходные данные
+
+В этом примере для простоты - двумерные
+
+```{r echo = FALSE}
+x1 <- c(0.5, 1.0, 1.1, 1.5, 1.9, 2.0, 2.2, 2.3, 2.5, 3.1)
+x2 <- c(2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9)
+df <- data.frame(x1, x2)
+library(ggplot2)
+theme_set(theme_classic())
+p_raw <- ggplot(df) + geom_point(aes(x = x1, y = x2), colour = "black", size = 4) + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(df)), hjust = -0.6)
+```
+
+<div class="columns-2">
+
+```{r, echo = FALSE}
+df
+```
+
+
+```{r, echo=FALSE, fig.width=4}
+p_raw
+```
+
+</div>
+
+## Центрирование
+
+Если из каждого значения переменной вычесть среднее значение этой переменной, то центр координат переместится в точку $(\bar x _{1}, \bar x _{2})$
+
+```{r echo = FALSE}
+# normalize
+dfnorm <- data.frame(x1=x1-mean(x1), x2=x2-mean(x2))
+dfnorm <- dfnorm[order(x1), ]
+p_normalized <- ggplot(dfnorm) + geom_point(aes(x = x1, y = x2), colour = "black", size = 4) + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(dfnorm)), hjust = -0.6)
+```
+
+<div class="columns-2">
+Центрированные данные:
+
+```{r echo=FALSE}
+dfnorm
+```
+
+```{r echo=FALSE, fig.width=4}
+p_normalized
+```
+
+</div>
+
+## Матрица ковариаций между признаками
+
+<div class="columns-2">
+
+Исходные данные:
+
+```{r echo = FALSE}
+dfnorm
+```
+
+</br></br>
+
+Матрица ковариаций:
+
+```{r echo = FALSE}
+xyCov <- cov(dfnorm)
+xyCov
+```
+
+- описывает совместное варьирование нескольких переменных
+- по диагонали - дисперсии признаков
+- выше и ниже диагонали - ковариации признаков друг с другом
+
+</div>
+
+
+## Матрицу ковариаций можно представить в виде собственных векторов и собственных чисел
+
+Матрица ковариаций:
+
+```{r, echo=FALSE}
+xyCov
+```
+
+<div class="columns-2">
+
+Собственные числа:
+
+- используются для оценки вклада главных компонент в общую изменчивость
+- дисперсия вдоль собственных векторов пропорциональна их собственным числам
+
+```{r echo=FALSE}
+#new axes
+eigen_values <- eigen(xyCov)$values
+eigen_values
+```
+</br></br>
+
+Собственные вектора:
+
+- задают направление осей главных компонент
+- перпендикулярны друг другу
+- вдоль первого - максимальная дисперсия данных, вдоль следующего - максимальная дисперсия из оставшейся
+
+```{r echo=FALSE}
+eigen_vectors <- eigen(xyCov)$vectors
+eigen_vectors
+```
+
+</div>
+
+## С помощью собственных векторов и собственных чисел можно найти в пространстве признаков новые оси, вдоль которых будет максимальный разброс точек.
+
+```{r echo=FALSE, fig.width=4}
+dfnorm$pc1 <- eigen_vectors[2,1]/eigen_vectors[1,1] * dfnorm$x1
+dfnorm$pc2 <- eigen_vectors[2,2]/eigen_vectors[1,2] * dfnorm$x1
+# plot of future axes
+p_futureax <- p_normalized +
+  geom_line(data = dfnorm, aes(x = x1, y = pc1), linetype = "dashed") +
+  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = "dashed") + 
+  geom_text(aes(x = x1, y = x2, label = rownames(dfnorm)), hjust = -0.6)
+p_futureax
+```
+
+
+
+## Можно найти новые координаты точек в получившемся новом пространстве
+
+<div class="columns-2">
+
+Объекты и оси в пространстве исходных признаков:
+
+```{r echo=FALSE, fig.width=4}
+p_futureax
+```
+
+Объекты в пространстве новых осей (главных компонент):
+
+```{r pcaplot, echo=FALSE, fig.width=4, message=FALSE, warning=FALSE}
+# rotation
+library(vegan)
+df_pca <- rda(df, scale = TRUE)
+library(autoplot)
+autoplot(df_pca, type = "obs", size = 5)
+```
+
+</div>
+
+## На графике ординации изображено новое пространство
+
+```{r pcaplot, echo=FALSE, fig.width=4, message=FALSE, warning=FALSE}
+```
+
+<div class="columns-2">
+
+По собственным числам судим о доле изменчивости, объясненной новыми направлениями осей (компонентами)
+
+- PC1 - больше всего изменчивости
+- PC2 - то, что осталось
+
+</br>
+
+По новым координатам судим о близости объектов
+
+</br>
+
+По факторным нагрузкам исходных переменных на компоненты интерпретируем новые направления
+
+</br>
+
+</div>
+
+# Анализ главных компонент в R
+
+## Пример: Морфометрия поссумов
+
+<div class="columns-2">
+
+
+
+![possum](img/possum.jpg)
+
+<small>Possum by Hasitha Tudugalle on Flickr
+https://www.flickr.com/photos/hasitha_tudugalle/6037880962</small>
+
+</div>
+
+<div class = "footnote">Данные Lindenmayer et al. (1995)</div>
+
+## Знакомимся с данными
+
+```{r}
+library(DAAG)
+data(possum)
+colnames(possum)
+
+sum(is.na(possum))
+possum[!complete.cases(possum), ]
+```
+
+##
+
+```{r}
+# поссумы из разных сайтов
+table(possum$site)
+# поссумы из 2 популяций
+table(possum$Pop)
+```
+
+##
+
+```{r}
+# половой состав выборок из разных сайтов
+with(possum, table(sex, site, Pop))
+```
+
+##
+
+```{r}
+# В исходных данных сайты закодированы цифрами
+unique(possum$site)
+# Добавим названия сайтов
+possum$site <- factor(possum$site, 
+levels = 1:7,
+labels = c("Cambarville","Bellbird",
+           "Whian Whian", "Byrangery",
+           "Conondale ","Allyn River",
+           "Bulburin"))
+```
+
+## Как связаны признаки между собой?
+
+Можно построить серию графиков с признаками во всех возможных комбинациях.
+
+```{r pairs-pos, eval=FALSE, tidy.opts=list(blank=FALSE, width.cutoff=60)}
+library(RColorBrewer)
+# цвета
+cols <- brewer.pal(n = length(levels(possum$site)), name = "Set1")
+# график
+pairs(possum[, c(6:14, 2)], col = cols[possum$site], pch =  as.numeric(possum$sex))
+```
+
+##
+
+```{r,pairs-pos,fig.height=6.5,fig.width=10,echo=FALSE,cache=TRUE}
+```
+
+
+## Анализ главных компонент
+
+```{r}
+library(vegan)
+# возьмем только строки, где нет пропущенных значений
+possum <- possum[complete.cases(possum), ]
+# ординация, используем переменные с hdlngth по belly
+ord <- rda(possum[, 6:14], scale = TRUE)
+```
+
+```{r smrord, eval=FALSE}
+summary(ord)
+```
+
+## Все результаты можно посмотреть при помощи функции `summary()` {.smaller}
+
+```{r, eval=TRUE, echo=FALSE}
+summary(ord)
+```
+
+
+## Части результатов в `summary()`
+
+- Importance of components - собственные числа (eigenvalues) и доля объясненной изменчивости
+- Species scores - факторные нагрузки исходных переменных на каждую из компонент
+- Site scores - факторные координаты объектов
+
+### Масштабирование - scaling
+
+- __scaling = "species", correlation = TRUE__ - отношения между переменными (нагрузки переменных пересчитаны с учетом соб. чисел, интерпретируются как корреляции)
+- __scaling = "sites"__ - отношения между объектами (факт. координаты пересчитаны с учетом соб. чисел)
+
+## Что нужно знать, чтобы интерпретировать результаты?
+
+Мы хотим снизить размерность данных и вместо n-дцати исходных признаков получить несколько главных компонент (лучше 2 или 3 для удобства интерпретации).
+
+Эти главные компоненты будут описывать данные почти так же хорошо, как исходные признаки, но при этом будут независимы друг от друга.
+
+Эти компоненты мы сможем трактовать как сложные признаки и описывать отношения между объектами в терминах этих признаков.
+
+1. Сколько компонент нужно оставить?
+2. Сколько общей изменчивости объясняют оставленные компоненты?
+3. Что означают получившиеся компоненты?
+4. Как располагаются объекты в пространстве главных компонент?
+
+## 1А. Cколько компонент нужно оставить?
+
+Вариант А. Оставляем компоненты с соб. числами > 1 (правило Кайзера)
+
+```{r}
+eigenvals(ord)
+eigenvals(ord) > mean(eigenvals(ord))
+```
+
+## 1Б. Cколько компонент нужно оставить?
+
+Вариант Б. Оставляем компоненты, кот объясняют больше изменчивости, чем возможно случайно (по модели сломанной палки).
+
+Строим график собственных чисел
+
+```{r}
+screeplot(ord, bstick = TRUE, type = "lines")
+abline(h = 1, lty = 2)
+```
+
+## 2. Сколько изменчивости объясняют компоненты?
+
+Допустим, мы решили оставить первые две компоненты. 
+
+Изменчивость, объясненная каждой из компонент, в процентах
+```{r}
+eigenvals(ord)/sum(eigenvals(ord))*100
+```
+
+Первые две компоненты объясняют `r round(sum(eigenvals(ord)[1:2]/sum(eigenvals(ord))*100), 0)` % общей изменчивости
+
+
+## 3. Что означают получившиеся компоненты?
+
+Факторные нагрузки описывают связь переменных с компонентами
+
+- Вклад переменных в изменчивость вдоль компоненты тем сильнее, чем больше модуль их факторной нагрузки.
+- Знак факторной нагрузки означает направление изменения исходной переменной вдоль главной компоненты.
+
+```{r}
+scores(ord, display = "species", choices = c(1, 2, 3), scaling = "species", correlation = TRUE)
+```
+
+## Можно нарисовать факторные нагрузки на графике
+
+- Чем ближе стрелки исходных признаков к оси компоненты, тем выше их нагрузка.
+- Стрелки направлены в сторону увеличения значения исходного признака
+
+```{r, fig.width=4, fig.height=4}
+biplot(ord, scaling = "species", correlation = TRUE, main = "PCA -  species scaling", display = "species")
+```
+
+
+## График факторных нагрузок в ggplot {.smaller}
+
+```{r, ggload-pos, message=FALSE, warning=FALSE, fig.width=4}
+# install.packages("devtools")
+# library("devtools")
+# install_github("jiho/autoplot")
+library(autoplot)
+# fortify(ord) # исходные данные, если нужно
+ggloadings <- autoplot(ord, data = possum, type = "var", PC = c(1, 2))  +  labs (x = "PC1", y = "PC2") + xlim(c(-2, 2)) + ylim(c(-2, 2))
+ggloadings
+```
+
+
+## Интерпретируем компоненты по графику факторных нагрузок
+
+<div class="columns-2">
+
+> - Первая главная компонента - это физические размеры поссумов (высокие нагрузки у переменных длина головы, общая длина, измерения черепа, груди и живота). У нагрузок отрицательный знак, значит у крупных поссумов будут маленькие значения координат по первой компоненте.
+> - Вторая главная компонента - длина ушей, ног и хвоста. Высокие значения по этой компоненте у поссумов с большими ушами, длинными ногами и коротким хвостом.
+
+
+```{r, ggload-pos, message=FALSE, warning=FALSE, echo=FALSE, fig.height=4,fig.width=4}
+```
+
+</div>
+
+## 4. Значения факторов (= факторные координаты) - координаты объектов в пространстве главных компонент
+
+```{r}
+# Координаты можно добыть так (но на самом деле сейчас нам нужен только график)
+scores(ord, display = "sites",  choices = c(1, 2, 3), scaling = "sites")
+```
+
+## График факторных координат (= график ординации)
+
+```{r,fig.width=5,fig.height=5, tidy.opts=list(width.cutoff = 60)}
+biplot(ord, scaling = "sites", main = "PCA - sites scaling", display = "sites", type = "t")
+```
+
+## График факторных координат в ggplot
+
+```{r, ggscor-pos, fig.height=4.5, fig.width=10}
+ggscores <- autoplot(ord, data = possum, type = "obs", PC = c(1, 2), aes(colour = site, shape = sex), size = 3)
+ggscores
+```
+
+## Делаем красивый график ординации.
+
+```{r}
+# Подписи можно удалить из объекта `autoplot` и вставить свои.
+# Смотрим на слои графика, второй из них содержит geom_text и он нам не нужен
+ggscores$layers
+# удаляем слой с подписями
+ggscores$layers <- ggscores$layers[-2] 
+```
+
+
+## Интерпретируем сходство объектов по графику ординации
+
+<div class="columns-2">
+
+Первые две компоненты объясняют 65% общей изменчивости
+
+44% общей изменчивости объясняет первая главная компонента, связанная с размером особей. Более крупные поссумы встречаются в популяциях из Камбарвиля и Бирангери
+
+Вторая компонента, которую мы интерпретировали как пропорции ног, ушей и хвоста, объясняет 21% общей изменчивости. Внутри отдельных популяций поссумы мало отличаются по этим параметрам (об этом говорит небольшой разброс точек вдоль второй компоненты). Зато поссумы из Камбарвиля и Беллберда не похожи на других: у них относительно более крупные уши, длинные ноги и короткие хвосты, чем у поссумов из других популяций.
+
+```{r, fig.width=5, echo=FALSE}
+ggscores
+```
+
+</div>
+
+##
+
+```{r,fig.width=10, fig.height=4.5}
+# Несколько графиков рядом
+library(gtable)
+g1 <- ggplotGrob(ggloadings)
+g2 <- ggplotGrob(ggscores)
+g <- gtable:::cbind_gtable(g1, g2, "first")
+grid.newpage()
+grid.draw(g)
+```
+
+
+## Факторные координаты можно использовать для снижения размерности данных {.smaller}
+
+Было 7 скоррелированных признаков, стало 2 __независимых__ (они ведь перпендикулярны) главных компоненты
+
+Значения факторных координат можно использовать в анализах, где нужна независимость переменных:
+
+- Множественная регрессия
+- Дискриминантный анализ (например, генетические данные)
+- Дисперсионный анализ
+- Корреляция с другими признаками, которые не были использованы в анализе главных компонент, и т.д., и т.п.
+
+```{r}
+# Так можно экстрагировать компоненты с исходными данными
+scrs <- scores(ord, display = "sites",  choices = c(1, 2, 3), scaling = "sites")
+data_with_pc <- data.frame(possum, scrs)
+head(data_with_pc)
+```
+
+## Условия применимости анализа главных компонент
+
+Похожи на условия применимости множественной линейной регрессии
+
+- Линейные связи между переменными (т.к. матрица корреляций или ковариаций)
+- Исключить наблюдения, в которых есть пропущенные значения
+- Если много нулей - трансформация данных (например, трансформация Хелингера)
+- Если очень много нулей - удалить такие переменные из анализа
+
+## Пример: Морфометрия египетских черепов {.smaller}
+
+<div class="columns-2">
+
+Измерения 150 черепов в мм:
+
+- mb - максимальная ширина
+- bh - высота от основания до макушки
+- bl - расстояние от основания черепа до края в. челюсти
+- nh - высота носа 
+
+Эпоха (epoch):
+
+- 1 - ранний прединастический период (ок. 4000 до н.э.)
+- 2 - поздний прединастический период (ок. 3300 до н.э.)
+- 3 - 12 и 13 династии (ок. 1850 до н.э.)
+- 4 - Птолемейский период (ок. 200 до н.э.)
+- 5 - Римский период (ок. 150 н.э.)
+
+![skulls](img/skulls.png)
+
+</div>
+
+<div class="footnote">Данные Thompson, Randall-Maciver (1905). Источник Manly (1994).</div>
+
+## Знакомимся с данными
+
+```{r}
+library(HSAUR)
+data("skulls")
+str(skulls, vec.len = 2)
+sum(is.na(skulls))
+table(skulls$epoch)
+```
+
+##
+
+```{r, fig.width=10, fig.height=5}
+# цвета
+library(RColorBrewer)
+cols <- brewer.pal(n = length(levels(skulls$epoch)), name = "Set1")
+# график
+pairs(skulls[, -1], col = cols[skulls$epoch])
+```
+
+## Задание: 
+
+Сделайте анализ главных компонент. Как менялась форма черепов в древнем египте в разные эпохи?
+
+## Решение
+
+Делаем анализ главных компонент.
+
+Не забудьте оставить в исходных данных только непрерывные переменные
+
+```{r}
+ord1 <- rda(skulls[, -1], scale = TRUE)
+```
+
+## Cколько компонент нужно оставить?
+
+```{r}
+screeplot(ord1, bstick = TRUE, type = "lines")
+abline(h = 1, lty = 2)
+```
+
+> - Оставляем две компоненты (можно даже одну)
+
+## Сколько изменчивости объясняют компоненты?
+
+```{r}
+eig <- eigenvals(ord1)
+explained <- sum(eig[1:2])/sum(eig) * 100
+explained
+```
+
+> - Компоненты вместе объясняют `r round(explained, 0)` % общей изменчивости
+
+## Что означают получившиеся компоненты?
+
+- Вдоль 1й компоненты уменьшается расстояние от основания черепа до края в. челюсти (bl) и высота от основания до макушки (bh)
+- Вдоль 2й компоненты уменьшается высота носа (nh) и максимальная ширина (mb)
+
+```{r}
+scores(ord1, display = "species", choices = c(1, 2), scaling = "species", correlation = TRUE)
+```
+
+## Что означают получившиеся компоненты?
+
+- Вдоль 1й компоненты уменьшается расстояние от основания черепа до края в. челюсти (bl) и высота от основания до макушки (bh)
+- Вдоль 2й компоненты уменьшается высота носа (nh) и максимальная ширина (mb)
+
+```{r, fig.height=3.5}
+ggloadings1 <- autoplot(ord1, data = skulls, type = "var", PC = c(1, 2)) + 
+    labs(x = "PC1", y = "PC2") + xlim(c(-2.3, 2)) + ylim(c(-2.3, 2))
+ggloadings1
+```
+
+## Как располагаются объекты в пространстве главных компонент?
+
+```{r}
+ggscores1 <- autoplot(ord1, data = skulls, type = "obs", PC = c(1, 2), aes(colour = epoch), size = 3) + scale_color_brewer(name = "Эпоха")
+ggscores1$layers <- ggscores1$layers[-2]
+ggscores1
+```
+
+## Для облегчения интерпретации располагаем графики рядом
+
+```{r}
+g1 <- ggplotGrob(ggloadings1)
+g2 <- ggplotGrob(ggscores1)
+g <- gtable:::cbind_gtable(g1, g2, "first")
+grid.newpage()
+grid.draw(g)
+```
+
+> - С течением времени форма черепов древних египтян изменялась. Постепенно увеличивались размеры черепа, а длина носа практически не изменялась.
+
+
+## Take home messages
+
+- Метод главных компонент:
+    - исследование связей между переменными
+    - построение ординации объектов
+    - снижение размерности данных
+- Собственные числа - вклад компонент в общую изменчивость
+- Факторные нагрузки - связь исходных переменных с компонентами - используются для интерпретации
+- Значения факторов (факторные координаты) - новые координаты объектов в пространстве уменьшенной размерности
+- Значения факторов можно использовать как новые комплексные переменные в других видах анализов.
+
+
+## Дополнительные ресурсы
+
+- Borcard, D., Gillet, F., Legendre, P., 2011. Numerical ecology with R. Springer.
+- Legendre, P., Legendre, L., 2012. Numerical ecology. Elsevier.
+- Oksanen, J., 2011. Multivariate analysis of ecological communities in R: vegan tutorial. R package version 2–0.
+- The Ordination Web Page URL http://ordination.okstate.edu/ (accessed 10.21.13).
+- Quinn, G.G.P., Keough, M.J., 2002. Experimental design and data analysis for biologists. Cambridge University Press.
+- Zuur, A.F., Ieno, E.N., Smith, G.M., 2007. Analysing ecological data. Springer.
+

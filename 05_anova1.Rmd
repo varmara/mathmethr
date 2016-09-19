@@ -1,0 +1,403 @@
+---
+title       : Дисперсионный анализ, часть 1
+subtitle    : Математические методы в зоологии - на R, осень 2015
+author      : Марина Варфоломеева
+output:
+  ioslides_presentation:
+    css: my_styles.css
+    highlight: espresso
+    widescreen: yes
+---
+
+```{r setup, include = FALSE, cache = FALSE}
+#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
+# to configure markdown parsing
+options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
+#------
+# output options
+options(width = 70, scipen = 6, digits = 3)
+
+# to render cyrillics in plots use cairo pdf
+options(device = function(file, width = 7, height = 7, ...) {
+  cairo_pdf(tempfile(), width = width, height = height, ...)
+  })
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = TRUE, fig.width = 7, fig.height = 3)
+```
+
+## Знакомимся дисперсионным анализом
+
+- Опасности множественных сравнений
+- Почему можно использовать дисперсии для сравнения средних
+- Модель дисперсионного анализа
+- Условия применимости дисперсионного анализа
+- Post hoc тесты
+- Представление результатов дисперсионного анализа
+
+## Вы сможете
+
+- Объяснить, в чем опасность множественных сравнений, и как с ними можно бороться
+- Рассказать, как в дисперсионном анализе моделируются значения зависимой переменной
+- Перечислить и проверить условия применимости дисперсионного анализа
+- Интерпретировать и описать результаты, записанные в таблице дисперсионного анализа
+- Провести множественные попарные сравнения при помощи post hoc теста Тьюки, представить и описать их результаты
+
+## Пример: сон у млекопитающих
+
+- `TotalSleep` - общая продолжительность сна. В нашем анализе это будет зависимая переменная
+- `Danger`  - уровень опасности среды для вида, пять градаций (1 - 5)
+
+```{r}
+library(readxl)
+sleep <- read_excel("sleep.xlsx", sheet = 1)
+head(sleep, 2)
+# Сделаем sleep$Danger фактором
+sleep$Danger <- factor(sleep$Danger, levels = 1:5, labels = c("очень низкий", "низкий", "средний", "высокий", "очень высокий"))
+```
+
+<div class = "footnote">Данные: Allison, Cicchetti (1976), электронная версия [Statlib database](http://lib.stat.cmu.edu) </div>
+
+## Задание: Постройте график
+
+Постройте график зависимости общей продолжительности сна от уровня опасности среды. Какой геом лучше подойдет для изображения (`geom_point` или `geom_boxplot`)?
+
+Раскрасьте график в зависимости от уровня опасности среды (используйте эстетики `fill` или `colour`)
+
+Придумайте, каким образом посчитать, в какой группе животных общая продолжительность сна больше?
+
+### Дополнительное задание:
+
+Попробуйте сменить палитру раскраски, используя `scale_colour_brewer` (варианты можно посмотреть в справке в подразделе примеров или в интернете [Colors (ggplot2): раздел RColorBrewer palette chart](http://www.cookbook-r.com/Graphs/Colors_%28ggplot2%29/) )
+
+## Решение {.smaller}
+
+```{r, fig.width=10}
+library(ggplot2) 
+theme_set(theme_bw(base_size = 14) + theme(legend.key = element_blank()))
+
+gg_sleep <- ggplot(data = sleep, aes(x = Danger, y = TotalSleep, colour = Danger)) + 
+  labs(x = "Уровень опасности", y = "Продолжительность сна") + 
+  scale_colour_brewer("Уровень опасности", palette = "Dark2")
+gg_sleep + geom_boxplot()
+```
+
+# Опасности множественных сравнений
+
+## Попарные сравнения средних
+
+### 2 группы - 1 сравнение
+
+$\alpha _{для\ сравнения} = 0.05$
+
+### 4 группы - 6 сравнений
+
+$\alpha _{для\ сравнения} = 0.05$
+
+### А какой будет $\alpha$ для группы из 6 сравнений?
+
+>- $\alpha _{для\ группы\ сравнений} = 0.05 \cdot 6 = 0.3$
+>- Опасно! Случайно найдем различия там, где их нет!
+
+
+## Если нужно много сравнений можно снизить $\alpha _{для\ сравнения}$
+
+$$\alpha _{для\ группы\ сравнений} = \alpha _{для\ сравнения} \cdot n$$
+
+Хотим зафиксировать $\alpha _{для\ группы\ сравнений} = 0.05$
+
+Поправка Бонферрони:
+
+$$\alpha _{для\ сравнения} = \frac{\alpha _{для\ группы\ сравнений}}{n}$$
+
+>- для 4 групп, 6 сравнений, $\alpha _{для\ сравнения} = 0.008$  
+  Очень жесткий критерий!
+
+# Дисперсионный анализ
+
+## Модель дисперсионного анализа {.smaller}
+
+<div class="columns-2">
+
+$$y _{ij} = \mu + a _i + \epsilon _{ij}$$
+
+Из чего складываются средние значения в группах по фактору? 
+
+Группа | Общее среднее | Эффект | <small>Случайная изменчивость</small>
+----- | ----- | ----- | -----
+очень низкий | $$\mu$$ | $$a _1$$ | $$\epsilon _{1j}$$
+низкий | $$\mu$$ | $$a _2$$ | $$\epsilon _{2j}$$
+... | ... | ... | ...
+очень высокий | $$\mu$$ | $$a _5$$ | $$\epsilon _{5j}$$
+
+
+```{r echo = FALSE}
+sleep[, c("Danger", "TotalSleep")]
+```
+
+</div>
+
+## Структура общей изменчивости {.smaller}
+
+Общая изменчивость (SSt) = Факторная (SSx) + Случайная (SSe)
+
+```{r echo = FALSE, warning=FALSE, fig.width = 10.5, fig.height=5}
+# # Общая изменчивость (отклонения от общего среднего)
+gg_sleep_total <- gg_sleep + 
+  geom_jitter(position = position_jitter(width = 0.3)) +
+  geom_hline(yintercept = mean(sleep$TotalSleep, na.rm = TRUE), linetype = "dashed") + 
+  annotate("text", label = "Общее\nсреднее", 
+           x = 0,  y = mean(sleep$TotalSleep, na.rm = TRUE), hjust = -0.1, size = 4) + 
+    ylim(0, 22) +
+  ggtitle("Общая изменчивость\n(отклонения от общего среднего)") +
+  annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = 0,  y = 0.25, hjust = -0.1, size = 6) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8))
+
+library(plyr)
+# Межгрупповая изменчивость (связанная с фактором)
+gg_sleep_factor <- gg_sleep + 
+  geom_hline(yintercept = mean(sleep$TotalSleep, na.rm = TRUE), linetype = "dashed") + 
+  geom_errorbar(stat = "hline", size = 1, yintercept = function(TotalSleep) mean(TotalSleep, na.rm = TRUE), 
+                width = .8, aes(ymax = ..y.., ymin = ..y..)) + 
+    ylim(0, 22) +
+  ggtitle("Факторная изменчивость\n(межгрупповая)")+
+    annotate("text", label = "SS[x] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = 0,  y = 0.25, hjust = -0.1, size = 6) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8))
+
+# Внутригрупповая изменчивость (случайная)
+gg_sleep_error <- gg_sleep + 
+  geom_jitter(position = position_jitter(width = 0.3)) +
+  geom_errorbar(stat = "hline",  size = 1, yintercept = function(TotalSleep) mean(TotalSleep, na.rm = TRUE), 
+                width = .8, aes(ymax = ..y.., ymin = ..y..)) + 
+  ylim(0, 22) +
+  ggtitle("Случайная изменчивость\n(внутригрупповая)")+
+    annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = 0,  y = 0.25, hjust = -0.1, size = 6) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8))
+
+library(gridExtra)
+grid.arrange(gg_sleep_total, gg_sleep_factor, gg_sleep_error, ncol = 3, widths = c(0.38, 0.31, 0.31))
+```
+
+Если выборки из одной совокупности, то
+Факторная изменчивость = Случайная изменчивость
+
+## Таблица дисперсионного анализа  {.smaller}
+
+Источник изменчивости  |  Суммы квадратов отклонений,<br /><br /> SS   |   Число степеней свободы,<br /><br /> df   | Средний квадрат отклонений<br />(дисперсия),<br /> MS | <br /><br /><br /> F  
+---------------------- | --------- | ------ | ------------------- | -----
+Название фактора | $$SS _x = \sum{(\bar y - \hat y _i)^2}$$ | $$df _x = a - 1$$ | $$MS _x = \frac{SS _x}{df _x}$$ | $$F _{df _r, df _e} = \frac{MS _r}{MS _e}$$
+Случайная | $$SS _e = \sum{(y _i - \hat y _i)^2}$$ | $$df _e = N - a$$ | $$MS _e = \frac{SS _e}{df _e}$$ | 
+Общая | $$SS _t = \sum {(\bar y - y _i)^2}$$ | $$df _t = N - 1$$ | 
+
+<br />
+Гипотезы:
+
+$H _0: MS _x = MS _e$, $H _A: MS _x ≠ MS _e$
+
+
+## Дисперсионный анализ в R {.smaller}
+
+Используем Anova из пакета car, хотя есть и другие функции. Зачем? Когда факторов будет больше одного, эта функция сможет правильно оценить достоверность каждого из них независимо от других.
+
+Anova(результат_функции_lm) - дисперсионный анализ
+
+```{r}
+library(car)
+mod <- lm(TotalSleep ~ Danger, data=sleep)
+sleep_anova <- Anova(mod)
+sleep_anova
+```
+
+```{r,echo=FALSE}
+result <- sleep_anova
+dfs <- paste0(result$Df, collapse= ",")
+fval <- round(result$'F value'[1], 2)
+sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[1] <= 0.05, "$p < 0.05$", ""))
+```
+
+>- Общая продолжительность сна различается у видов животных, которые в разной степени подвержены опасностям в течение жизни ($F _{`r dfs`} = `r fval`$, `r sign`).
+
+
+## Вопрос: 
+
+Назовите условия применимости дисперсионного анализа
+
+>- Подсказка: дисперсионный анализ - линейная модель, как и регрессия
+
+## Ответ:
+
+Условия примененимости дисперсионного анализа:
+
+- Случайность и независимость групп и наблюдений внутри групп
+- Нормальное распределение остатков
+- Гомогенность дисперсий остатков
+
+Другие ограничения:
+
+- Лучше работает, если размеры групп примерно одинаковы (т.наз. сбалансированный дисперсионный комплекс)
+- Устойчив к отклонениям от нормального распределения (при равных объемах групп или при больших выборках)
+
+## Задание: Проверьте условия применимости
+
+Проверьте условия применимости дисперсионного анализа используя графики остатков
+
+## Решение
+
+## 1. Данные для проверки условий применимости на графиках остатков
+
+```{r}
+# Данные для анализа остатков
+sleep_diag <- fortify(mod)
+head(sleep_diag)
+```
+
+## 2. Выбросы, гомогенность дисперсий {.smaller}
+
+```{r fig.width=10, tidy=FALSE}
+gg_res <- ggplot(sleep_diag, aes(x = .fitted, y = .stdresid)) + 
+  geom_hline(yintercept = 0)
+gg_1 <- gg_res + geom_point(aes(size = .cooksd))
+gg_2 <- gg_res + geom_boxplot(aes(x = Danger))
+library(gridExtra)
+grid.arrange(gg_1, gg_2, ncol = 2)
+```
+
+>- Остатки в пределах двух стандартных отклонений, расстояния Кука маленькие - можно продолжать.
+- Подозрительно маленькая дисперсия продолжительности сна в группе с очень высоким уровнем опасности.
+
+## 3. Нормальность распределения
+
+```{r}
+ggplot(sleep_diag) + geom_point(stat = "qq", aes(sample = .stdresid)) + 
+  geom_abline(yintercept = 0, slope = sd(sleep_diag$.stdresid))
+```
+
+>- Распределение практически нормальное
+
+## Немного более удобный квантильный график для проверки нормальности распределения
+
+qqPlot() из пакета car
+```{r, echo=FALSE}
+set.seed(93)
+```
+```{r, fig.height=4}
+qqPlot(mod)
+```
+
+>- Нет отклонений от нормального распределения
+
+# Post hoc тесты
+
+## Post-hoc тесты
+
+Дисперсионный анализ показывает, есть ли влияние фактора (= различаются ли средние значения зависимой переменной между группами)
+
+Пост-хок тесты показывают, какие именно из возможных пар средних значений различаются.
+
+## Свойства post-hoc тестов для попарных сравнений средних
+
+- Применяются, если влияние фактора значимо
+- Делают поправку для снижения вероятности ошибки I рода $\alpha$, (но не слишком, чтобы не
+снизилась мощность, чтобы не возросла $\beta$)
+  - Учитывают величину различий между средними
+  - Учитывают количество сравниваемых пар
+- Различаются по степени консервативности (Тьюки - разумный компромисс) 
+- Работают лучше при равных объемах групп, при гомогенности дисперсий
+
+## Пост-хок тест Тьюки в R
+
+- `glht()` - "general linear hypotheses testing"
+- `linfct` - аргумент, задающий гипотезу для тестирования
+
+- `mcp()` - функция, чтобы задавать множественные сравнения (обычные пост-хоки)
+- `Danger` = "Tukey" - тест Тьюки по фактору `Danger`
+
+```{r, warning=FALSE, message=FALSE}
+library(multcomp)
+sleep_pht <- glht(mod, linfct = mcp(Danger = "Tukey"))
+```
+
+## Результаты попарных сравнений (тест Тьюки) {.smaller}
+
+
+```{r, R.options=list(width = 80)}
+summary(sleep_pht)
+```
+
+## Описываем результаты пост-хок теста
+
+- Продолжительность сна у видов, подвергающихся очень высокому уровню опасности в течение жизни, значительно меньше, чем у тех, кто живет при среднем, низком и очень низком уровне опасности (тест Тьюки, $p < 0.05$). 
+
+# Графическое представление результатов пост-хок теста
+
+## Посчитаем описательную статистику по группам
+
+```{r, tidy=FALSE, message=FALSE}
+library(dplyr) # есть удобные функции для описания данных
+sleep_summary <- sleep %>% # берем датафрейм sleep
+  group_by(Danger) %>% # делим на группы по Danger
+  # по каждой группе считаем разное
+  summarise(
+    .n = sum(!is.na(TotalSleep)),
+    .mean = mean(TotalSleep, na.rm = TRUE),
+    .sd = sd(TotalSleep, na.rm = TRUE),
+    .upper_cl = .mean + 1.98*.sd,
+    .lower_cl = .mean - 1.98*.sd)
+sleep_summary
+```
+
+## Этот график можно использовать для представления результатов {.smaller}
+
+```{r tidy=FALSE}
+gg_means <- ggplot(sleep_summary, aes(x = Danger, y = .mean)) + 
+  geom_bar(stat = "identity", fill = "turquoise3", colour = "black", width = 0.5) + 
+  geom_errorbar(aes(ymin = .lower_cl, ymax = .upper_cl), width = 0.1) +
+  labs(x = "Обработка", y = "Вес, г") +
+  geom_text(aes(label = c("A", "A", "A", "AB", "B"), vjust = -0.3, hjust = 1.5), size = 6)
+gg_means
+```
+
+>- Достоверно различающиеся по пост-хок тесту группы обозначим разными буквами.
+
+## Можно "опустить" прямоугольники на ось х
+
+```{r fig.height = 4, tidy=FALSE}
+upperlimit <- max(sleep_summary$.upper_cl + 1)
+gg_means +
+  scale_y_continuous(expand = c(0,0),
+    limit = c(0, upperlimit))
+```
+
+## Сохраняем таблицу дисперсионного анализа в файл
+
+```{r eval = FALSE, tidy=FALSE}
+# 1) в csv
+write.csv(sleep_anova, file = "medley_res.csv")
+
+# 2) в xls или xlsx с помощью XLConnect
+library(XLConnect)
+writeWorksheetToFile(data = sleep_anova, file = "medley_res.xls", 
+                     sheet = "anova_table")
+
+# или
+
+# 3) отправляем в буфер обмена (только Windows) для вставки в Word-Excel
+write.table(file = "clipboard", x = sleep_anova, sep = "\t")
+```
+
+
+## Take home messages
+
+>- При множественных попарных сравнениях увеличивается вероятность ошибки первого рода. Поправка Бонферрони - способ точно рассчитать, насколько нужно снизить уровень значимости для каждого из сравнений
+- При помощи дисперсионного анализа можно проверить гипотезу о равенстве средних значений
+- Условия применимости (должны выполняться, чтобы тестировать гипотезы)
+  - Случайность и независимость групп и наблюдений внутри групп
+  - Нормальное распределение
+  - Гомогенность дисперсий
+- Post hoc тесты - это попарные сравнения после дисперсионного анализа, которые позволяют сказать, какие именно средние различаются
+
+
+## Дополнительные ресурсы
+
+- Quinn, Keough, 2002, pp. 173-207
+- Logan, 2010, pp. 254 - 282
+- [Open Intro to Statistics](http://www.openintro.org/stat/), pp.236-246 
+- Sokal, Rohlf, 1995, pp. 179-260
+- Zar, 2010, pp. 189-207

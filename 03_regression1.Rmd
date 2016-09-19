@@ -1,0 +1,596 @@
+---
+title: "Регрессионный анализ, часть 1"
+author: "Марина Варфоломеева"
+date: "осень 2015"
+output:
+  beamer_presentation:
+    colortheme: seagull
+    fonttheme: structurebold
+    highlight: tango
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: CambridgeUS
+    toc: yes
+subtitle: Математические методы в зоологии - на R
+institution: СПбГУ
+---
+
+```{r setup, include = FALSE, cache = FALSE}
+# output options
+options(width = 60, scipen = 6, digits = 3) 
+library(knitr)
+opts_chunk$set(fig.path='figure/fig-',fig.show='hold',size='footnotesize',comment="#",warning=FALSE, message=FALSE,dev='cairo_pdf', fig.height=1.8, fig.width=5.4)
+library("extrafont")
+# font_import()
+# loadfonts() ## for pdf()
+```
+### Вы сможете
+- посчитать и протестировать различные коэффициенты корреляции между переменными
+- подобрать модель линейной регрессии и записать ее в виде уравнения
+- проверить валидность модели при помощи t- или F-теста
+- оценить долю изменчивости, которую объясняет модель, при помощи \(R^2\)
+
+# Описание зависимости между переменными
+
+## Пример: усыхающие личинки мучных хрущаков
+
+\begin{columns}
+\begin{column}{0.48\textwidth}
+Как зависит потеря влаги личинками \href{http://ru.wikipedia.org/wiki/Хрущак_малый_мучной}{малого мучного хрущака} \textit{Tribolium confusum} от влажности воздуха? 
+\begin{itemize}
+\item 9 экспериментов, продолжительность 6 дней
+\item разная относительная влажность воздуха, %
+\item измерена потеря влаги, мг
+\end{itemize}
+\small{(Nelson, 1964; данные из Sokal, Rohlf, 1997, табл. 14.1 по Logan, 2010. глава 8, пример 8c; Данные в файлах nelson.xlsx и nelson.csv)}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=0.3\linewidth]{./img/Tribolium_confusum.png}
+\caption{Малый мучной хрущак \textit{Tribolium confusum}, photo by Sarefo, CC BY-SA}
+\end{figure}
+\end{column}
+\end{columns}
+
+## Читаем данные из файла и знакомимся с ними
+
+```{r}
+# setwd("C:/mathmethr/week2") # установите рабочую директорию, 
+# или используйте полный путь к файлу
+library(readxl)
+nelson <- read_excel("nelson.xlsx", sheet = 1)
+## или из .csv 
+# nelson <- read.table(file="nelson.csv", header = TRUE, sep = "\t", dec = ".") 
+str(nelson)
+head(nelson)
+```
+
+## Связана ли потеря веса со влажностью?
+
+### Корреляция Пирсона
+
+- Оценивает только линейную составляющую связи
+- Параметрические тесты значимости применимы если переменные распределены нормально
+  
+  
+### Ранговые коэффициенты корреляции (кор. Кендалла и кор. Спирмена)
+
+- Не зависят от формы распределения переменных
+- Тест на значимость непараметрический
+
+
+## Задача: оцените силу связи 
+
+- Посчитайте разные коэффициенты корреляции между потерей веса и влажностью
+
+- Чем отличаются результаты функций `cor()`, `cor.test()`?
+
+## Решение
+
+```{r}
+cor(nelson$humidity, nelson$weightloss) # корреляция Пирсона
+cor.test(nelson$humidity, nelson$weightloss, 
+         alternative = "two.sided", method = "pearson")
+# cor(nelson$humidity, nelson$weightloss, method = "kendall")
+# cor.test(nelson$humidity, nelson$weightloss, 
+#          alternative = "two.sided", method = "kendall")
+# cor(nelson$humidity, nelson$weightloss, method = "spearman")
+# cor.test(nelson$humidity, nelson$weightloss, 
+#          alternative = "two.sided", method = "spearman")
+```
+
+
+## Как зависит потеря веса от влажности?
+
+```{r, nelson-plot}
+library(ggplot2);theme_set(theme_bw(base_size = 8))
+gg_nelson <- ggplot(data=nelson, aes(x = humidity, y = weightloss)) + 
+  geom_point() + 
+  labs(x = "Относительная влажность, %", y = "Потеря веса, мг")
+gg_nelson
+```
+
+## Как зависит потеря веса от влажности?
+
+\[weightloss _i = b _0 + b _1 humidity _i\]
+
+```{r, nelson-plot}
+```
+
+# Линейная регрессия
+
+## Линейная регрессия
+
+- простая
+
+\[Y _i = \beta _0 + \beta _1 x _i + \epsilon _i\]
+
+- множественная
+
+\[Y _i = \beta _0 + \beta _1 x _{1 i} + \beta _2 x _{2 i} + ... + \epsilon _i\]
+
+## Как провести линию регрессии?
+
+\begin{columns}[onlytextwidth]
+\begin{column}{0.6\textwidth}
+
+\(Y _i = \beta _0 + \beta _1 x _i + \epsilon _i\) - модель регрессии
+
+\(\hat y _i = b _0 + b _1 x _i\) - оценка модели
+
+нужно оценить \(\beta _0\), \(\beta _1\) и \(\sigma^2\)
+\end{column}
+\begin{column}{0.4\textwidth}
+\begin{itemize}
+\item Метод наименьших квадратов (Ordinary Least Squares)
+\item Методы максимального правдоподобия (Maximum Likelihood, REstricted Maximum Likelihood)
+\end{itemize}
+\end{column}
+\end{columns}
+
+```{r, nelson-plot, echo=FALSE}
+```
+
+## Метод наименьших квадратов
+
+\begin{columns}[onlytextwidth]
+\begin{column}{0.4\textwidth}
+\(Y _i = \beta _0 + \beta _1 x _i + \epsilon _i\) - модель регрессии
+
+\(\hat y _i = b _0 + b _1 x _i\) - оценка модели
+
+нужно оценить \(\beta _0\), \(\beta _1\) и \(\sigma^2\)
+\end{column}
+\begin{column}{0.6\textwidth}
+\begin{figure}
+\includegraphics[width=0.9\linewidth]{./img/OLS-regression-line.png}
+\caption{Линия регрессии по методу наименьших квадратов (из кн. Quinn, Keough, 2002, стр. 85, рис. 5.6 a)}
+\end{figure}
+\end{column}
+\end{columns}
+
+## Оценки параметров линейной регрессии
+
+\begin{tabular}{l l l}
+ \hline\noalign{\smallskip}
+Параметры & Оценки параметров & Стандартные ошибки оценок \\
+ \hline\noalign{\smallskip}
+\(\beta _1\)    & \(b _1 = \frac {\sum _{i=1}^{n} {[(x _i - \bar x)(y _i - \bar y)]}}{\sum _{i=1}^{n} {(x _i - \bar x)^2}}\)      & \(SE _{b _1} = \sqrt{\frac{MS _e}{\sum _{i=1}^{n} {(x _i - \bar x)^2}}}\) \\
+\(\beta _0\)    & \(b _0 = \bar y - b _1 \bar x\)  & \(SE _{b _0} = \sqrt{MS _e [\frac{1}{n} + \frac{\bar x}{\sum _{i=1}^{n} {(x _i - \bar x)^2}}]}\) \\
+\(\epsilon _i\) & \(e _i = y _i - \hat y _i\)      & \(\approx \sqrt{MS _e}\) \\
+ \hline\noalign{\smallskip}
+\end{tabular}
+Таблица из кн. Quinn, Keough, 2002, стр. 86, табл. 5.2
+
+### Оценки параметров линейной регрессии
+  - подбирают так, чтобы минимизировать остатки \(\sum{(y _i - \hat y _i)^2}\)
+
+### Стандартные ошибки коэффициентов
+  - используются для построения доверительных интервалов
+  - нужны для статистических тестов
+
+## Коэффициенты регрессии
+
+### Интерпретация коэффициентов регрессии
+
+![Интерпретация коэффициентов регрессии](./img/interpretation-of-regression-coefficients.png "Интерпретация коэффициентов регрессии")
+
+\small{Рисунок из кн. Logan, 2010, стр. 170, рис. 8.2}
+
+### Для сравнения разных моделей - стандартизованные коэффициенты
+- Не зависят от масштаба измерений x и y
+- Можно вычислить, зная обычные коэффициенты и их стандартные отклонения \(b^\ast _1 = {b _1  \frac {\sigma _x} {\sigma _y}}\)
+- Можно вычислить, посчитав регрессию по стандартизованным данным
+
+## Добавим линию регрессии на график
+
+```{r, nelson-conf}
+gg_nelson + geom_smooth(method = "lm")
+```
+
+## Задача: как вы думаете, что это за серая область вокруг линии регрессии?
+> - Это...
+    - 95\% доверительная зона регрессии
+    - В ней с 95\% вероятностью лежит регрессионная прямая  
+    - Возникает из-за неопределенности оценок коэффициентов регрессии
+    
+```{r, nelson-conf}
+```
+
+## Как в R задать формулу линейной регрессии
+
+`lm(формула, данные)` - функция для подбора регрессионных моделей
+
+Формат формулы: `зависимая_переменная ~ модель`
+
+- \(\hat y _i = b _0 + b _1 x _i\) (простая линейная регрессия с \(b _0\) (intercept))
+    - Y ~ X
+    - Y ~ 1 + X 
+    - Y ~ X + 1
+
+- \(\hat y _i = b _1 x _i\) (простая линейная регрессия без \(b _0\))
+    - Y ~ X - 1
+    - Y ~ -1 + X
+
+- \(\hat y _i = b _0\) (уменьшенная модель, линейная регрессия Y от \(b _0\))
+    - Y ~ 1
+    - Y ~ 1 - X
+
+## Задача: Запишите в нотации R эти модели линейных регрессий
+
+- \(\hat y _i = b _0 + b _1 x _{1 i} + b _2 x _{2 i} + b _3 x _{3 i}\)
+
+(множественная линейная регрессия с \(b _0\))
+
+- \(\hat y _i = b _0 + b _1 x _{1 i} + b _3 x _{3 i}\)
+
+(уменьшенная модель множественной линейной регрессии, без \(x _2\))
+
+## Решение
+
+- \(\hat y _i = b _0 + b _1 x _{1 i} + b _2 x _{2 i} + b _3 x _{3 i}\)
+
+(множественная линейная регрессия с \(b _0\))
+
+    Y ~ X1 + X2 + X3
+    
+    Y ~ 1 + X1 + X2 + X3
+
+- \(\hat y _i = b _0 + b _1 x _{1 i} + b _3 x _{3 i}\)
+
+(уменьшенная модель множественной линейной регрессии, без \(x _2\))
+
+    Y ~ X1 + X3
+    
+    Y ~ 1 + X1 + X3
+
+## Подбираем параметры линейной модели
+
+```{r, nelson-reg}
+nelson_lm <- lm(weightloss ~ humidity, nelson)
+summary(nelson_lm)
+```
+
+## Задача: Назовите, чему равны коэффициенты линейной регрессии?
+
+> - Коэффициенты линейной регрессии \(b _0\) и \(b _1\)...
+    - \(b _0 = \) `r coef(nelson_lm)[1]`
+    - \(b _1 = \) `r coef(nelson_lm)[2]`
+
+```{r,nelson-reg,echo=FALSE}
+```
+
+# Неопределенность оценок коэффициентов
+
+## Неопределенность оценок коэффициентов
+
+### Доверительный интервал коэффициента
+  - зона, в которой с \((1 - \alpha) \cdot 100\%\) вероятностью содержится среднее значение коэффициента
+  - \(b _1 \pm t _{\alpha, df = n - 2}SE _{b _1}\)
+  - \(\alpha = 0.05\) => \((1 - 0.05) \cdot 100\% = 95\%\) интервал
+
+### Доверительная зона регрессии
+  - зона, в которой с \((1 - \alpha) \cdot 100\%\) вероятностью лежит регрессионная прямая
+
+```{r, nelson-conf, echo=FALSE}
+```
+
+## Находим доверительные интервалы коэффициентов
+
+```{r}
+# оценки коэффициентов отдельно
+coef(nelson_lm)
+
+# доверительные интервалы коэффициентов
+confint(nelson_lm)
+```
+
+## Предсказываем Y при заданном X 
+
+Какова средняя потеря веса при заданной влажности?
+
+```{r fig.height = 7}
+newdata <- data.frame(humidity = c(50, 100)) # значения, для которых предсказываем
+(pr1 <- predict(nelson_lm, newdata, interval = "confidence", se = TRUE))
+```
+
+- При 50 и 100\% относительной влажности ожидаемая средняя потеря веса жуков будет `r round(pr1$fit[1,1], 1)` \(\pm\) `r round(pr1$fit[1,1] - pr1$fit[1,2], 1)` и `r round(pr1$fit[2,1], 1)` \(\pm\) `r round(pr1$fit[2,1] - pr1$fit[2,2], 1)`, соответственно.
+
+## Строим доверительную зону регрессии
+```{r}
+library(gridExtra)
+grid.arrange(gg_nelson + geom_smooth(method = "lm") + 
+               labs (title = "95% доверительная зона регрессии"), 
+             gg_nelson + geom_smooth(method = "lm", level = 0.99) + 
+               labs (title = "99% доверительная зона регрессии"), 
+             ncol = 2)
+```
+
+## Неопределенность оценок предсказанных значений
+
+### Доверительный интервал к предсказанному значению
+  - зона в которую попадают \((1 - \alpha) \cdot 100\%\) значений \(\hat y _i\) при данном \(x _i\)
+  - \(\hat y _i \pm t _{0.05, n - 2}SE _{\hat y _i}\)
+  - \(SE _{\hat y} = \sqrt{MS _{e} [1 + \frac{1}{n} + \frac{(x _{prediction} - \bar x)^2} {\sum _{i=1}^{n} {(x _{i} - \bar x)^2}}]}\)
+
+### Доверительная область значений регрессии
+  - зона, в которую попадает \((1 - \alpha) \cdot 100\%\) всех предсказанных значений
+```{r, nelson-pr-all,echo=FALSE,results='hide'}
+(pr_all <- predict(nelson_lm, interval = "prediction"))
+nelson_with_pred <- data.frame(nelson, pr_all)
+```
+
+```{r, nelson-pred, echo=FALSE, fig.height=1.75}
+gg_nelson + geom_smooth(method = "lm", se = FALSE) +
+  geom_ribbon(data = nelson_with_pred, 
+              aes(y = fit, ymin = lwr, ymax = upr), 
+              fill = 'green', alpha = 0.2)
+```
+
+
+## Предсказываем изменение Y для 95\% наблюдений при заданном X
+
+В каких пределах находится потеря веса у 95\% жуков при заданной влажности?
+```{r}
+newdata <- data.frame(humidity = c(50, 100)) # новые данные для предсказания значений
+(pr2 <- predict(nelson_lm, newdata, interval = "prediction", se = TRUE))
+```
+
+- У 95\% жуков при 50 и 100\% относительной влажности будет потеря веса будет в пределах `r round(pr2$fit[1,1], 1)` \(\pm\) `r round(pr2$fit[1,1] - pr2$fit[1,2], 1)` и `r round(pr2$fit[2,1], 1)` \(\pm\) `r round(pr2$fit[2,1] - pr2$fit[2,2], 1)`, соответственно.
+
+## Данные для доверительной области значений
+
+Предсказанные значения для исходных данных объединим с исходными данными в новом датафрейме - для графиков
+```{r, nelson-pr-all}
+```
+
+
+## Строим доверительную область значений и доверительный интервал одновременно
+```{r, nelson-plot-all}
+gg_nelson + geom_smooth(method = "lm", 
+                       aes(fill = "Доверительный \nинтервал"), 
+                       alpha = 0.4) +
+  geom_ribbon(data = nelson_with_pred, 
+              aes(y = fit, ymin = lwr, ymax = upr, 
+                  fill = "Доверительная \nобласть значений"), 
+              alpha = 0.2) +
+  scale_fill_manual('Интервалы', values = c('green', 'blue'))
+```
+
+## Осторожно!
+
+### Вне интервала значений \(X\) ничего предсказать нельзя!
+```{r, nelson-plot-all, echo=FALSE}
+```
+
+# Проверка валидности модели
+
+## Проверка при помощи t-критерия
+
+### t-критерий
+
+Нулевая гипотеза \(H _0 : b _1 = \theta\), \(\theta = 0\)
+
+Тест 
+
+\[t = \frac{b _1 - \theta}{SE _{b _1}}\]
+
+Число степеней свободы \(df = n - 2\)
+
+## Проверка коэффициентов с помощью t-критерия
+
+```{r}
+summary(nelson_lm)
+```
+
+- Увеличение относительной влажности привело к достоверному замедлению потери веса жуками (\(b _1 = -0.053\), \(t = - 16.35\), \(p < 0.01\))
+
+## Проверка при помощи F-критерия
+
+### F-критерий
+
+Нулевая гипотеза \(H _0: \beta _1 = 0\) 
+
+Тест
+
+\[F = {MS _{regression} \over MS _{error}}\]
+
+Число степеней свободы \(df _{regression}\), \(df _{error}\)
+
+- Та же самая нулевая гипотеза, что и у t. Как так получается?
+
+## Общая изменчивость
+
+\begin{minipage}[t]{\textwidth}
+Общая изменчивость - \(SS _{total}\), отклонения от общего среднего значения
+\begin{figure}[b]
+\centering
+\includegraphics[height=.5\textwidth]{./img/total-variation.png}
+\caption{Общая изменчивость (из кн. Logan, 2010, стр. 172, рис. 8.3 a-c)}
+\end{figure}
+  \end{minipage}
+
+## Общая изменчивость 
+
+\(SS _{total} = SS _{regression} + SS _{error}\)
+
+\begin{columns}[c]
+\begin{column}{0.48\linewidth}
+\begin{figure}[t]
+\centering
+\includegraphics[width=.9\textwidth]{./img/explained-variation.png}
+\caption{Объясненная изменчивость }
+\end{figure}
+\end{column}
+\begin{column}{0.48\linewidth}
+\begin{figure}[t]
+\centering
+\includegraphics[width=.9\textwidth]{./img/residual-variation.png}
+\caption{Остаточная изменчивость}
+\end{figure}
+\end{column}
+\end{columns}
+
+## Если зависимости нет, \(b _1 = 0\)
+
+Тогда \(\hat y _i = \bar y _i\) и \(MS _{regression} \approx MS _{error}\)
+
+\begin{columns}[c]
+\begin{column}{0.48\linewidth}
+\begin{figure}[t]
+\centering
+\includegraphics[width=.9\textwidth]{./img/explained-variation.png}
+\caption{Объясненная изменчивость }
+\end{figure}
+\end{column}
+\begin{column}{0.48\linewidth}
+\begin{figure}[t]
+\centering
+\includegraphics[width=.9\textwidth]{./img/residual-variation.png}
+\caption{Остаточная изменчивость}
+\end{figure}
+\end{column}
+\end{columns}
+
+## Что оценивают средние квадраты отклонений?
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{ L{2.3cm} C{2cm} C{1.5cm} C{2.5cm} C{4cm}}
+\hline\noalign{\smallskip}
+Источник \linebreak[4] изменчивости & Суммы квадратов отклонений SS &  Число степеней свободы df & Средний квадрат отклонений MS & Ожидаемый средний квадрат \\
+\hline\noalign{\smallskip}
+Регрессия & \(\sum{(\bar y - \hat y _i)^2}\) & \(1\) & \(\frac{\sum _{i=1}^{n}{(\bar y - \hat y _i)^2}}{1}\) & \(\sigma _{\epsilon} ^2 + {\beta _1} ^2 \sum _{i=1}^{n} {(x _i - \bar x)^2}\) \\
+Остаточная & \(\sum{(y _i - \hat y _i)^2}\) & \(n - 2\) & \(\frac{\sum _{i=1}^{n}{(y _i - \hat y _i)^2}}{n - 2}\) & \(\sigma _{\epsilon} ^2\) \\
+Общая & \(\sum {(\bar y - y _i)^2}\) & \(n - 1\) &  & \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
+\newline
+Если \(b _1 = 0\), тогда \(\hat y _i = \bar y _i\) и \(MS _{regression} \approx MS _{error}\)
+
+Тестируем:
+
+\[F = {MS _{regression} \over MS _{error}}\]
+
+## F-критерий и распределение F-статистики
+
+\begin{columns}[c]
+\begin{column}{0.38\linewidth}
+F - соотношение объясненной и не объясненной изменчивости 
+\[F = \frac {MS _{regression}} {MS _{error}}\]
+Зависит от
+\begin{itemize}
+\item \(\alpha\)
+\item \(df _{regression}\)
+\item \(df _{error}\)
+\end{itemize}
+\end{column}
+\begin{column}{0.58\linewidth}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.9\textwidth]{./img/f-distribution.png}
+\caption{Распределение F-статистики при справедливой \(H _0\) (с изменениями из кн. Logan, 2010, стр. 172, рис. 8.3 d)}
+\end{figure}
+\end{column}
+\end{columns}
+
+
+## Таблица результатов дисперсионного анализа
+
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{L{2.2cm} c c c c}
+\hline\noalign{\smallskip}
+Источник \linebreak[2] изменчивости  & SS & df & MS & F  \\
+\hline\noalign{\smallskip}
+Регрессия & \(SS _r = \sum{(\bar y - \hat y _i)^2}\) & \(df _r = 1\) & \(MS _r = \frac{SS _r}{df _r}\) & \(F _{df _r, df _e} = \frac{MS _r}{MS _e}\) \\
+Остаточная & \(SS _e = \sum{(y _i - \hat y _i)^2}\) & \(df _e = n - 2\) & \(MS _e = \frac{SS _e}{df _e}\) \\ 
+Общая & \(SS _t = \sum {(\bar y - y _i)^2}\) & \(df _t = n - 1\) & & \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
+
+- \large{Минимальное упоминание в тексте - \(F _{df _r, df _e}\), \(p\)}
+
+## Проверяем валидность модели при помощи F-критерия
+
+```{r}
+nelson_aov <- aov(nelson_lm)
+summary(nelson_aov)
+```
+
+- Количество влаги, потерянной жуками в период эксперимента, достоверно зависело от уровня относительной влажности \linebreak[2] (\(F _{1, 7} = 267\), \(p < 0.01\)).
+
+# Оценка качества подгонки модели
+
+## Коэффициент детерминации
+
+### Коэффициент детерминации \(R^2)\
+
+доля общей изменчивости, объясненная линейной связью x и y
+
+\[R^2 = \frac {SS _r} {SS _t}\]
+
+\[0 \le R^2 \le 1\]
+
+
+Иначе рассчитывается как \(R^2 = r^2\)
+
+## Коэффициент детерминации можно найти в сводке модели
+
+```{r}
+summary(nelson_lm)
+```
+
+## Будьте внимательны с  \(R^2\)!
+
+### Сравнение качества подгонки моделей
+
+Не сравнивайте \(R^2\) моделей с разным числом параметров, \linebreak для этого есть \(R^2 _{adjusted}\)
+
+## Take home messages
+
+> - Модель простой линейной регрессии \(y _i = \beta _0 + \beta _1 x _i + \epsilon _i\)
+- В оценке коэффициентов регрессии и предсказанных значений существует неопределенность. Доверительные интервалы можно расчитать, зная стандартные ошибки.
+- Валидность модели линейной регрессии можно проверить при помощи t- или F-теста. \(H _0: \beta _1 = 0\)
+- Качество подгонки модели можно оценить при помощи коэффициента детерминации \(R^2\)
+
+## Дополнительные ресурсы
+
+- Учебники
+    - Гланц, 1999, стр. 221-244
+    - [Open Intro to Statistics](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/OpenIntroStatSecond.pdf): [Chapter 7. Introduction to linear regression](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/oiStat2_07.pdf), pp. 315-353.  
+    - Quinn, Keough, 2002, pp. 78-110
+    - Logan, 2010, pp. 170-207
+    - Sokal, Rohlf, 1995, pp. 451-491
+    - Zar, 1999, pp. 328-355
+
+- Упражнения для тренировки
+    - OpenIntro Labs, Lab 7: Introduction to linear regression (Осторожно, они используют базовую графику а не `ggplot`)
+        - [Обычный вариант](http://www.openintro.org/stat/labs.php), упражнения 1---4
+        - [Интерактивный вариант на Data Camp](https://www.datacamp.com/courses/data-analysis-and-statistical-inference_mine-cetinkaya-rundel-by-datacamp/lab-6-introduction-to-linear-regression?ex=1), до вопроса 4
+    

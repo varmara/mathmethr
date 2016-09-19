@@ -1,0 +1,611 @@
+---
+title: "Регрессионный анализ, часть 2"
+author: "Марина Варфоломеева"
+date: "осень 2015"
+output:
+  beamer_presentation:
+    colortheme: seagull
+    fonttheme: structurebold
+    highlight: tango
+    includes:
+      in_header: ./../includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: CambridgeUS
+    toc: yes
+subtitle: Математические методы в зоологии - на R
+institution: СПбГУ
+---
+
+```{r setup, include = FALSE, cache = FALSE}
+# output options
+options(width = 70, scipen = 6, digits = 3) 
+library(knitr)
+opts_chunk$set(fig.path='figure/fig-',fig.show='hold',size='footnotesize',comment="#",warning=FALSE, message=FALSE,dev='cairo_pdf', fig.height=1.8, fig.width=5.4)
+library("extrafont")
+# font_import()
+# loadfonts() ## for pdf()
+```
+
+### Вы сможете
+- Подобрать модель множественной линейной регрессии, проверить ее валидность и интерпретировать коэффициенты при разных предикторах.
+- Проверить условия применимости линейной регрессии при помощи анализа остатков
+
+# Множественная линейная регрессия
+
+## Пример: птицы Австралии
+
+Зависит ли обилие птиц в лесах Австралии от характеристик леса? (Loyn, 1987, пример из кн. Quinn, Keough, 2002)
+
+56 лесных участков в юго-восточной Виктории, Австралия
+
+- `l10area` - Площадь леса, га
+- `l10dist` - Расстояние до ближайшего леса, км (логарифм)
+- `l10ldist` - Расстояние до ближайшего леса большего размера, км (логарифм)
+- `yr.isol` - Продолжительности изоляции, лет
+- `abund` - Обилие птиц
+
+## Открываем данные
+
+```{r}
+# установите рабочую директорию
+# birds <- read.delim(file = "loyn.csv") # из .csv
+library(readxl)
+birds <- read_excel("loyn.xls", sheet = 1)
+str(birds)
+```
+
+## Задача: запишите формулу модели регрессии
+
+Как зависит обилие птиц от характеристик леса? Запишите в обозначениях R модель множественной линейной регрессии
+
+$$Y _i = b _0 + b _1 x _{1 i} + b _2 x _{2 i} + b _3 x _{3 i} + b _4 x _{4 i}$$
+
+Используйте названия переменных вместо $x _{1 i} - x _{4 i}$
+
+- `abund` - Обилие птиц
+- `l10area` - Площадь леса, га
+- `l10dist` - Расстояние до ближайшего леса, км (логарифм)
+- `l10ldist` - Расстояние до ближайшего леса большего размера,
+км (логарифм)
+- `yr.isol` - Продолжительности изоляции, лет
+
+## Решение
+
+В обозначениях R модель множественной линейной регрессии
+
+\[abund \sim l10area + l10dist + l10ldist + yr.isol\]
+
+Названия переменных:
+
+- `abund` - Обилие птиц
+- `l10area` - Площадь леса, га
+- `l10dist` - Расстояние до ближайшего леса, км (логарифм)
+- `l10ldist` - Расстояние до ближайшего леса большего размера,
+км (логарифм)
+- `yr.isol` - Продолжительности изоляции, лет
+
+## Подбираем параметры модели и проверяем валидность с помощью t-критерия
+
+$H _0: \beta _i = 0$
+
+```{r}
+bird_lm <- lm(abund ~ l10area + l10dist + l10ldist + yr.isol, data = birds)
+summary(bird_lm)
+```
+
+## Задача: Запишите уравнение множественной линейной регрессии
+
+Запишите уравнение множественной линейной регрессии
+
+В качестве подсказки:  
+
+```{r}
+coef(bird_lm)
+bird_lm$call
+```
+
+```{r echo = FALSE}
+lm_equation <- function(fit, strict = TRUE){
+#   extracting call formula 
+  frml <- as.character(fit$call)[2]
+#   extract signs
+    sign <- ifelse(grepl("-", coef(fit)[-1]), " - ", " + ")
+  # extract coefficients
+  coeffs <- format(abs(coef(fit)), digits = 2, trim = TRUE)
+  if(strict == TRUE){
+    i <- 1:(length(coeffs) - 1)
+    vars <- c("Y", paste0(" X", i))
+    
+  } else {
+# extract vector of variable names
+  vars <- unlist(strsplit(frml, "[~+]"))
+# combine everything
+  }
+  start <- ifelse(coef(fit)[1] > 0, paste(vars[1], coeffs[1], sep = " = "), paste(vars[1], coeffs[1], sep = " = - "))
+  end <- paste(sign, coeffs[-1], vars[-1], sep = "", collapse = "")
+  return(cat(start, end, sep = ""))
+}
+```
+
+## Уравнение множественной линейной регрессии
+
+```{r}
+coef(bird_lm)
+```
+
+Уравнение регрессии:  
+
+```{r results='asis', echo=FALSE}
+lm_equation(bird_lm, strict=FALSE)
+```
+
+более формальная запись:  
+
+```{r results='asis', echo=FALSE}
+lm_equation(bird_lm)
+```
+
+## Интерпретация коэффициентов регрессии
+
+```{r}
+coef(bird_lm)
+```
+
+### Обычные коэффициенты
+- величина зависит от единиц измерения
+
+
+## Сравнение влияния разных факторов
+
+```{r}
+scaled_bird_lm <- lm(abund ~ scale(l10area) + scale(l10dist) + 
+                       scale(l10ldist) + scale(yr.isol), data = birds)
+coef(scaled_bird_lm)
+```
+
+### Бета-коэффициенты 
+- измерены в стандартных отклонениях
+- относительная оценка влияния фактора
+- можно сравнивать
+
+
+## Задача: Сравните влияние разных факторов
+
+Определите по значениям beta-коэффициентов, какие факторы сильнее всего влияют на обилие птиц
+
+```{r}
+summary(scaled_bird_lm)
+```
+
+## Оценка качества подгонки модели
+
+```{r}
+summary(bird_lm)$adj.r.squared
+```
+
+### Скорректированный $R^2$
+- Учитывает число переменных в модели
+
+# Условия применимости линейной регрессии
+
+## Условия применимости линейной регрессии 
+
+Условия применимости линейной регрессии должны выполняться, чтобы тестировать гипотезы
+
+1. Независимость
+1. Линейность 
+1. Нормальное распределение
+1. Гомогенность дисперсий
+1. Отсутствие колинеарности предикторов (для множественной регрессии)
+
+## 1. Независимость
+
+\begin{itemize}
+\item Значения $y _i$ должны быть независимы друг от друга
+\begin{itemize}
+\item берегитесь псевдоповторностей и автокорреляций (например, временных)
+\end{itemize}
+\item Контролируется на этапе планирования
+\item Проверяем на графике остатков
+\end{itemize}
+
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-12.png}
+\vskip0pt plus 1filll
+Остаточная изменчивость (Рис. из кн. Diez et al., 2010, стр. 332, рис. 7.8)
+
+## 2. Линейность связи
+
+- проверяем на графике рассеяния исходных данных
+- проверяем на графике остатков
+
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-12.png}
+\vskip0pt plus 1filll
+Остаточная изменчивость (Рис. из кн. Diez et al., 2010, стр. 332, рис. 7.8)
+
+## Что бывает, если неглядя применять линейную регрессию
+
+\begin{columns}
+\begin{column}{0.48\textwidth}
+
+\href{http://ru.wikipedia.org/wiki/Квартет_Энскомба}{Квартет Энскомба} - примеры данных, где регрессии одинаковы во всех случаях (Anscombe, 1973)
+
+\[y _i = 3.0 + 0.5 x _i\]
+
+\[r^2 = 0.68\]
+
+\[H _0: \beta _1 = 0, t = 4.24, p = 0.002\]
+
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/anscombe.png}
+\caption{Квартет Энскомба (рис. из кн. Quinn, Keough, 2002, стр. 97, рис. 5.9}
+\end{figure}
+\end{column}
+\end{columns}
+
+## 3. Нормальное распределение остатков
+
+\begin{columns}
+\begin{column}{0.48\textwidth}
+Нужно, т.к. в модели $Y _i = \beta _0 + \beta x _i + \epsilon _i$ зависимая переменная $Y \sim N(0,\sigma^2)$, а значит $\epsilon _i \sim N(0,\sigma^2)$
+\begin{itemize}
+\item Нужно для тестов параметров, а не для подбора методом наименьших квадратов
+\item Нарушение не страшно - тесты устойчивы к небольшим отклонениям от нормального распределения
+\item Проверяем распределение остатков на нормально-вероятностном графике
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/normality-assumption.png}
+\caption{Условие нормальности и гомогенность дисперсий (рис. 11.4 из кн. Watkins et al., 2008, стр. 743)}
+\end{figure}
+\end{column}
+\end{columns}
+
+## 4. Гомогенность дисперсий
+
+\begin{columns}
+\begin{column}{0.48\textwidth}
+Нужно, т.к. в модели $Y _i = \beta _0 + \beta x _i + \epsilon _i$ зависимая переменная $Y \sim N(0,\sigma^2)$ и дисперсии $\sigma^2 _1 = \sigma^2 _2 = ... = \sigma^2 _i$ для каждого $Y _i$ \par
+Но, поскольку $\epsilon _i \sim N(0,\sigma^2)$, можно проверить равенство дисперсий остатков $\epsilon _i$
+\begin{itemize}
+\item Нужно и важно для тестов параметров
+\item Проверяем на графике остатков по отношению к предсказанным значениям
+\item Можно сделать тест С Кокрана (Cochran's C), но только если несколько значений y для каждого x
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/normality-assumption.png}
+\caption{Условие нормальности и гомогенность дисперсий (рис. 11.4 из кн. Watkins et al., 2008, стр. 743)}
+\end{figure}
+\end{column}
+\end{columns}
+
+## Диагностика регрессии по графикам остатков
+
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-violations-on-residual-plots.png}
+\caption{Диагностика регрессии по графикам остатков (рис. 8.5 d из кн. Logan, 2010, стр. 174)}
+\end{figure}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{enumerate}[(a)]
+\item все условия выполнены
+\item разброс остатков разный (wedge-shaped pattern)
+\item разброс остатков одинаковый, но нужны дополнительные предикторы
+\item к нелинейной зависимости применили линейную регрессию
+\end{enumerate}
+\end{column}
+\end{columns}
+
+## Задача: Проанализируйте графики остатков
+
+Скажите пожалуйста
+
+\begin{itemize}
+\item какой регрессии соответствует какой график остатков?
+\item все ли условия применимости регрессии здесь выполняются?
+\item назовите случаи, в которых можно и нельзя применить линейную регрессию?
+\end{itemize}
+\vskip0pt plus 1filll
+\begin{figure}[H]
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-quiz1.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-quiz2.png}
+\end{subfigure}
+\caption{Графики регрессий и остатков (рис. 3.84-3.85 из кн. Watkins et al. 2008, стр. 177)}
+\end{figure}
+
+## Решение
+
+- A-I - нелинейная связь - нельзя; 
+- B-II - все в порядке, можно; 
+- C-III - все в порядке, можно; 
+- D-IV - синусоидальный тренд в остатках, нарушено условие независимости или зависимость нелинейная - нельзя.
+
+\vskip0pt plus 1filll
+
+\begin{figure}[H]
+\begin{subfigure}[b]{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-quiz1.png}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-quiz2.png}
+\end{subfigure}
+\caption{Графики регрессий и остатков (рис. 3.84-3.85 из кн. Watkins et al. 2008, стр. 177)}
+\end{figure}
+
+## Какие наблюдения влияют на ход регрессии больше других?
+
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{block}<2,3>{Влиятельные наблюдения, выбросы, outliers}
+\begin{itemize}
+\item большая абсолютная величина остатка
+\item близость к краям области определения (leverage - рычаг, сила; иногда называют hat)
+\end{itemize}
+\end{block}
+\uncover<3>{На графике точки и линии регрессии построенные с их включением}
+\begin{itemize}
+\item<3> 1 - не влияет
+\item<3> 2 - умеренно влияет (большой остаток, малая сила влияния)
+\item<3> 3 - очень сильно влияет (большой остаток, большая сила влияния)
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/influential-observations.png}
+\caption{Влиятельные наблюдения (рис. 5.8 из кн. Quinn, Keough, 2002, стр. 96)}
+\end{figure}
+\end{column}
+\end{columns}
+
+## Как оценить влиятельность наблюдений?
+
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{block}{Расстояние Кука (Cook's d, Cook, 1977)}
+\begin{itemize}
+\item Учитывает одновременно величину остатка и близость к краям области определения (leverage)
+\item Условное пороговое значение: выброс, если $d \ge 4/(N - k - 1)$, где $N$ - объем выборки, $k$ - число предикторов.
+\end{itemize}
+\end{block}
+\uncover<2>{Дж. Фокс советует не обращать внимания на пороговые значения (Fox, 1991)}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/influential-observations.png}
+\caption{Влиятельные наблюдения (рис. 5.8 из кн. Quinn, Keough, 2002, стр. 96)}
+\end{figure}
+\end{column}
+\end{columns}
+
+## Что делать с влиятельными точками и с выбросами?
+
+\begin{columns}
+\begin{column}{0.48\textwidth}
+\begin{itemize}
+\item Проверить, не ошибка ли это. Если нет, не удалять - обсуждать!
+\item Проверить, что будет, если их исключить из модели
+\end{itemize}
+\end{column}
+\begin{column}{0.48\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/influential-observations.png}
+\caption{Влиятельные наблюдения (рис. 5.8 из кн. Quinn, Keough, 2002, стр. 96)}
+\end{figure}
+\end{column}
+\end{columns}
+
+## Колинеарность предикторов
+
+\begin{block}{Колинеарность}
+Когда предикторы коррелируют друг с другом, т.е. не являются взаимно независимыми
+\end{block}
+
+Последствия
+
+- Модель неустойчива к изменению данных
+- При добавлении или исключении наблюдений может меняться оценка и знак коэффициентов
+
+Что делать с колинеарностью?
+
+- Удалить из модели избыточные предикторы
+- Получить вместо скоррелированных предикторов один новый комбинированный при помощи метода главных компонент
+
+## Проверка на колинеарность
+
+### Толерантность (tolerance)
+
+$1-R^2$ регрессии данного предиктора от всех других
+
+$T \le 0.25$ - колинеарность
+
+### Показатель инфляции для дисперсии
+
+(коэффициент распространения дисперсии, Variance inflation factor, VIF)
+
+$VIF = 1/T$
+
+$\sqrt{VIF} > 2$  - коллинеарность
+
+# Проверка условий применимости линейной регрессии
+
+## Как проверить условия применимости?
+
+- Величина остатков, влиятельность наблюдений, тренды - на графике остатков от предсказанных значений
+- Форма распределения остатков - нормальновероятностный график
+- Колинеарность предикторов - толерантность и показатель инфляции для дисперсии
+
+## Для анализа остатков выделим нужные данные в новый датафрейм
+
+```{r}
+library(ggplot2) # там есть функция fortify()
+bird_diag <- fortify(bird_lm)
+
+head(bird_diag, 2)
+```
+
+Кроме `abund`, `l10area`, `l10dist`, `l10ldist` и `yr.isol` нам понадобятся
+
+- `.cooksd` - расстояние Кука  
+- `.fitted` - предсказанные значения  
+- `.resid` - остатки  
+- `.stdresid` - стандартизованные остатки
+
+## Задача: Постройте график зависимости стандартизованных остатков от предсказанных значений
+
+Используйте данные из `bird_diag`
+
+```{r, eval = FALSE}
+ggplot()
+aes()
+geom_point()
+```
+
+### Стандартизованные остатки 
+
+$$\frac {y _i - \hat y _i} {\sqrt{MS _e}}$$
+
+- можно сравнивать между регрессиями
+- можно сказать, какие остатки большие, какие нет
+    - $\le 2 SD$ - обычные
+    - $> 3 SD$ - редкие
+
+## Решение:
+
+График зависимости стандартизованных остатков от предсказанных значений
+```{r}
+theme_set(theme_bw(base_size = 8) + theme(legend.key = element_blank()))
+gg_resid <- ggplot(data = bird_diag, aes(x = .fitted, y = .stdresid))
+gg_resid + geom_point()
+```
+
+## График стандартизованных остатков от предсказанных значений
+
+График станет информативнее, если кое-что добавить
+
+```{r,res-plot}
+gg_resid <- gg_resid + geom_point(aes(size = .cooksd)) +          # расстояние Кука
+  geom_smooth(method="loess", se = FALSE) +  # линия тренда
+  geom_hline(yintercept = 0)                 # горизонтальная линия y = 0
+gg_resid
+```
+
+## Можно подписать остатки больше двух стандартных отклонений на предыдущем графике
+
+Стандартизованные остатки $\le 2 SD$ - обычные, $> 3 SD$ - редкие
+
+```{r}
+# Создаем логический вектор, где TRUE, если стандартизованный остаток больше 2
+f_outlier <- abs(bird_diag$.stdresid) > 2
+# Создаем будущие ярлыки
+labs <- ifelse(test = f_outlier,
+               yes = row(bird_diag), # Если test == TRUE
+               no = "") # Если test == FALSE
+
+gg_resid_lab <- gg_resid + 
+  geom_text(aes(label = labs), hjust=2, colour = "blue", size = 2)
+gg_resid_lab
+```
+
+
+
+## Интерпретируем график стандартизованных остатков от предсказанных значений
+
+Какие выводы можно сделать по графику остатков?
+
+```{r,res-plot, echo=FALSE}
+```
+
+\pause
+\begin{itemize}
+\item Большая часть стандартизованных остатков в пределах двух стандартных отклонений. Есть отдельные влиятельные наблюдения, которые нужно проверить
+\item Разброс остатков не совсем одинаков. Похоже на гетерогенность дисперсий
+\item Тренда среди остатков нет
+\end{itemize}
+
+## Нормальновероятностный график стандартизованных остатков
+
+Используется, чтобы оценить форму распределения.
+Если точки лежат на одной прямой - нормальное распределение.
+
+```{r qqplot, warning = FALSE, message=FALSE}
+mean_val <- mean(bird_diag$.stdresid)  
+sd_val <- sd(bird_diag$.stdresid)
+ggplot(bird_diag, aes(sample = .stdresid)) + geom_point(stat = "qq") +
+geom_abline(intercept = mean_val, slope = sd_val) + # точки должны быть здесь
+  labs(x = "Квантили стандартного нормального распределения", y = "Квантили набора данных")
+```
+
+## Интерпретируем нормальновероятностный график 
+
+Какие выводы можно сделать по нормальновероятностному графику?
+
+```{r qqplot, warning = FALSE, message=FALSE, echo=FALSE}
+```
+\pause
+\begin{itemize}
+\item Отклонений от нормального распределения нет
+\end{itemize}
+
+## Проверим, есть ли в этих данных колинеарность предикторов
+
+```{r message = FALSE}
+library(car)
+vif(bird_lm) # variance inflation factors
+sqrt(vif(bird_lm)) > 2 # есть ли проблемы?
+1/vif(bird_lm) # tolerance
+```
+
+\pause
+Все в порядке, предикторы независимы
+
+## Take home messages
+
+- Для сравнения влияния разных предикторов можно использовать бета-коэффициенты
+- Условия применимости линейной регрессии должны выполняться, чтобы тестировать гипотезы
+    1. Независимость
+    1. Линейность 
+    1. Нормальное распределение
+    1. Гомогенность дисперсий
+    1. Отсутствие колинеарности предикторов (для множественной регрессии)
+
+## Дополнительные ресурсы
+
+Учебники
+
+- Quinn, Keough, 2002, pp. 92-98, 111-130
+- [Open Intro to Statistics](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/OpenIntroStatSecond.pdf): [Chapter 8. Multiple and logistic regression](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/oiStat2_08.pdf), pp. 354-367.
+- Logan, 2010, pp. 170-173, 208-211
+- Sokal, Rohlf, 1995, pp. 451-491, 609-653
+- Zar, 2010, pp. 328-355, 419-439
+
+Упражнения для тренировки
+
+- OpenIntro Labs, Lab 7: Introduction to linear regression (Осторожно, они используют базовую графику а не `ggplot`)
+    - [Обычный вариант](http://www.openintro.org/download.php?file=os2_lab_07A&referrer=/stat/labs.php), после упражнения 4
+    - [Интерактивный вариант на Data Camp](https://www.datacamp.com/courses/data-analysis-and-statistical-inference_mine-cetinkaya-rundel-by-datacamp/lab-6-introduction-to-linear-regression?ex=1), после вопроса 4
+- OpenIntro Labs, Lab 8: Multiple linear regression
+    - [Обычный вариант](http://www.openintro.org/download.php?file=os2_lab_08A&referrer=/stat/labs.php), до упражнения 11
+    - [Интерактивный вариант на Data Camp](https://www.datacamp.com/courses/data-analysis-and-statistical-inference_mine-cetinkaya-rundel-by-datacamp/lab-7-multiple-linear-regression-9?ex=1), до вопроса 8
+    

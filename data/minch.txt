@@ -1,0 +1,23 @@
+##############################################################################
+#     									     #
+#	Legend of formats and contents for data files to 		     #
+#	accompany "Design and Analysis for Biologists" by 		     #
+#	G. Quinn & M. Keough, 2002					     #
+#									     #
+#	-------------------------------------------------------------	     #
+#	Used in Box 9-5, Fig 9-7					     #
+#									     #
+##############################################################################
+
+Format of the files: (9-5, Fig 9-7)
+	* minch.xls (Microsoft Excel)
+	* minch.csv (comma delimeted ascii text file)
+
+File contents:
+	* SITE - site label
+	* ZONE - zones running up the shore (SZ(+TR)=seaward zone with mangrove trees, SZ(-TR)=seaward zone without mangrove trees, MZ=middle zone with trees, LZ=landward zone at upper levels)
+	* LIMPT - average number of limpets on oyster shells per quadrat (from 5 quadrats)
+	* LIMPT100 - number of limpets per 100 oyster shells
+	* SQLIM100 - square root transformation of LIMPT100
+
+----------------------------------------------------------------------------------------

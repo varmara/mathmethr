@@ -1,0 +1,3 @@
+Nelson, 1964 data on water loss (mg) by nine batches of confused flour
+beetle (Tribolium confusum), kept at different relative humidities (0-93%) for 6 days
+(Table 14.1 Sokal and Rohlf (1997)).
