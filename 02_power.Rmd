@@ -1,53 +1,212 @@
 ---
 title: Анализ мощности
-subtitle: Математические методы в зоологии на R, осень 2015
+subtitle: Математические методы в зоологии с использованием R
 author: Марина Варфоломеева
-smaller: true
 output:
   ioslides_presentation:
-    widescreen: true
-    css: my_styles.css
+    css: assets/my_styles.css
+    widescreen: yes
 ---
 
-```{r setup, include = FALSE, cache = FALSE}
-#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
-# to configure markdown parsing
-options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
-#------
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 # output options
-options(width = 70, scipen = 6, digits = 3)
-
-# to render cyrillics in plots use cairo pdf
-options(device = function(file, width = 7, height = 7, ...) {
-  cairo_pdf(tempfile(), width = width, height = height, ...)
-  })
+options(width = 70)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3.5)
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, message=FALSE)
 ```
 
 ```{r libs, echo=FALSE}
 library(ggplot2)
+theme_set(theme_bw())
 library(grid)
 library(gridExtra) # to rescale legend
 ```
 
 ## Экономим силы с помощью анализа мощности
 
+  - Тестирование гипотез (двухвыборочный t-критерий)
   - Статистические ошибки при проверке гипотез
   - Мощность статистического теста
   - *A priori* анализ мощности, оценка величины эффекта
-  - *Post hoc* анализ мощности
   - Как влиять на мощность тестов
 
-## Вы сможете
+### Вы сможете
 
+  - сравнивать средние значения при помощи t-критерия, интерпретировать и описывать результаты
   - дать определение ошибок I и II рода, и графически изобразить их отношение к мощности теста
   - оценивать величину эффекта и необходимый объем выборки по данным пилотного исследования
   - загружать данные из .xls в R
-  - строить гистограммы и боксплоты с помощью `ggplot2`
-  - сравнивать средние значения при помощи t-критерия, интерпретировать и описывать результаты
-  - расчитывать фактическую мощность теста
+  - строить боксплоты с помощью `ggplot2`
+
+  
+# Тестирование гипотез
+
+## Тест Стьюдента (t-критерий)
+
+Двухвыборочный тест Стьюдента (Student, 1908) используется для проверки значимости различий между средними значениями двух нормально распределенных величин.
+
+$$t=\frac{\bar{\mu}_1 - \bar{\mu}_2}{SE}$$
+
+Гипотезы: $H_0: \mu_1 = \mu_2$, $H_A: \mu_1 \ne \mu_2$
+
+Условия применимости:
+
+- Выборки случайны и независимы друг от друга
+- Величины нормально распределены
+- Дисперсии в группах одинаковы
+
+$$SE = \sqrt{\frac{sd_1^2(n_1-1) +sd_2^2(n_2-1)}{n_1+n_2-2}\Big(\frac{1}{n_1} + \frac{1}{n_2}\Big)}$$
+
+$$df = n_1 + n_2 - 2$$
+
+## Тест Уэлча (модификация теста Стьюдента для случая разных дисперсий)
+
+$$t=\frac{\bar{\mu}_1 - \bar{\mu}_2}{SE}$$
+
+Условия применимости:
+
+- Выборки случайны и независимы друг от друга
+- Величины нормально распределены
+
+
+$$SE = \sqrt{\frac {sd_1^2} {n_1} + \frac {sd_2^2} {n_2}}$$
+
+Приблизительное число степеней свободы рассчитывается по уравнению Уэлча-Саттеруэйта (Welch–Satterthwaite equation)
+
+$$df \approx \frac {\Big(\frac{sd^2_1}{n_1} + \frac{sd^2_2}{n_2}\Big)^2} {\frac {sd_1^4} {n^2_1 \cdot df_1} + \frac {sd_2^4} {n^2_2 \cdot df_1}}$$
+
+## t-распределение
+
+t-статистика подчиняется t-распределению.
+
+Иными словами, если много раз взять выборки __из одной__ совокупности (т.е. при условии, что $H_0$ верна) и посчитать между ними разницу, то она будет подчиняться t-распределению. 
+
+Форма t-распределения зависит только от одного параметра --- числа степеней свободы $df$
+
+```{r gg-t, echo=FALSE, purl=FALSE}
+t_df <- data.frame(t = seq(-6, 6, length.out = 1000))
+
+dt_limit <- function(x, alph = 0.05, df = 18, sides = 2, ncp = 0, what = "alpha") {
+  if(sides == 1) alph <- alph
+  if(sides == 2) alph <- alph/2
+  t_cr <- abs(qt(p = alph, df = df))
+  
+  if(what == "alpha"){
+  y <- dt(x, df, ncp = ncp)
+  y[!(x < -t_cr | x > t_cr)] <- NA
+  }
+    if(what == "beta"){
+  y <- dt(x, df, ncp = ncp)
+  y[!(x >= -t_cr & x <= t_cr)] <- NA
+    }
+      if(what == "power"){
+  y <- dt(x, df, ncp = ncp)
+  y[!(x < -t_cr | x > t_cr)] <- NA
+  }
+  return(y)
+}
+
+
+gg_t <- ggplot(data = t_df, aes(x = t)) +
+  stat_function(fun = dt, args=list(df=18), size = 1, geom="line", colour="darkred") + 
+    labs(x = "Стандартизованная разница средних", 
+       y = "Вероятность", 
+       title = "t-распределение, df = 18")
+
+gg_t
+```
+
+
+
+## В хвостах этого распределения находятся редкие значения
+
+```{r gg-tcrit, echo=FALSE, purl=FALSE}
+alpha <- 0.05
+df <- 18
+sides <- 2
+p_cut <- abs(qt(p = alpha/sides, df = df))
+gg_t + 
+  # alpha
+  stat_function(fun = dt_limit, 
+                args = list(alph = alpha, df = df, sides = sides), 
+                geom="area", fill="red", alpha = 0.7) + 
+  stat_function(fun=dt, args=list(df=df), 
+                geom="line", colour="darkred") +
+  labs(title = "t-распределение, df = 18, alpha = 0.05") + 
+  # редкие
+  geom_text(x=-4, y=0.1, label= "Редкие значения") + 
+  geom_text(x=4, y=0.1, label= "Редкие значения") + 
+  geom_text(x=0, y=0.1, label= "Обычные значения") + 
+  geom_vline(xintercept = p_cut, size = 1, linetype = "dotted") +
+  geom_vline(xintercept = -p_cut, size = 1, linetype = "dotted") +
+    annotate(geom = "text", x = -p_cut, y = 0.4, hjust = 1.1, 
+           label = "-t и t при alpha 0.05") 
+```
+
+Обычно используется уровень значимости $\alpha$ 0.05 или 0.01. 
+
+__Уровень значимости $\alpha$ --- это вероятность ошибочно отвергнуть справедливую нулевую гипотезу__. Т.е. это вероятность найти различия там, где их нет (__вероятность ошибки I рода__).
+
+Для t-теста  $\alpha$ --- это вероятность ошибочно сделать вывод о том, что средние выборок различаются __при условии, что эти выборки получены из одной генеральной совокупности__.
+
+## Тестирование гипотезы о равенстве двух средних при помощи t-критерия
+
+- Для конкретных данных считаем значение t-критерия
+- Сравниваем его с теоретическим распределением t (распределением при условии, что $H_0$ верна)
+- Принимаем решение, отвергнуть ли $H_0$
+
+```{r gg-tcrit-h, echo=FALSE, purl=FALSE}
+gg_t + 
+    # alpha
+  stat_function(fun = dt_limit, 
+                args = list(alph = alpha, df = df, sides = sides), 
+                geom="area", fill="red", alpha = 0.7) + 
+  stat_function(fun=dt, args=list(df=df), 
+                geom="line", colour="darkred") + 
+    labs(title = "t-распределение, df = 18, alpha = 0.05") + 
+# Зоны решений
+  geom_segment(x=-1.5, xend = -1.5, y=0, yend = 0.2) +
+  annotate(geom = "text", x = -3, y = 0.25,
+           label = "|t| < |t_crit| \n Не можем отвергнуть H0") +
+  geom_segment(x=2.7, xend = 2.7, y=0, yend = 0.2) +
+  annotate(geom = "text", x = 2.7, y = 0.25, 
+           label = "|t| >= |t_crit| \n Отвергаем H0")
+```
+
+## Пример: Снотворное
+
+В датасете `sleep` содержатся данные об увеличении продолжительности сна по сравнению с контролем после применения двух снотворных препаратов (Cushny, Peebles, 1905, Student, 1908)
+
+```{r}
+data(sleep)
+View(sleep)
+```
+
+## Двухвыборочный t-критерий
+
+Сравним увеличение продолжительности сна при помощи двухвыборочного t-критерия.
+
+```{r}
+tt <- t.test(extra ~ group, sleep)
+tt
+```
+
+## Что спрятано в результатах?
+
+Как называются отдельные элементы результатов можно узнать посмотрев их структуру при помощи функции `str()`
+
+```{r}
+str(tt)
+```
+
+## Можно получить элементы результатов в виде отдельных цифр
+
+```{r}
+tt$parameter # степени свободы
+tt$p.value # доверительная вероятность
+tt$statistic # значение t-критерия
+```
 
 # Статистические ошибки при проверке гипотез
 
@@ -59,267 +218,82 @@ library(gridExtra) # to rescale legend
 | Отклонить H0 	| Ошибка I рода </br>Ложно-положительный результат | 	Верно </br>Положительный результат |
 | Сохранить H0 	| Верно </br>Отрицательный результат | Ошибка II рода </br> Ложно-отрицательный результат |
 
-```{r power_data, echo = FALSE, cache=TRUE}
-# Power plot using ggplot2
-# reworked after
-# http://rpsychologist.com/creating-a-typical-textbook-illustration-of-statistical-power-using-either-ggplot-or-base-graphics/
+## Ошибка I рода
 
-# theme_bw with only x axis
-theme_bw_x <- function (base_size = 12, base_family = "")
-{
-  require(ggplot2)
-  theme_bw(base_size = base_size, base_family = base_family) %+replace%
-    theme(panel.border = element_blank(),
-          axis.line = element_line(colour = "black"),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          axis.line.y = element_blank(),
-          axis.text.y = element_blank(),
-          axis.ticks.y = element_blank(),
-          axis.title.y = element_blank(),
-          legend.key = element_blank(),
-          legend.key.size = unit(3, "lines"),
-          legend.text = element_text(size = 24, hjust = 0.5))
-}
-
-# theme_bw without axes and with larger legend
-theme_bw_noxy <- function (base_size = 12, base_family = "")
-{
-  require(ggplot2)
-  theme_bw(base_size = base_size, base_family = base_family) %+replace%
-    theme(panel.border = element_blank(), axis.line = element_line(colour = "black"),
-          panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-          axis.line = element_blank(), axis.text = element_blank(),
-          axis.ticks = element_blank(), axis.title = element_blank(),
-          legend.key = element_blank(),
-          legend.key.size = unit(3, "lines"),
-          legend.text = element_text(size = 24, hjust = 0.5))
-}
-
-generate_power_data <- function(m1 = 0, sd1 = 7, m2 = 3.5, sd2 = 7, alpha = 0.05, h.type = "equal"){
-  # set length of tails
-  min1 <- m1-sd1*4
-  max1 <- m1+sd1*4
-  min2 <- m2-sd2*4
-  max2 <- m2+sd2*4
-  # create a sequence for x axis including z.crit
-  x <- seq(min(min1,min2), max(max1, max2), .01)
-  # compute critical value
-
-  switch(h.type,
-         greater={
-           z.crit <- qnorm(1-alpha, m1, sd1)
-           z.critm <- m1 - abs(m1 - z.crit)
-         },
-         less={
-           z.crit <- qnorm(1-alpha, m1, sd1)
-           z.critm <- m1 - abs(m1 - z.crit)
-         },
-         equal={
-           z.crit <- qnorm(1-(alpha/2), m1, sd1)
-           z.critm <- m1 - abs(m1 - z.crit)
-         }
-  )
-  x[length(x)+1] <- z.crit
-  x[length(x)+1] <- z.critm
-  x <- sort(x)
-
-  # generate normal distributions
-  y1 <- dnorm(x, m1, sd1)
-  y2 <- dnorm(x, m2, sd2)
-  # combine to data frame
-  df1 <- data.frame(x = x, y = y1)
-  df2 <- data.frame(x = x, y = y2)
-  # compute intervals for polygons
-  outside.l <- x <= z.critm
-  inside <- (x >= z.critm) & (x <= z.crit)
-  outside.r <- x >= z.crit
-
-  switch(h.type,
-         greater={
-           # Alpha polygon
-           if(m1 < m2){
-             alph <- data.frame(x = x[outside.r], y = pmin(y1[outside.r], y2[outside.r]))
-           } else {
-             alph <- data.frame(x = x[outside.r], y = pmax(y1[outside.r], y2[outside.r]))
-           }
-           alph$y[alph$x == z.crit] <- 0
-           # Beta polygon one-tailed
-           bet <- data.frame(x = x[outside.l | inside], y = y2[outside.l | inside])
-           bet$y[bet$x == z.crit] <- 0
-           bet$y[bet$x == z.critm] <- 0
-           # power polygon; 1-beta, one-tailed
-           pwrd <- data.frame(x = x[outside.r], y = y2[outside.r])
-           pwrd$y[pwrd$x == z.crit] <- 0
-           alph$id <- 3
-           bet$id <- 2
-           pwrd$id <- 1
-           alph$obj <- 3
-           bet$obj <- 2
-           pwrd$obj <- 1
-           # combine data frames
-           poly <- rbind(alph, bet, pwrd)
-           poly$id <- factor(poly$id,  labels = c("power","beta","alpha"))
-         },
-         less={
-           # Alpha polygon
-           if(m1 < m2){
-             alph <- data.frame(x = x[outside.l], y = pmax(y1[outside.l], y2[outside.l]))
-           } else{
-             alph <- data.frame(x = x[outside.l], y = pmin(y1[outside.l], y2[outside.l]))
-           }
-           alph$y[alph$x == z.critm] <- 0
-           # Beta polygon one-tailed
-           bet <- data.frame(x = x[outside.r | inside], y = y2[outside.r | inside])
-           bet$y[bet$x == z.crit] <- 0
-           bet$y[bet$x == z.critm] <- 0
-           # power polygon; 1-beta, one-tailed
-           pwrd <- data.frame(x = x[outside.l], y = y2[outside.l])
-           pwrd$y[pwrd$x == z.critm] <- 0
-           alph$id <- 3
-           bet$id <- 2
-           pwrd$id <- 1
-           alph$obj <- 3
-           bet$obj <- 2
-           pwrd$obj <- 1
-           # combine data frames
-           poly <- rbind(alph, bet, pwrd)
-           poly$id <- factor(poly$id,  labels = c("power","beta","alpha"))
-         },
-         equal={
-           # alph polygon
-           if(m1 < m2){
-             alph.r <- data.frame(x = x[outside.r], y = pmin(y1[outside.r], y2[outside.r]))
-             alph.l <- data.frame(x = x[outside.l], y = pmax(y1[outside.l], y2[outside.l]))
-           } else {
-             alph.r <- data.frame(x = x[outside.r], y = pmax(y1[outside.r], y2[outside.r]))
-             alph.l <- data.frame(x = x[outside.l], y = pmin(y1[outside.l], y2[outside.l]))
-           }
-           alph.r$y[alph.r$x == z.crit] <- 0
-           alph.l$y[alph.l$x == z.critm] <- 0
-           # beta polygon, two-tailed
-           bet <- data.frame(x = x[inside], y = y2[inside])
-           bet$y[bet$x == z.crit] <- 0
-           bet$y[bet$x == z.critm] <- 0
-           # two power polygons, two-tailed
-           pwrd.l <- data.frame(x = x[outside.l], y = y2[outside.l])
-           pwrd.l$y[pwrd.l$x == z.critm] <- 0
-           pwrd.r <-data.frame(x = x[outside.r], y = y2[outside.r])
-           pwrd.r$y[pwrd.r$x == z.crit] <- 0
-           alph.l$id <- 3
-           alph.l$obj <- 5
-           alph.r$id <- 3
-           alph.r$obj <- 4
-           bet$id <- 2
-           bet$obj <-3
-           pwrd.l$id <- 1
-           pwrd.l$obj <- 2
-           pwrd.r$id <- 1
-           pwrd.r$obj <- 1
-           # combine data frames
-           poly <- rbind(alph.l, alph.r, bet, pwrd.l, pwrd.r)
-           poly$id <- factor(poly$id,  labels = c("power","beta","alpha"))
-           poly$obj <- factor(poly$obj,  labels = c("powerr","powerl", "beta", "alphar", "alphal"))
-         }
-  )
-  return(list(df1 = df1, df2 = df2, poly = poly, m1 = m1, m2 = m2, h.type = h.type, z.crit = z.crit, z.critm = z.critm))
-}
-
-pwr_plot <- function(pwrd, alph = TRUE, bet = TRUE, power = TRUE, ann = TRUE){
-  require(ggplot2)
-  # initialise filter for the data
-  filter <- vector(length = length(pwrd$poly$id))
-  # possible values for the scale
-  category <- vector()
-  lbls <- vector()
-  if(alph){
-    filter <- pwrd$poly$id == "alpha"
-    category <- c(category, "alpha")
-    lbls <- c(lbls, bquote(alpha))
-  }
-  if(bet){
-    filter <- filter | pwrd$poly$id == "beta"
-    category <- c(category, "beta")
-    lbls <- c(lbls, bquote(beta))
-  }
-  if(power){
-    filter <- filter | pwrd$poly$id == "power"
-    category <- c(category, "power")
-    lbls <- c(lbls, bquote(1 - beta))
-  }
-  # define colours by type of polygon
-  cols <- c("alpha" = "red", "beta" = "blue", "power" = "green")
-  if(any(alph, bet, power)){
-  p <- ggplot() +
-    geom_line(data = pwrd$df1, aes(x, y, linetype = "H0", group = NULL, fill = NULL)) +
-    geom_line(data = pwrd$df2, aes(x, y, linetype = "Ha", group = NULL, fill = NULL)) +
-    geom_polygon(data = pwrd$poly[filter, ], aes(x, y, fill = id, group = obj), alpha = 0.3) +
-    scale_linetype_discrete(name = "Гипотезы") +
-    scale_fill_manual(values = cols, limits = category, name = "Вероятности", labels = lbls)
-  } else {
-    p <- ggplot() +
-      geom_line(data = pwrd$df1, aes(x, y, linetype = "H0", group = NULL, fill = NULL)) +
-      geom_line(data = pwrd$df2, aes(x, y, linetype = "Ha", group = NULL, fill = NULL)) +
-      scale_linetype_discrete(name = "Гипотезы")
-  }
-  return(p)
-}
-
-dat <- generate_power_data(m1 = 0, m2 = 5, sd1 = 10, sd2 = 10, h.type = "equal")
+```{r power_alpha, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
+gg_alpha <- gg_t + 
+  # alpha
+  stat_function(fun = dt_limit, 
+                args = list(alph = alpha, df = df, sides = sides), 
+                geom = "area", fill = "red", alpha = 0.7) + 
+  # H_0 curve
+  stat_function(fun = dt, args=list(df = df), 
+                geom = "line", colour = "darkred") + 
+  # labs
+  labs(title = "t-распределение, df = 18, alpha = 0.05") +
+  # limits
+  geom_vline(xintercept = p_cut, size = 1, linetype = "dotted") +
+  geom_vline(xintercept = -p_cut, size = 1, linetype = "dotted") +
+    annotate(geom = "text", x = -p_cut, y = 0.4, hjust = 1.1,
+           label = "-t и t при alpha 0.05")
+gg_alpha
 ```
 
-### Вероятности гипотез
+__Ошибка I рода --- вероятность отвергнуть $H_0$, когда верна $H_0$__
 
-```{r power_curves, echo = FALSE, fig.height=3}
-pwr_plot(pwrd = dat, alph = F, bet = F, power = F) +
-  guides(linetype = guide_legend(title = NULL)) +
-  theme_bw_noxy(base_size = 18)
+## Мы этого не знаем, но может быть верна $H_A$...
+
+```{r power_alternative, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
+gg_alpha +
+    stat_function(fun = dt, 
+                args = list(df = df, ncp = nc), 
+                geom = "line", colour = "steelblue", size = 1)
 ```
 
-## Типы ошибок при проверке гипотез
+Можно построить еще одно распределение статистики --- распределение, при условии того, что верна $H_A$
 
-| 	|H0 == TRUE |	H0 == FALSE |
-|-----|-----|-----|
-| Отклонить H0 	| Ошибка I рода </br>Ложно-положительный результат | 	Верно </br>Положительный результат |
-| Сохранить H0 	| Верно </br>Отрицательный результат | Ошибка II рода </br> Ложно-отрицательный результат |
+## Ошибка II рода
 
-### Ошибки I рода
 
-```{r power_alpha, echo = FALSE, fig.height=3}
-pwr_plot(pwrd = dat, alph = T, bet = F, power = F) +
-  guides(fill = guide_legend(title = NULL), linetype = guide_legend(title = NULL)) +
-  theme_bw_noxy(base_size = 18)
+```{r power_beta, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
+gg_beta <- gg_alpha + 
+    # beta
+  stat_function(fun = dt_limit, 
+                args = list(alph = alpha, df = df, sides = sides,
+                            ncp = nc, what = "beta"), 
+                geom = "area", fill="steelblue", alpha = 0.7) +
+# H_A curve
+  stat_function(fun = dt, 
+                args = list(df = df, ncp = nc), 
+                geom = "line", colour = "steelblue", size = 1)
+gg_beta
+```
+__Ошибка II рода --- вероятность принять $H_0$, когда верна $H_A$__
+
+## Мощность теста --- способность выявлять различия
+
+```{r power-power, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
+gg_power <- gg_beta +
+# power
+    stat_function(fun = dt_limit, 
+                args = list(alph = alpha, df = df, sides = sides,
+                            ncp = nc, what = "power"), 
+                geom = "area", fill="seagreen2", alpha = 0.7) +
+# H_A curve
+  stat_function(fun = dt, 
+                args = list(df = df, ncp = nc), 
+                geom = "line", colour = "steelblue", size = 1)
+
+gg_power
 ```
 
-## Типы ошибок при проверке гипотез
+__Мощность теста - вероятность отвергнуть $H_0$, когда верна $H_А$__
 
-| 	|H0 == TRUE |	H0 == FALSE |
-|-----|-----|-----|
-| Отклонить H0 	| Ошибка I рода </br>Ложно-положительный результат | 	Верно </br>Положительный результат |
-| Сохранить H0 	| Верно </br>Отрицательный результат | Ошибка II рода </br> Ложно-отрицательный результат |
+$$Power = 1 - \beta$$
 
-### Ошибки II рода
+Обычно считается, что хорошо, когда мощность не меньше 0.8
 
-```{r power_beta, echo = FALSE, fig.height=3}
-pwr_plot(pwrd = dat, alph = T, bet = T, power = F) +
-  guides(fill = guide_legend(title = NULL), linetype = guide_legend(title = NULL)) +
-  theme_bw_noxy(base_size = 18)
-```
-
-## Типы ошибок при проверке гипотез
-
-| 	|H0 == TRUE |	H0 == FALSE |
-|-----|-----|-----|
-| Отклонить H0 	| Ошибка I рода </br>Ложно-положительный результат | 	Верно </br>Положительный результат |
-| Сохранить H0 	| Верно </br>Отрицательный результат | Ошибка II рода </br> Ложно-отрицательный результат |
-
-### Мощность теста - способность выявлять различия $Power = 1 - \beta$
-
-```{r echo = FALSE, fig.height=3, fig.width=10.1}
-pwr_plot(pwrd = dat, alph = T, bet = T, power = T) +
-  guides(fill = guide_legend(title = NULL), linetype = guide_legend(title = NULL)) +
-  theme_bw_noxy(base_size = 18)
-```
+Т.е. что в 80% случаев мы можем найди различия заданной величины, если они есть.
 
 ## Анализ мощности
 
@@ -371,54 +345,37 @@ $d$ Коэна (Cohen's d)
 <br />
 $$d = \frac{\bar \mu_1 - \bar \mu_2}{\sigma}$$
 
-## Как оценить стандартное отклонение для расчета величины эффекта? {.build}
+ Где сигма может оцениваться одним из способов: 
+ 
+- среднеквадратичное отклонение ($d$ Коэна)
 
-$$d = \frac{\bar \mu_1 - \bar \mu_2}{\sigma}$$
+$\sigma = {\sqrt{\frac {s_1^2 + s_2^2 } {2} }}$
 
-- как среднеквадратичное стандартное отклонение ($d$ Коэна)
+- обобщенное стандартное отклонение ($g$ Хеджа)
 
-\[d = \frac{|\bar x_1 - \bar x_2|} {\sqrt{\frac {s_1^2 + s_2^2 } {2} }}\]
+$\sigma = {\sqrt{\frac {(n _1 - 1)s_1^2 + (n _2 - 1)s_2^2 }  {n _1 + n _2 - 2} } }$
 
-- как обобщенное стандартное отклонение ($g$ Хеджа)
 
-\[g = \frac{|\bar x _1 - \bar x _2|} {\sqrt{\frac {(n _1 - 1)s_1^2 + (n _2 - 1)s_2^2 }  {n _1 + n _2 - 2} } }\]
+## Величина эффекта
 
-## Как оценить ожидаемую величину эффекта?
+Яков Коэн предложил делить эффекты на сильные, умеренные и слабые (Cohen, 1982)
 
-$$d = \frac{\bar \mu_1 - \bar \mu_2}{\sigma}$$
-
-> - Варианты:
-    - Пилотные исследования
-    - Литература
-    - Общебиологические знания
-    - Технические требования
-
-## Величина эффекта из общих соображений
-
-Яков Коэн (1982)
-
-сильные, умеренные и слабые эффекты
 ```{r }
 library(pwr)
 cohen.ES(test = "t", size = "large")
 ```
 
-## Рассчитайте
+## Задание
 
-величину умеренных и слабых эффектов для t-критерия
+Рассчитайте величину умеренных и слабых эффектов для t-критерия
 
-```{r eval = FALSE}
-    library()
-    cohen.ES()
+## Решение
+
+```{r purl = FALSE}
+cohen.ES(test = "t", size = "medium")
+cohen.ES(test = "t", size = "small")
 ```
 
-Подсказка: обозначения можно посмотреть в файлах справки
-
-```{r eval = FALSE}
-    help(cohen.ES)
-    ?cohen.ES
-    cohen.ES # курсор на слове, нажать F1
-```
 
 ## Величина эффекта из пилотных данных
 
@@ -426,11 +383,11 @@ $$d = \frac{\bar \mu_1 - \bar \mu_2}{\sigma}$$
 
 ${\sigma}$ - cтандартное отклонение плотности халиотисов:
 
-> - Плотность крупных халиотисов на $50 м^2$ была $\bar x = 47.5$, $SD = 27.7$
+- Плотность крупных халиотисов на $50 м^2$ была $\bar x = 47.5$, $SD = 27.7$
 
 ${\bar \mu_1 - \bar \mu_2}$ - cредний вылов халиотисов в год:
 
-> - Масса выловленных коммерческим способом + данные о размерах -> численность -> плотность
+- Масса выловленных коммерческим способом + данные о размерах -> численность -> плотность
     - Предположили, что коммерческий лов и любительский лов равны
     - Коммерческий лов  = 11.6 экз. $м^{-2}$
     - Коммерческий + любительский лов = 23.2 экз. $м^{-2}$
@@ -446,61 +403,75 @@ effect <- diff/sigma # величина эффекта
 effect
 ```
 
-## Функции для анализа мощности t-критерия
+Функции для анализа мощности t-критерия:
 
 - при одинаковых объемах групп `pwr.t.test()`
 - при разных объемах групп `pwr.t2n.test()`
 
 ## Считаем объем выборки
 
-
 ```{r}
-pwr.t.test(n = NULL, d = effect, power = power, sig.level = alpha,
-           type = "two.sample", alternative = "two.sided")
+pwr_hal <- pwr.t.test(n = NULL, 
+                      d = effect, 
+                      power = power, 
+                      sig.level = alpha, 
+                      type = "two.sample", 
+                      alternative = "two.sided")
+pwr_hal
 ```
 
-> - Чтобы с вероятностью 0.8 выявить различия плотности халиотисов в местах, где лов разрешен и запрещен, нужно обследовать __по 24 места каждого типа__, если мы верно оценили величину эффекта.
+> - Чтобы с вероятностью 0.8 выявить различия плотности халиотисов в местах, где лов разрешен и запрещен, нужно обследовать __по `r ceiling(pwr_hal$n)` пробы каждого типа__, если мы верно оценили величину эффекта.
 
-## Рассчитайте
+## Задание
 
-сколько нужно обследовать мест, чтобы обнаружить слабый эффект
-с вероятностью 0.8, при уровне значимости 0.01
+Рассчитайте сколько нужно обследовать проб, чтобы обнаружить слабый эффект с вероятностью 0.8, при уровне значимости 0.01
 
-```{r eval = FALSE}
-    cohen.ES()
-    pwr.t.test()
-```
+Вам понадобятся функции `cohen.ES()` и `pwr.t.test()`
 
 ## Решение
 
-
-```{r}
+```{r purl = FALSE}
 cohen.ES(test = "t", size = "small")
-pwr.t.test(n = NULL, d = 0.2, power = 0.8, sig.level = 0.01,
-           type = "two.sample", alternative = "two.sided")
+pwr.t.test(n = NULL, d = 0.2, 
+           power = 0.8, sig.level = 0.01,
+           type = "two.sample", 
+           alternative = "two.sided")
 ```
 
 ## Пример: Улитки на устрицах в мангровых зарослях*
 
 В каких зонах мангровых зарослей на устрицах предпочитают обитать улитки (Minchinton, Ross, 1999)?
 
-> - Факторы:
+- Факторы:
     - Сайт (A и B)
     - Зона зарослей (LZ - ближе к земле, MZ - средняя часть, SZ(+TR)с деревьями, SZ(-TR) - ближе к морю, без деревьев)
 
-> - Собрали по 5 проб - число улиток на раковинах устриц
+- Собрали по 5 проб - число улиток на раковинах устриц
 
 <div class = "footnote">* - Данные из Quinn, Keough, 2002, Box 9-5, Fig 9-7</div>
 
+## Скачиваем данные с сайта
+
+Не забудьте войти в вашу директорию для матметодов при помощи `setwd()`
+
+```{r}
+library(downloader)
+
+# в рабочем каталоге создаем суб-директорию для данных
+if(!dir.exists("data")) dir.create("data")
+
+# скачиваем файл
+download(
+  url = "https://varmara.github.io/mathmethr/data/minch.xls", 
+  destfile = "data/minch.xls")
+```
+
+
 ## Читаем данные из файла
 
-Не забудте войти в вашу директорию для матметодов, например, так
-
-```{r snail_all, message = FALSE}
-# setwd("C:/Мои\ документы/mathmethR/) # в Windows
-# setwd(/home/yourusername/mathmethR/) # в Linux
+```{r}
 library(readxl)
-minch <- read_excel(path = "minch.xls", sheet = 1)
+minch <- read_excel(path = "data/minch.xls", sheet = 1)
 ```
 
 ```{r}
@@ -511,282 +482,87 @@ str(minch) # Структура данных
 
 ```{r}
 head(minch)     # Первые несколько строк файла
-minch$zone[1:3] # Первые три значения переменной zone
-minch[2:3, c(1, 3, 5)] # 2-3 строки и 3, 5, 7 столбцы
-```
-
-## Гистограмма числа улиток
-
-Геом `geom_histogram`
-
-```{r echo=FALSE}
-theme_set(theme_grey(base_size = 16))
-```
-
-```{r snail_plots, message = FALSE}
-library(ggplot2)
-ggplot(data = minch, aes(x = limpt100)) + 
-  geom_histogram(stat = "bin", binwidth = 3)
-```
-
-## Не нравится тема? Можно привинтить другую!
-
-Можно прибавить к графику `theme_bw()`, `theme_classic()`, `theme_grey()`
-
-Можно установить для всех последующих графиков `theme_set()`
-
-```{r message = FALSE, eval = FALSE, tidy=TRUE}
-# ggplot(data = minch, aes(x = limpt100)) + geom_histogram(stat = "bin", binwidth = 3) + theme_classic()
-theme_set(theme_bw())
-ggplot(data = minch, aes(x = limpt100)) +
-  geom_histogram(stat = "bin", binwidth = 3)
-```
-
-```{r echo = FALSE, message=FALSE}
-theme_set(theme_bw(base_size = 16))
-ggplot(data = minch, aes(x = limpt100)) +
-  geom_histogram(stat = "bin", binwidth = 3)
-```
-
-## Раскрашиваем гистограмму
-
-эстетика `fill`
-
-```{r}
-hp <- ggplot(data = minch, aes(x = limpt100, fill = site)) +
-  geom_histogram(stat = "bin", binwidth = 3, position = "dodge") +
-  labs(x = "Число улиток на 100 устриц", y = "Число проб", fill = "Сайт")
-hp # теперь гистограмму из этого объекта можно вызвать в любой момент
-```
-
-## Раскрасить иначе? Нет проблем!
-
-```{r}
-# Чтобы не переписывать всеменяем только эстетику
-hp + aes(fill = zone) +  labs(fill = "Зона литорали")
-
-```
-
-## График с панелями
-
-Фасеты `facet_wrap`, `facet_grid`
-
-```{r}
-hp + facet_wrap(~ zone)
-```
-
-## Поэкспериментируйте с панелями
-
-Что происходит, если мы выбираем другие переменные? Почему?
-
-Какие еще бывают варианты разбивки на панели?<br />
-Автоподсказки: напишите `facet` и нажмите `Ctrl+Space`
-
-Что будет если менять `fill` и `facet` одновременно?
-
-```{r eval = FALSE}
-    ggplot()
-    aes()
-    geom_histogram()
-    facet_wrap()
-```
-
-## Решение
-
-```{r}
-# hp + aes(fill = limpt100) # ошибка, т.к. непрерывная шкала, вместо дискретной
-# у эстетики должна быть дискретная шкала
-
-# одновременно панели и раскрашивание
-hp + facet_grid(site~zone) + aes(fill = zone)
 ```
 
 ## Боксплоты числа улиток
 
+Нормальное ли тут распределение?
+
 ```{r fig.width = 4}
-bp <- ggplot(data = minch, aes(x = site, y = limpt100)) +
-  geom_boxplot()
-bp
+ggplot(data = minch, aes(x = site, y = limpt100)) +
+  geom_boxplot() +
+  labs(y = "Число улиток на 100 устриц", 
+       x = "Сайт")
 ```
 
-## Дома самостоятельно поэкспериментируйте
+## Боксплот корня из численности улиток (__sqlim100__) для двух сайтов<br />
 
-
-
-с панелями `facet` и с эстетиками `fill` и `colour`
-
-Что будет, если мы выберем другие переменные?
-
-Опишите форму и разброс распределения улиток в двух сайтах
-Симметрично? Похоже ли на нормальное?
-
-```{r eval = FALSE}
-    ggplot()
-    aes()
-    geom_boxplot()
-    facet_wrap()
+```{r}
+ggplot(data = minch, aes(x = site, y = sqlim100)) +
+  geom_boxplot() +
+  labs(y = "Число улиток на 100 устриц", 
+       x = "Сайт")
 ```
 
-## Решение
-
-```{r eval = FALSE}
-    bp + aes(colour = zone)
-    bp + aes(fill = site)
-    bp + aes(fill = site) + facet_wrap(~zone)
-    bp + facet_grid(site~zone)
-```
-
-## ...и постройте
-
-боксплот и гистограмму переменной __sqlim100__ (квадратный корень из численности улиток) для двух сайтов<br />
-
-Подсказка: `x` и `y` это тоже эстетики, поэтому можно использовать предыдущие графики
-
-Стало ли распределение больше походить на нормальное?
-
-```{r eval = FALSE}
-    ggplot()
-    geom_histogram()
-    geom_boxplot()
-    aes()
-```
-
-## Решение
-
-```{r eval=FALSE}
-bp + aes(fill = site)
-bp + aes(y = sqlim100, fill = site)
-hp + aes(fill = site) + labs(fill = "Сайт")
-hp + aes(x = sqlim100, fill = site) + labs(fill = "Сайт")
-```
+>- Распределение стало больше походить на нормальное. Можно пользоваться t-критерием для сравнения значений корня из численности улиток (__sqlim100__) для двух сайтов.
 
 # A priory анализ мощности по данным пилотного исследования
 
+## Анализ мощности по данным пилотного исследования
 
-## Пилотное исследование халиотисов
+Представим, что эти данные --- это данные пилотного исследования.
 
+Мы хотим выяснить по этим данным, сколько нужно собрать проб, чтобы показать, что плотность улиток различается на двух сайтах.
 
-2 сайта, 4 зоны, по 2 пробы
-
-Мы хотим сравнить сайты
-
-```{r fig.width = 4}
-minch_smpl <- read_excel("minch_smpl.xls", sheet = 1)
-ggplot(minch_smpl, aes(x = site, y = sqlim100)) +
-  geom_boxplot(aes(fill = site))
-```
-
-## Величина эффекта по исходным данным
-
+### Величина эффекта по исходным данным
 
 ```{r}
 library(effsize)
-effect <- cohen.d(minch_smpl$sqlim100, minch_smpl$site)
-effect
+eff_snail <- cohen.d(minch$sqlim100, minch$site)
+eff_snail
+
+# Вычислим модуль, поскольку для `pwr.t.test()` эффект должен быть положительным
+effect_snail <- abs(eff_snail$estimate)
 ```
 
->- как добыть значение величины эффекта?
+## Задание
 
-## Как добыть значение величины эффекта?
+Рассчитайте объем выборки, чтобы показать различия плотности улиток между сайтами с вероятностью 0.8?
 
-### 1. Как называется в структуре объекта элемент, где записана величина эффекта?
+Используйте функцию `pwr.t.test()`
 
-```{r}
-str(effect)
-```
-
-## Как добыть значение величины эффекта?
-
-### 2. Обращаемся к этому элементу по имени через `$`
-
-```{r}
-effect$estimate
-```
-
-### 3. Вычислим модуль, поскольку для pwr.t.test() эффект должен быть положительным
-
-```{r}
-effect <- abs(effect$estimate)
-```
-
-## Рассчитайте
-
-объем выборки, чтобы показать различия плотности улиток между сайтами с вероятностью 0.8?
-
-```{r eval = FALSE}
-    pwr.t.test()
-```
 
 ## Решение
 
-```{r}
-library(pwr)
-pwr.t.test(n = NULL, d = effect, power = 0.8, sig.level = 0.05,
-           type = "two.sample", alternative = "two.sided")
+```{r purl = FALSE}
+pwr_snail <- pwr.t.test(n = NULL, d = effect_snail, power = 0.8, sig.level = 0.05, type = "two.sample", alternative = "two.sided")
+pwr_snail
 ```
 
->- Нужна выборка __624 площадки с каждого сайта__, чтобы с вероятностью 0.8 обнаружить различия плотности улиток между сайтами.
+>- Нужна выборка __`r ceiling(pwr_snail$n)` площадок с каждого сайта__, чтобы с вероятностью 0.8 обнаружить различия плотности улиток между сайтами.
 
-# Post hoc анализ мощности
+## Задание
 
-## Что получилось бы с улитками из примера на самом деле?
+Представьте, что в датасете __sleep__ содержатся данные пилотного исследования.
 
-```{r fig.width = 6}
-# bp <- ggplot(data = minch, aes(x = site,
-# y = limpt100)) + geom_boxplot()
-bp + aes(y = sqlim100)
+Оцените, какой объем выборки нужно взять, чтобы показать, что число часов дополнительного сна после применения двух препаратов различается?
+
+## Решение
+
+```{r purl=FALSE}
+eff_sleep <- cohen.d(sleep$extra, sleep$group)
+effect_sleep <- abs(eff_sleep$estimate)
+pwr_sleep <- pwr.t.test(n = NULL, d = effect_sleep, power = 0.8, sig.level = 0.05, type = "two.sample", alternative = "two.sided")
+pwr_sleep
 ```
 
-## Проверим, различается ли плотность улиток между локациями
-
-По умолчанию в R используется t-критерий для неравных дисперсий (Модификация Велча)
-
-```{r}
-t.test(sqlim100 ~ site, data = minch, var.equal = FALSE)
-```
-
-> - Достоверных различий плотности улиток между локациями не обнаружено (t-критерий, p<0.01)
-
-## Post hoc анализ - когда различий не нашли
-
-<div class = "footnote">* - Данные из Quinn, Keough, 2002, Box 7-1, Fig 7-4</div>
-
-Какова была реальная величина эффекта?
-
-Хватило ли нам мощности, чтобы выявлять такие незначительные различия?
-
-### Для post hoc анализа нужно знать
-
-- тест ($H _0$ отвергнута!) — t-критерий
-- уровень значимости — α = 0.05
-- фактический объем выборки — 20
-- фактическая величина эффекта — ?
-- реальная мощность теста - ?
-
-## Сделаем post hoc анализ мощности
-
-```{r}
-effect_real <- cohen.d(minch$sqlim100, minch$site)
-effect_real <- abs(effect_real$estimate)
-pwr.t.test(n = 20, d = effect_real,
-           power = NULL, sig.level = 0.05,
-           type = "two.sample",
-           alternative = "two.sided")
-```
+Нужна выборка __`r ceiling(pwr_sleep$n)` человека в каждой из групп__, чтобы с вероятностью 0.8 обнаружить различия числа часов дополнительного сна после применения двух препаратов.
 
 # Как влиять на мощность теста?
 
-## Мощность зависит
+## Чем больше объем выборки --- тем больше мощность
 
-
-- от объема выборки
-- от величины эффекта
-- от уровня значимости
-
-## Чем больше объем выборки—тем больше мощность
-
-
-```{r pwr_vs_n, echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE, fig.width = 10, fig.height = 5}
+```{r pwr_vs_n, echo = FALSE, cache = TRUE, fig.width = 10, fig.height = 5, purl = FALSE}
 # Plots of power vs. sample size etc.
 # Modified after http://imdevsoftware.wordpress.com/2013/01/17/255/
 
@@ -841,9 +617,9 @@ pwr.size <-
 pwr.size
 ```
 
-## Чем больше уровень значимости—тем больше мощность
+## Чем больше уровень значимости --- тем больше мощность
 
-```{r cache = TRUE, dependson='pwr_vs_n', echo = FALSE, warning = FALSE, fig.width = 10, fig.height = 5}
+```{r cache = TRUE, dependson='pwr_vs_n', echo = FALSE, warning = FALSE, fig.width = 10, fig.height = 5, purl = FALSE}
 # Power increases as the signifficance level increases
 #   plot power vs n at d = 0.5, add linetype = sig.level (p = 0.01, p = 0.05)
 pwr_size_apha <- ggplot(data = dat[dat$effect == "d = 0.5", ],
@@ -859,9 +635,9 @@ pwr_size_apha <- ggplot(data = dat[dat$effect == "d = 0.5", ],
 pwr_size_apha
 ```
 
-## Чем больше величина различий—тем больше мощность
+## Чем больше величина различий --- тем больше мощность
 
-```{r cache = TRUE, dependson='pwr_vs_n', echo = FALSE, warning = FALSE, fig.width = 10, fig.height = 5}
+```{r cache = TRUE, dependson='pwr_vs_n', echo = FALSE, warning = FALSE, fig.width = 10, fig.height = 5, purl = FALSE}
 # Power increases as effect size increases
 #   plot power vs n at
 # add linetype = sig.level (p = 0.01, p = 0.05)
@@ -878,29 +654,18 @@ pwr_size_alpha_d <- ggplot(data = dat, aes(x = size, y = value, color = sig.leve
 pwr_size_alpha_d
 ```
 
-## Скажите
+## Каким образом можно повлиять на мощность теста?
 
-Какие из факторов, влияющих на мощность теста, мы __не можем__ контролировать?
-
-> - Мы не можем контролировать внешние факторы
-    - величину эффекта ($ES$)
-    - фоновую изменчивость ($\sigma^2$)
-
-Каким образом можно повлиять на мощность теста?
-
-> - Мощность теста можно регулировать, если
+- Мощность теста можно регулировать, если
     - изменить число повторностей
     - выбрать другой уровень значимости ($\alpha$)
     - определиться, какие эффекты действительно важны ($ES$)
 
 ## Take home messages
 
->- Контролируем статистические ошибки:
-    - чтобы не находить несуществующих эффектов, фиксируем уровень значимости
-    - чтобы не пропустить значимое, рассчитываем величину эффекта, объем выборки и мощность теста
-    - когда не обнаружили достоверных эффектов, оцениваем величину эффекта и мощность теста
-
->- Способность выявлять различия зависит
+- Чтобы не находить несуществующих эффектов, фиксируем уровень значимости
+- Чтобы не пропустить значимое, рассчитываем величину эффекта, объем выборки и мощность теста
+- Способность выявлять различия зависит
     - от объема выборки,
     - от уровня значимости
     - от величины эффекта

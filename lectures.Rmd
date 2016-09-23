@@ -15,9 +15,13 @@ install.packages("ggplot2")
 
 ## 2.Анализ мощности
 
-- Презентация [html] | [pdf]
-- [код R]
-- Данные
+```{r eval=FALSE}
+install.packages(c("downloader", "readxl", "effsize", "pwr"))
+```
+
+- Презентация [html](02_power.html) | [pdf](02_power.pdf)
+- [код R](02_code_power.R)
+- Данные: [minch.xls](data/minch.xls)
 - [Примеры вопросов следующего теста]
 
 ## 3.Регрессионный анализ, часть 1
