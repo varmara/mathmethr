@@ -1,5 +1,9 @@
 ---
 title: Знакомство с R
+output:
+  html_document:
+    css: my_styles.css
+    mode: selfcontained
 ---
 
 # Загружаем, устанавливаем...
@@ -576,7 +580,7 @@ tail(my_worms)
 # fix(my_worms) # ручное редактирование. осторожно! избегайте его использовать, никаких документов о нем не останется
 ```
 
-## Навигация внутри датафреймов
+## Адресация внутри датафреймов
 
 Вывод столбца-переменной при помощи оператора $ и имени переменной
 
@@ -599,14 +603,14 @@ my_worms[, 2] # второй столбец целиком
 ## Базовые графики
 
 Скаттерплот (точечный график) --- по оси х и y непрерывные числовые величины
-```{r}
+```{r p-scatter}
 plot(x = my_worms$Width, y = my_worms$Length)
 ```
 
 
 Боксплот --- по оси х дискретная величина, по оси y  значение непрерывной величины. Черта - медиана, коробка - 25 и 75 персентили, усы - либо размах варьирования, либо 1.5 интерквартильных расстояния (1.5 высоты коробки), если есть "выбросы".
 
-```{r}
+```{r p-box}
 plot(x = my_worms$Colour, y = my_worms$Length)
 ```
 
@@ -618,7 +622,7 @@ plot(x = my_worms$Colour, y = my_worms$Length)
 
 Нарисуем те же самые графики при помощи пакета ggplot2
 
-```{r}
+```{r gg-scatter-box}
 library(ggplot2)
 
 ggplot(data = my_worms) +
@@ -631,7 +635,7 @@ ggplot(data = my_worms) +
 
 Добавляем для точек эстетику цвет (colour) из переменной Colour
 
-```{r}
+```{r gg-colour}
 ggplot(data = my_worms) +
   geom_point(aes(x = Width, y = Length, colour = Colour))
 ```
@@ -645,7 +649,7 @@ gg <- ggplot(data = my_worms) +
 ```
 
 Чтобы вывести график, нужно напечатать название переменной.
-```{r}
+```{r gg-saved}
 gg
 
 ```
@@ -653,33 +657,33 @@ gg
 Можно менять темы оформления графика. 
 Если тема нужна только один раз, то прибавляем ее к графику
 
-```{r}
+```{r gg-themes}
 gg + theme_dark()
 gg + theme_light()
 gg + theme_classic()
 ```
 
 Можно установить нужную тему до конца сессии.
-```{r}
+```{r gg-theme-set}
 theme_set(theme_bw())
 gg
 ```
 
 Подписи осей и легенд задает функция labs()
 
-```{r}
+```{r gg-labs}
 gg + labs(x = "Ширина", y = "Длина", colour = "Цвет")
 ```
 
 Графики можно делить на фасетки при помощи facet_wrap или facet_grid
 
-```{r}
+```{r gg-facets}
 gg + facet_wrap(~Colour, nrow = 1)
 ```
 
 Чтобы изменить подписи цветов, нужно изменить уровни соотв. фактора.
 
-```{r}
+```{r gg-translate-captions}
 my_worms$col_rus <- factor(my_worms$Colour, levels = c("green", "red"), labels = c("Зеленый", "Красный"))
 ggplot(data = my_worms) +
   geom_point(aes(x = Width, y = Length, colour = col_rus)) +

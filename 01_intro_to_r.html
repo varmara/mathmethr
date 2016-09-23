@@ -380,7 +380,7 @@ div.tocify {
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="dv">2</span>^<span class="dv">4</span></code></pre></div>
 <pre><code>## [1] 16</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sqrt</span>(<span class="dv">27</span>)</code></pre></div>
-<pre><code>## [1] 5.196152</code></pre>
+<pre><code>## [1] 5.2</code></pre>
 </div>
 <div class="section level1">
 <h1>Переменные</h1>
@@ -688,7 +688,7 @@ snail_colours <span class="co"># это текстовый вектор.</span><
 <pre><code>## [1] 80</code></pre>
 <p>Та же история с функцией <code>mean</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(NAs_NANs, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre><code>## [1] 11.42857</code></pre>
+<pre><code>## [1] 11.4</code></pre>
 <p>Попробуем написать пользовательскую функцию <code>mmean()</code>, которая будет по умолчанию считать среднее значение элементов в векторе с учетом пропущенных значений (<code>NA</code>)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mmean &lt;-<span class="st"> </span>function(x){
   <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
@@ -749,7 +749,7 @@ wid &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">f
 ## 9      9    18    red</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fix(my_worms) # ручное редактирование. осторожно! избегайте его использовать, никаких документов о нем не останется</span></code></pre></div>
 <div id="--" class="section level2">
-<h2>Навигация внутри датафреймов</h2>
+<h2>Адресация внутри датафреймов</h2>
 <p>Вывод столбца-переменной при помощи оператора $ и имени переменной</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_worms$Length</code></pre></div>
 <pre><code>## [1] 1 2 3 4 5 6 7 8 9</code></pre>
@@ -774,10 +774,10 @@ wid &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">f
 <h2>Базовые графики</h2>
 <p>Скаттерплот (точечный график) — по оси х и y непрерывные числовые величины</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dt">x =</span> my_worms$Width, <span class="dt">y =</span> my_worms$Length)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/p-scatter-1.png" width="672" /></p>
 <p>Боксплот — по оси х дискретная величина, по оси y значение непрерывной величины. Черта - медиана, коробка - 25 и 75 персентили, усы - либо размах варьирования, либо 1.5 интерквартильных расстояния (1.5 высоты коробки), если есть “выбросы”.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dt">x =</span> my_worms$Colour, <span class="dt">y =</span> my_worms$Length)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/p-box-1.png" width="672" /></p>
 <p>Для настройки внешнего вида см graphical parameters в help</p>
 <p>На самом деле, мы не будем пользоваться этой системой графики, но об этом в следующих сериях</p>
 </div>
@@ -788,44 +788,44 @@ wid &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">f
 
 <span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Width, <span class="dt">y =</span> Length))</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-70-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-scatter-box-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Colour, <span class="dt">y =</span> Length))</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-70-2.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-scatter-box-2.png" width="672" /></p>
 <p>Добавляем для точек эстетику цвет (colour) из переменной Colour</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Width, <span class="dt">y =</span> Length, <span class="dt">colour =</span> Colour))</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-colour-1.png" width="672" /></p>
 <p>Графики можно сохранять в переменных, и использовать потом</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Width, <span class="dt">y =</span> Length, <span class="dt">colour =</span> Colour))</code></pre></div>
 <p>Чтобы вывести график, нужно напечатать название переменной.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-saved-1.png" width="672" /></p>
 <p>Можно менять темы оформления графика. Если тема нужна только один раз, то прибавляем ее к графику</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">theme_dark</span>()</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-74-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-themes-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">theme_light</span>()</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-74-2.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-themes-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">theme_classic</span>()</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-74-3.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-themes-3.png" width="672" /></p>
 <p>Можно установить нужную тему до конца сессии.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">theme_set</span>(<span class="kw">theme_bw</span>())
 gg</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-theme-set-1.png" width="672" /></p>
 <p>Подписи осей и легенд задает функция labs()</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Ширина&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Длина&quot;</span>, <span class="dt">colour =</span> <span class="st">&quot;Цвет&quot;</span>)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-labs-1.png" width="672" /></p>
 <p>Графики можно делить на фасетки при помощи facet_wrap или facet_grid</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">facet_wrap</span>(~Colour, <span class="dt">nrow =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-facets-1.png" width="672" /></p>
 <p>Чтобы изменить подписи цветов, нужно изменить уровни соотв. фактора.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_worms$col_rus &lt;-<span class="st"> </span><span class="kw">factor</span>(my_worms$Colour, <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;green&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;Зеленый&quot;</span>, <span class="st">&quot;Красный&quot;</span>))
 <span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Width, <span class="dt">y =</span> Length, <span class="dt">colour =</span> col_rus)) +
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Ширина&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Длина&quot;</span>, <span class="dt">colour =</span> <span class="st">&quot;Цвет&quot;</span>) +
 <span class="st">  </span><span class="kw">facet_wrap</span>(~col_rus, <span class="dt">nrow =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-78-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/gg-translate-captions-1.png" width="672" /></p>
 </div>
 </div>
 
