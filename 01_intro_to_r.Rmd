@@ -1,9 +1,5 @@
 ---
 title: Знакомство с R
-output:
-  html_document:
-    css: my_styles.css
-    mode: selfcontained
 ---
 
 # Загружаем, устанавливаем...
