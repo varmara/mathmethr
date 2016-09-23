@@ -1,14 +1,19 @@
 ---
 title       : Ординация и классификация с использованием мер сходства-различия
 subtitle    : Математические методы в зоологии - на R, осень 2015
-author      : Марина Варфоломеева
 output:
   ioslides_presentation:
-    css: my_styles.css
-    highlight: espresso
+    css: assets/my_styles.css
     widescreen: yes
 ---
 
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+# output options
+options(width = 70, scipen = 6, digits = 3)
+library(knitr)
+# chunk default options
+opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+```
 
 ## Меры сходства и различия, ординация, классификация
 
@@ -21,23 +26,6 @@ output:
 - Выбирать подходящий для данных коэффициент сходства/различия
 - Представлять многомерные данные в меньшем числе измерений при помощи неметрического многомерного шкалирования
 - Строить дендрограммы при помощи подходящего метода аггрегации
-
-```{r setup, include = FALSE, cache = FALSE}
-#-- RUN THE FRAGMENT BETWEEN LINES BEFORE COMPILING MARKDOWN
-# to configure markdown parsing
-options(markdown.extensions = c("no_intra_emphasis", "tables", "fenced_code", "autolink", "strikethrough", "lax_spacing", "space_headers", "latex_math"))
-#
-# output options
-options(width = 70, scipen = 6, digits = 3)
-
-# to render cyrillics in plots use cairo pdf
-options(device = function(file, width = 7, height = 7, ...) {
-  cairo_pdf(tempfile(), width = width, height = height, ...)
-  })
-library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = TRUE, fig.width = 7, fig.height = 3, tidy.opts=list(blank=FALSE), warning=FALSE, message=FALSE)
-```
 
 
 # Коэффициенты сходства и различия

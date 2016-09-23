@@ -16,7 +16,7 @@ output:
     slide_level: 2
     theme: CambridgeUS
     toc: yes
-subtitle: Математические методы в зоологии - на R
+subtitle: Математические методы в зоологии с использованием R
 institution: СПбГУ
 ---
 
