@@ -537,6 +537,51 @@ double_rainbow</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_log &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="ot">FALSE</span>, <span class="dv">3</span>), <span class="kw">rep</span>(<span class="ot">TRUE</span>, <span class="dv">4</span>))
 vect_log</code></pre></div>
 <pre><code>##  [1]  TRUE  TRUE  TRUE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE</code></pre>
+<div id="-----" class="section level3">
+<h3>Применение логических векторов для фильтрации данных</h3>
+<p>Логические векторы создаются при проверке выполнения каких либо условий, заданных при помощи логических операторов (<code>&gt;</code>, <code>&lt;</code>, <code>==</code>, <code>!=</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>!</code>, <code>&amp;</code>, <code>|</code>). Такие векторы можно использовать для фильтрации данных</p>
+<p>Вспомните, у нас был вот такой текстовый вектор</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">double_rainbow</code></pre></div>
+<pre><code>##  [1] &quot;red&quot;    &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot; &quot;red&quot;   
+##  [8] &quot;orange&quot; &quot;yellow&quot; &quot;green&quot;  &quot;blue&quot;   &quot;violet&quot;</code></pre>
+<p>Задача 1. Допустим, мы хотим из этого вектора извлечь только желтый цвет.</p>
+<p>Мы можем создать логический вектор, в котором TRUE будет только для 3-го и 9-го элементов</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_yellow &lt;-<span class="st"> </span>double_rainbow ==<span class="st"> &quot;yellow&quot;</span>
+f_yellow</code></pre></div>
+<pre><code>##  [1] FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE
+## [12] FALSE</code></pre>
+<p>Этот логический вектор-фильтр мы можем использовать для извлечения данных из <code>double_rainbow</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">double_rainbow[f_yellow]</code></pre></div>
+<pre><code>## [1] &quot;yellow&quot; &quot;yellow&quot;</code></pre>
+<p>Задача 2. Допустим, мы хотим извлечь из double_rainbow желтый и синий Желтый фильтр у нас уже есть, поэтому мы создадим фильтр для синего.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_blue &lt;-<span class="st"> </span>double_rainbow ==<span class="st"> &quot;blue&quot;</span></code></pre></div>
+<p>Выражение “желтый или синий” можно записать при помощи логического “или” (<code>|</code>)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_yellow |<span class="st"> </span>f_blue</code></pre></div>
+<pre><code>##  [1] FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE  TRUE FALSE  TRUE
+## [12] FALSE</code></pre>
+<p>Задача решена, мы извлекли желтый и синий цвета.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">double_rainbow[f_yellow |<span class="st"> </span>f_blue]</code></pre></div>
+<pre><code>## [1] &quot;yellow&quot; &quot;blue&quot;   &quot;yellow&quot; &quot;blue&quot;</code></pre>
+<p>То же самое можно было бы записать короче.</p>
+<p>В одну строку — совершенно нечитабельно:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">double_rainbow[double_rainbow ==<span class="st"> &quot;yellow&quot;</span> |<span class="st"> </span>double_rainbow ==<span class="st"> &quot;blue&quot;</span>]</code></pre></div>
+<pre><code>## [1] &quot;yellow&quot; &quot;blue&quot;   &quot;yellow&quot; &quot;blue&quot;</code></pre>
+<p>Фильтр отдельно — читается лучше:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_colours &lt;-<span class="st"> </span>double_rainbow ==<span class="st"> &quot;yellow&quot;</span> |<span class="st"> </span>double_rainbow ==<span class="st"> &quot;blue&quot;</span>
+double_rainbow[f_colours]</code></pre></div>
+<pre><code>## [1] &quot;yellow&quot; &quot;blue&quot;   &quot;yellow&quot; &quot;blue&quot;</code></pre>
+<p>У нас был числовой вектор</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num</code></pre></div>
+<pre><code>##  [1] -11 -10  -9  -8  -7  -6  -5  -4  -3  -2  -1   0   1   2   3   4   5
+## [18]   6   7   8   9  10  11  12</code></pre>
+<p>Задача 3. Давайте извлечем из числового вектора <code>vect_num</code> только значения больше 0</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vect_num[vect_num &gt;<span class="st"> </span><span class="dv">0</span>]</code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10 11 12</code></pre>
+<p>Задача 4. Давайте извлечем из вектора <code>vect_num</code> все числа, которые либо меньше или равны -8, либо больше или равны 8</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">f_5_8 &lt;-<span class="st"> </span>(vect_num &lt;=<span class="st"> </span>-<span class="dv">8</span>) |<span class="st"> </span>(vect_num &gt;=<span class="st"> </span><span class="dv">8</span>)
+vect_num[f_5_8]</code></pre></div>
+<pre><code>## [1] -11 -10  -9  -8   8   9  10  11  12</code></pre>
+</div>
 </div>
 <div class="section level2">
 <h2>Факторы</h2>
@@ -729,10 +774,10 @@ wid &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">f
 <h2>Базовые графики</h2>
 <p>Скаттерплот (точечный график) — по оси х и y непрерывные числовые величины</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dt">x =</span> my_worms$Width, <span class="dt">y =</span> my_worms$Length)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-57-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
 <p>Боксплот — по оси х дискретная величина, по оси y значение непрерывной величины. Черта - медиана, коробка - 25 и 75 персентили, усы - либо размах варьирования, либо 1.5 интерквартильных расстояния (1.5 высоты коробки), если есть “выбросы”.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dt">x =</span> my_worms$Colour, <span class="dt">y =</span> my_worms$Length)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-58-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
 <p>Для настройки внешнего вида см graphical parameters в help</p>
 <p>На самом деле, мы не будем пользоваться этой системой графики, но об этом в следующих сериях</p>
 </div>
@@ -743,44 +788,44 @@ wid &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dt">f
 
 <span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Width, <span class="dt">y =</span> Length))</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-59-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-70-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Colour, <span class="dt">y =</span> Length))</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-59-2.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-70-2.png" width="672" /></p>
 <p>Добавляем для точек эстетику цвет (colour) из переменной Colour</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Width, <span class="dt">y =</span> Length, <span class="dt">colour =</span> Colour))</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-60-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
 <p>Графики можно сохранять в переменных, и использовать потом</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Width, <span class="dt">y =</span> Length, <span class="dt">colour =</span> Colour))</code></pre></div>
 <p>Чтобы вывести график, нужно напечатать название переменной.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-62-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
 <p>Можно менять темы оформления графика. Если тема нужна только один раз, то прибавляем ее к графику</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">theme_dark</span>()</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-63-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-74-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">theme_light</span>()</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-63-2.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-74-2.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">theme_classic</span>()</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-63-3.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-74-3.png" width="672" /></p>
 <p>Можно установить нужную тему до конца сессии.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">theme_set</span>(<span class="kw">theme_bw</span>())
 gg</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
 <p>Подписи осей и легенд задает функция labs()</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Ширина&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Длина&quot;</span>, <span class="dt">colour =</span> <span class="st">&quot;Цвет&quot;</span>)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
 <p>Графики можно делить на фасетки при помощи facet_wrap или facet_grid</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">facet_wrap</span>(~Colour, <span class="dt">nrow =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
 <p>Чтобы изменить подписи цветов, нужно изменить уровни соотв. фактора.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_worms$col_rus &lt;-<span class="st"> </span><span class="kw">factor</span>(my_worms$Colour, <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;green&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;Зеленый&quot;</span>, <span class="st">&quot;Красный&quot;</span>))
 <span class="kw">ggplot</span>(<span class="dt">data =</span> my_worms) +
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">x =</span> Width, <span class="dt">y =</span> Length, <span class="dt">colour =</span> col_rus)) +
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Ширина&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Длина&quot;</span>, <span class="dt">colour =</span> <span class="st">&quot;Цвет&quot;</span>) +
 <span class="st">  </span><span class="kw">facet_wrap</span>(~col_rus, <span class="dt">nrow =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
+<p><img src="01_intro_to_r_files/figure-html/unnamed-chunk-78-1.png" width="672" /></p>
 </div>
 </div>
 
