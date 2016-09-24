@@ -10,7 +10,7 @@ install.packages("ggplot2")
 
 - Конспект [html](01_intro_to_r.html)
 - [код R](01_intro_to_r.R)
-- [Примеры вопросов следующего теста]
+- [Примеры вопросов следующего теста](test_handouts/01-int-handout-test1.pdf)
 
 
 ## 2.Анализ мощности
