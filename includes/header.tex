@@ -4,27 +4,41 @@
 \defaultfontfeatures{Ligatures={TeX},Renderer=Basic,Scale=0.75}  %% свойства шрифтов по умолчанию
 \setmainfont[Ligatures={TeX,Historic}]{Times New Roman} %% задаёт основной шрифт документа
 \setsansfont[Ligatures={TeX,Historic}]{Verdana} %% задаёт шрифт без засечек
-\setmonofont{CMU Typewriter Text}
-% \setmainfont[Ligatures={TeX,Historic}]{CMU Serif} %% задаёт основной шрифт документа
-% \setsansfont{CMU Sans Serif}                    %% задаёт шрифт без засечек
-% \setmonofont{CMU Typewriter Text}               %% задаёт моноширинный шрифт
+\setmonofont[Scale=0.7]{DejaVu Sans Mono}
 
-\linespread{0.65}
+\linespread{0.75}
 
 \definecolor{links}{HTML}{2A1B81}
 \hypersetup{colorlinks=true,linkcolor=,urlcolor=links,pdfview=FitH,pdfpagelayout=SinglePage, unicode=true,breaklinks=true}
 
+% links format
 \usepackage{hyperref}
 \usepackage[labelformat=empty]{caption}
 
+% decrease text margins
+\setbeamersize{text margin left = 8pt, text margin right = 16pt}
+
+\newcommand{\columnsbegin}{\begin{columns}}
+\newcommand{\columnsend}{\end{columns}}
+
 \usepackage{graphics}
+
+% % subfigures
+% \usepackage{subcaption}
+% \usepackage{wrapfig}
 
 %\addto{\captionsrussian}{\renewcommand*{\figurename}{рис.}}
 
-\usepackage{array}
-\renewcommand{\arraystretch}{2}
-\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+% % Tables
+% \usepackage{array}
+% \renewcommand{\arraystretch}{2}
+% \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+% \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+% \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+
+% \logo{\includegraphics[height=0.3cm]{assets/Linmod_logo.png}}
+
+
+
 
 

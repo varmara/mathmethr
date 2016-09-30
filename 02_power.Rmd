@@ -1,21 +1,32 @@
 ---
-title: Анализ мощности
-subtitle: Математические методы в зоологии с использованием R
-author: Марина Варфоломеева
+title: "Анализ мощности"
+subtitle: "Математические методы в зоологии с использованием R"
+author: "Марина Варфоломеева"
 output:
-  ioslides_presentation:
-    css: assets/my_styles.css
-    widescreen: yes
+  beamer_presentation:
+    colortheme: seagull
+    highlight: tango
+    fonttheme: structurebold
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: CambridgeUS
+    toc: no
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 # output options
-options(width = 70)
+options(width = 70, scipen = 6, digits = 3)
 library(knitr)
 # chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE, message=FALSE)
+# opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+# library("extrafont")
 ```
-
 ```{r libs, echo=FALSE}
 library(ggplot2)
 theme_set(theme_bw())
@@ -36,7 +47,8 @@ library(gridExtra) # to rescale legend
   - сравнивать средние значения при помощи t-критерия, интерпретировать и описывать результаты
   - дать определение ошибок I и II рода, и графически изобразить их отношение к мощности теста
   - оценивать величину эффекта и необходимый объем выборки по данным пилотного исследования
-  - загружать данные из .xls в R
+  - загружать данные из интернета
+  - загружать данные из .xlsx в R
   - строить боксплоты с помощью `ggplot2`
 
   
@@ -130,14 +142,14 @@ gg_t +
   # alpha
   stat_function(fun = dt_limit, 
                 args = list(alph = alpha, df = df, sides = sides), 
-                geom="area", fill="red", alpha = 0.7) + 
-  stat_function(fun=dt, args=list(df=df), 
-                geom="line", colour="darkred") +
+                geom = "area", fill = "red", alpha = 0.7) + 
+  stat_function(fun = dt, args=list(df=df), 
+                geom = "line", colour = "darkred") +
   labs(title = "t-распределение, df = 18, alpha = 0.05") + 
   # редкие
-  geom_text(x=-4, y=0.1, label= "Редкие значения") + 
-  geom_text(x=4, y=0.1, label= "Редкие значения") + 
-  geom_text(x=0, y=0.1, label= "Обычные значения") + 
+  annotate(geom = "text", x = -4, y = 0.1, label = "Редкие значения") + 
+  annotate(geom = "text", x = 4, y = 0.1, label = "Редкие значения") + 
+  annotate(geom = "text", x = 0, y = 0.1, label = "Обычные значения") + 
   geom_vline(xintercept = p_cut, size = 1, linetype = "dotted") +
   geom_vline(xintercept = -p_cut, size = 1, linetype = "dotted") +
     annotate(geom = "text", x = -p_cut, y = 0.4, hjust = 1.1, 
@@ -151,10 +163,6 @@ __Уровень значимости $\alpha$ --- это вероятность
 Для t-теста  $\alpha$ --- это вероятность ошибочно сделать вывод о том, что средние выборок различаются __при условии, что эти выборки получены из одной генеральной совокупности__.
 
 ## Тестирование гипотезы о равенстве двух средних при помощи t-критерия
-
-- Для конкретных данных считаем значение t-критерия
-- Сравниваем его с теоретическим распределением t (распределением при условии, что $H_0$ верна)
-- Принимаем решение, отвергнуть ли $H_0$
 
 ```{r gg-tcrit-h, echo=FALSE, purl=FALSE}
 gg_t + 
@@ -173,6 +181,10 @@ gg_t +
   annotate(geom = "text", x = 2.7, y = 0.25, 
            label = "|t| >= |t_crit| \n Отвергаем H0")
 ```
+
+- Для конкретных данных считаем значение t-критерия
+- Сравниваем его с теоретическим распределением t (распределением при условии, что $H_0$ верна)
+- Принимаем решение, отвергнуть ли $H_0$
 
 ## Пример: Снотворное
 
@@ -210,13 +222,12 @@ tt$statistic # значение t-критерия
 
 # Статистические ошибки при проверке гипотез
 
-
 ## Типы ошибок при проверке гипотез
 
-| 	|H0 == TRUE |	H0 == FALSE |
+| 	|$$H0 == TRUE$$ |	$$H0 == FALSE$$ |
 |-----|-----|-----|
-| Отклонить H0 	| Ошибка I рода </br>Ложно-положительный результат | 	Верно </br>Положительный результат |
-| Сохранить H0 	| Верно </br>Отрицательный результат | Ошибка II рода </br> Ложно-отрицательный результат |
+| Отклонить $H_0$ 	| Ошибка I рода | 	Верно |
+| Сохранить $H_0$ 	| Верно | Ошибка II рода |
 
 ## Ошибка I рода
 
@@ -244,6 +255,7 @@ __Ошибка I рода --- вероятность отвергнуть $H_0$,
 ## Мы этого не знаем, но может быть верна $H_A$...
 
 ```{r power_alternative, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
+nc <- 0.5
 gg_alpha +
     stat_function(fun = dt, 
                 args = list(df = df, ncp = nc), 
@@ -268,6 +280,7 @@ gg_beta <- gg_alpha +
                 geom = "line", colour = "steelblue", size = 1)
 gg_beta
 ```
+
 __Ошибка II рода --- вероятность принять $H_0$, когда верна $H_A$__
 
 ## Мощность теста --- способность выявлять различия
@@ -297,32 +310,39 @@ $$Power = 1 - \beta$$
 
 ## Анализ мощности
 
-<div class="columns-2">
+\columnsbegin
 
-<center>*A priori*</center>
+\column{0.5\textwidth}
+
+*A priori*
 
 - какой нужен объем выборки, чтобы найти различия с разумной долей уверенности?
 - различия какой величины мы можем найти, если известен объем выборки?
 
-<center>*Post hoc*</center>
+\column{0.5\textwidth}
+
+*Post hoc*
 
 - смогли бы мы найти различия при помощи нашего эксперимента ($\alpha$, $n$), если бы величина эффекта была $X$?
 
-</br>
-
-</div>
+\columnsend
 
 # A priory анализ мощности
 
-## Пример: Заповедник спасает халиотисов*
+## Пример: Заповедник спасает халиотисов
 
 Лов халиотисов (коммерческий и любительский) запретили, организовав заповедник.
 
 Стало ли больше моллюсков через несколько лет? (Keough, King, 1991)
 
-<div class = "footnote">* - Данные из Quinn, Keough, 2002, Box 9-5, Fig 9-7</div>
+\vfill
+\tiny Данные из Quinn, Keough, 2002, Box 9-5, Fig 9-7
 
-## A priori анализ мощности {.column-2}
+## A priori анализ мощности
+
+\columnsbegin
+
+\column{0.5\textwidth}
 
 Что нужно
 
@@ -331,25 +351,35 @@ $$Power = 1 - \beta$$
 - желаемая мощность теста—80%
 - ожидаемая величина эффекта
 
-</br>
+\column{0.5\textwidth}
+
+\pause
+
+Что есть
 
 - $t$-критерий
 - $alpha = 0.05$
 - P = 80%
 - ?
 
+\columnsend
+
 ## Величина эффекта
 
 $d$ Коэна (Cohen's d)
 
-<br />
+
 $$d = \frac{\bar \mu_1 - \bar \mu_2}{\sigma}$$
 
  Где сигма может оцениваться одним из способов: 
- 
+
+\pause
+
 - среднеквадратичное отклонение ($d$ Коэна)
 
 $\sigma = {\sqrt{\frac {s_1^2 + s_2^2 } {2} }}$
+
+\pause
 
 - обобщенное стандартное отклонение ($g$ Хеджа)
 
@@ -411,16 +441,16 @@ effect
 ## Считаем объем выборки
 
 ```{r}
-pwr_hal <- pwr.t.test(n = NULL, 
-                      d = effect, 
-                      power = power, 
-                      sig.level = alpha, 
+pwr_hal <- pwr.t.test(n = NULL,  d = effect, 
+                      power = power,  sig.level = alpha, 
                       type = "two.sample", 
                       alternative = "two.sided")
 pwr_hal
 ```
 
-> - Чтобы с вероятностью 0.8 выявить различия плотности халиотисов в местах, где лов разрешен и запрещен, нужно обследовать __по `r ceiling(pwr_hal$n)` пробы каждого типа__, если мы верно оценили величину эффекта.
+\pause
+
+- Чтобы с вероятностью 0.8 выявить различия плотности халиотисов в местах, где лов разрешен и запрещен, нужно обследовать __по `r ceiling(pwr_hal$n)` пробы каждого типа__, если мы верно оценили величину эффекта.
 
 ## Задание
 
@@ -430,12 +460,12 @@ pwr_hal
 
 ## Решение
 
+\fontsize{10pt}{10pt}
+
 ```{r purl = FALSE}
 cohen.ES(test = "t", size = "small")
-pwr.t.test(n = NULL, d = 0.2, 
-           power = 0.8, sig.level = 0.01,
-           type = "two.sample", 
-           alternative = "two.sided")
+pwr.t.test(n = NULL, d = 0.2, power = 0.8, sig.level = 0.01,
+           type = "two.sample", alternative = "two.sided")
 ```
 
 ## Пример: Улитки на устрицах в мангровых зарослях*
@@ -448,13 +478,14 @@ pwr.t.test(n = NULL, d = 0.2,
 
 - Собрали по 5 проб - число улиток на раковинах устриц
 
-<div class = "footnote">* - Данные из Quinn, Keough, 2002, Box 9-5, Fig 9-7</div>
+\vfill
+\tiny Данные из Quinn, Keough, 2002, Box 9-5, Fig 9-7
 
 ## Скачиваем данные с сайта
 
 Не забудьте войти в вашу директорию для матметодов при помощи `setwd()`
 
-```{r}
+```{r eval=FALSE}
 library(downloader)
 
 # в рабочем каталоге создаем суб-директорию для данных
@@ -488,23 +519,25 @@ head(minch)     # Первые несколько строк файла
 
 Нормальное ли тут распределение?
 
-```{r fig.width = 4}
+```{r fig.width = 7, out.width='7cm', fig.height=3, out.height='3cm'}
 ggplot(data = minch, aes(x = site, y = limpt100)) +
   geom_boxplot() +
   labs(y = "Число улиток на 100 устриц", 
        x = "Сайт")
 ```
 
-## Боксплот корня из численности улиток (__sqlim100__) для двух сайтов<br />
+## Боксплот корня из численности улиток (`sqlim100`) для двух сайтов
 
-```{r}
+```{r fig.width = 7, out.width='7cm', fig.height=4, out.height='4cm'}
 ggplot(data = minch, aes(x = site, y = sqlim100)) +
   geom_boxplot() +
   labs(y = "Число улиток на 100 устриц", 
        x = "Сайт")
 ```
 
->- Распределение стало больше походить на нормальное. Можно пользоваться t-критерием для сравнения значений корня из численности улиток (__sqlim100__) для двух сайтов.
+\pause
+
+- Распределение стало больше походить на нормальное. Можно пользоваться t-критерием для сравнения значений корня из численности улиток (`sqlim100`) для двух сайтов.
 
 # A priory анализ мощности по данным пилотного исследования
 
@@ -514,14 +547,17 @@ ggplot(data = minch, aes(x = site, y = sqlim100)) +
 
 Мы хотим выяснить по этим данным, сколько нужно собрать проб, чтобы показать, что плотность улиток различается на двух сайтах.
 
-### Величина эффекта по исходным данным
+## Величина эффекта по исходным данным
 
 ```{r}
 library(effsize)
 eff_snail <- cohen.d(minch$sqlim100, minch$site)
 eff_snail
+```
 
-# Вычислим модуль, поскольку для `pwr.t.test()` эффект должен быть положительным
+Вычислим модуль, поскольку для `pwr.t.test()` эффект должен быть положительным
+
+```{r}
 effect_snail <- abs(eff_snail$estimate)
 ```
 
@@ -535,26 +571,38 @@ effect_snail <- abs(eff_snail$estimate)
 ## Решение
 
 ```{r purl = FALSE}
-pwr_snail <- pwr.t.test(n = NULL, d = effect_snail, power = 0.8, sig.level = 0.05, type = "two.sample", alternative = "two.sided")
+pwr_snail <- pwr.t.test(n = NULL, d = effect_snail, 
+                        power = 0.8, sig.level = 0.05, 
+                        type = "two.sample", 
+                        alternative = "two.sided")
 pwr_snail
 ```
 
->- Нужна выборка __`r ceiling(pwr_snail$n)` площадок с каждого сайта__, чтобы с вероятностью 0.8 обнаружить различия плотности улиток между сайтами.
+\pause
+
+- Нужна выборка __`r ceiling(pwr_snail$n)` площадок с каждого сайта__, чтобы с вероятностью 0.8 обнаружить различия плотности улиток между сайтами.
 
 ## Задание
 
-Представьте, что в датасете __sleep__ содержатся данные пилотного исследования.
+Представьте, что в датасете `sleep` содержатся данные пилотного исследования.
 
 Оцените, какой объем выборки нужно взять, чтобы показать, что число часов дополнительного сна после применения двух препаратов различается?
 
 ## Решение
 
+\fontsize{10pt}{10pt}
+
 ```{r purl=FALSE}
 eff_sleep <- cohen.d(sleep$extra, sleep$group)
 effect_sleep <- abs(eff_sleep$estimate)
-pwr_sleep <- pwr.t.test(n = NULL, d = effect_sleep, power = 0.8, sig.level = 0.05, type = "two.sample", alternative = "two.sided")
+pwr_sleep <- pwr.t.test(n = NULL, d = effect_sleep, 
+                        power = 0.8, sig.level = 0.05, 
+                        type = "two.sample", 
+                        alternative = "two.sided")
 pwr_sleep
 ```
+
+\fontsize{12pt}{12pt}
 
 Нужна выборка __`r ceiling(pwr_sleep$n)` человека в каждой из групп__, чтобы с вероятностью 0.8 обнаружить различия числа часов дополнительного сна после применения двух препаратов.
 
@@ -595,25 +643,25 @@ gen_pwr_vs_n <- function(d = c(0.2, 0.5, 0.8), a = c(0.05, 0.01), n = 150){
   return(t.test.power.effect)
 }
 
+th <- theme_classic(base_size = 18) +
+  theme(legend.key = element_blank(),
+        axis.line.x = element_line(colour = "black"),
+        axis.line.y = element_line(colour = "black"))
+
 dat <-gen_pwr_vs_n(n = 150)
 # factors
-dat$sig.level <- factor(dat$sig.level, levels = c(0.01, 0.05),
-                        labels = c("p = 0.01", "p = 0.05"))
-dat$effect <- factor(dat$effect, levels = c(0.2, 0.3, 0.5, 0.8),
-                     labels = c("d = 0.2", "d = 0.3", "d = 0.5", "d = 0.8"))
+dat$sig.level <- factor(dat$sig.level, levels = c(0.01, 0.05), labels = c("p = 0.01", "p = 0.05"))
+dat$effect <- factor(dat$effect, levels = c(0.2, 0.3, 0.5, 0.8), labels = c("d = 0.2", "d = 0.3", "d = 0.5", "d = 0.8"))
 
 # Power increases as the sample size increases
 # plot power vs n at d = 0.5, p = 0.01
 pwr.size <-
-  ggplot(data = dat[(dat$effect == "d = 0.5" & dat$sig.level == "p = 0.05"), ],
-         aes(x = size, y = value, color = sig.level)) +
+  ggplot(data = dat[(dat$effect == "d = 0.5" & dat$sig.level == "p = 0.05"), ], aes(x = size, y = value, color = sig.level)) +
   geom_line(size = 1.5) +
   scale_colour_discrete(name = "Уровень\nзначимости") +
   labs(x = "Объем выборки", y = "Мощность") +
   ggtitle("t-тест, d = 0.5") +
-  theme_minimal(base_size = 18) +
-  theme(legend.key = element_blank(),
-        axis.line = element_line(colour = "black"))
+  th
 pwr.size
 ```
 
@@ -629,9 +677,7 @@ pwr_size_apha <- ggplot(data = dat[dat$effect == "d = 0.5", ],
                         limits = c("p = 0.05", "p = 0.01")) +
   labs(x = "Объем выборки", y = "Мощность") +
   ggtitle("t-тест, d = 0.5") +
-  theme_minimal(base_size = 18) +
-  theme(legend.key = element_blank(),
-        axis.line = element_line(colour = "black"))
+  th
 pwr_size_apha
 ```
 
@@ -648,9 +694,7 @@ pwr_size_alpha_d <- ggplot(data = dat, aes(x = size, y = value, color = sig.leve
                         limits = c("p = 0.05", "p = 0.01")) +
   labs(x = "Объем выборки", y = "Мощность") +
   ggtitle("t-тест") +
-  theme_minimal(base_size = 18) +
-  theme(legend.key = element_blank(),
-        axis.line = element_line(colour = "black"))
+  th
 pwr_size_alpha_d
 ```
 
