@@ -19,16 +19,17 @@ install.packages("ggplot2")
 install.packages(c("downloader", "readxl", "effsize", "pwr"))
 ```
 
-- Презентация [html](02_power.html) | [pdf](02_power.pdf)
+- Презентация [pdf](02_power.pdf)
 - [код R](02_code_power.R)
 - Данные: [minch.xls](data/minch.xls)
 - [Примеры вопросов следующего теста](test_handouts/02-power-handout-test1.pdf)
 
 ## 3.Регрессионный анализ, часть 1
 
-- Презентация [html] | [pdf]
-- [код R]
-- Данные
+
+- Презентация [pdf](03_regression1.pdf)
+- [код R](03_code_regression1.pdf)
+- Данные: [nelson.xlsx](data/nelson.xlsx)
 - [Примеры вопросов следующего теста]
 
 ## 4.Регрессионный анализ, часть 2
