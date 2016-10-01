@@ -20,7 +20,7 @@ output:
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 # output options
-options(width = 70, scipen = 6, digits = 3)
+options(width = 70, scipen = 6)
 library(knitr)
 # chunk default options
 # opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
@@ -48,7 +48,7 @@ library(gridExtra) # to rescale legend
   - дать определение ошибок I и II рода, и графически изобразить их отношение к мощности теста
   - оценивать величину эффекта и необходимый объем выборки по данным пилотного исследования
   - загружать данные из интернета
-  - загружать данные из .xlsx в R
+  - загружать данные из .xlsx и .csv в R
   - строить боксплоты с помощью `ggplot2`
 
   
@@ -199,10 +199,18 @@ View(sleep)
 
 Сравним увеличение продолжительности сна при помощи двухвыборочного t-критерия.
 
+\fontsize{10pt}{10pt}
 ```{r}
 tt <- t.test(extra ~ group, sleep)
 tt
 ```
+
+\pause
+
+Результаты можно описать, например, так:
+
+- Различия изменения продолжительности сна при применении двух препаратов были недостоверны ($t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.01)`$)
+
 
 ## Что спрятано в результатах?
 
@@ -231,6 +239,16 @@ tt$statistic # значение t-критерия
 
 ## Ошибка I рода
 
+\small
+
+| 	|$$H0 == TRUE$$ |	$$H0 == FALSE$$ |
+|-----|-----|-----|
+| Отклонить $H_0$ 	| Ошибка I рода | 	Верно |
+| Сохранить $H_0$ 	| Верно | Ошибка II рода |
+
+\normalsize
+
+
 ```{r power_alpha, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
 gg_alpha <- gg_t + 
   # alpha
@@ -254,6 +272,16 @@ __Ошибка I рода --- вероятность отвергнуть $H_0$,
 
 ## Мы этого не знаем, но может быть верна $H_A$...
 
+\small
+
+| 	|$$H0 == TRUE$$ |	$$H0 == FALSE$$ |
+|-----|-----|-----|
+| Отклонить $H_0$ 	| Ошибка I рода | 	Верно |
+| Сохранить $H_0$ 	| Верно | Ошибка II рода |
+
+\normalsize
+
+
 ```{r power_alternative, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
 nc <- 0.5
 gg_alpha +
@@ -265,6 +293,15 @@ gg_alpha +
 Можно построить еще одно распределение статистики --- распределение, при условии того, что верна $H_A$
 
 ## Ошибка II рода
+
+\small
+
+| 	|$$H0 == TRUE$$ |	$$H0 == FALSE$$ |
+|-----|-----|-----|
+| Отклонить $H_0$ 	| Ошибка I рода | 	Верно |
+| Сохранить $H_0$ 	| Верно | Ошибка II рода |
+
+\normalsize
 
 
 ```{r power_beta, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
@@ -281,9 +318,18 @@ gg_beta <- gg_alpha +
 gg_beta
 ```
 
-__Ошибка II рода --- вероятность принять $H_0$, когда верна $H_A$__
+__Ошибка II рода --- вероятность принять $H_0$, когда верна__ $H_A$
 
 ## Мощность теста --- способность выявлять различия
+
+\small
+
+| 	|$$H0 == TRUE$$ |	$$H0 == FALSE$$ |
+|-----|-----|-----|
+| Отклонить $H_0$ 	| Ошибка I рода | 	Верно |
+| Сохранить $H_0$ 	| Верно | Ошибка II рода |
+
+\normalsize
 
 ```{r power-power, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
 gg_power <- gg_beta +
@@ -300,13 +346,21 @@ gg_power <- gg_beta +
 gg_power
 ```
 
-__Мощность теста - вероятность отвергнуть $H_0$, когда верна $H_А$__
+__Мощность теста - вероятность отвергнуть $H_0$, когда верна__ $H_A$
+
+$$Power = 1 - \beta$$
+
+## Мощность теста
 
 $$Power = 1 - \beta$$
 
 Обычно считается, что хорошо, когда мощность не меньше 0.8
 
 Т.е. что в 80% случаев мы можем найди различия заданной величины, если они есть.
+
+```{r power-power, echo = FALSE, fig.height=3, fig.width=10.1, purl = FALSE}
+```
+
 
 ## Анализ мощности
 
@@ -348,7 +402,7 @@ $$Power = 1 - \beta$$
 
 - тест
 - уровень значимости
-- желаемая мощность теста—80%
+- желаемая мощность теста
 - ожидаемая величина эффекта
 
 \column{0.5\textwidth}
@@ -358,8 +412,8 @@ $$Power = 1 - \beta$$
 Что есть
 
 - $t$-критерий
-- $alpha = 0.05$
-- P = 80%
+- $\alpha = 0.05$
+- $Power = 0.8$
 - ?
 
 \columnsend
@@ -491,35 +545,65 @@ library(downloader)
 # в рабочем каталоге создаем суб-директорию для данных
 if(!dir.exists("data")) dir.create("data")
 
-# скачиваем файл
-download(
-  url = "https://varmara.github.io/mathmethr/data/minch.xls", 
-  destfile = "data/minch.xls")
+# скачиваем файл в xlsx, либо в текстовом формате
+if (!file.exists("data/minch.xlsx")) {
+  download(
+    url = "https://varmara.github.io/mathmethr/data/minch.xlsx",
+    destfile = "data/minch.xlsx")
+}
+
+if (!file.exists("data/minch.csv")) {
+  download(
+    url = "https://varmara.github.io/mathmethr/data/minch.xls",
+    destfile = "data/minch.csv")
+}
 ```
 
 
-## Читаем данные из файла
+## Читаем данные из файла одним из способов
 
+### Чтение из xlsx
 ```{r}
 library(readxl)
-minch <- read_excel(path = "data/minch.xls", sheet = 1)
+minch <- read_excel(path = "data/minch.xlsx", sheet = 1)
 ```
+
+### Чтение из csv
+
+```{r}
+minch <- read.table("data/minch.csv", header = TRUE)
+```
+
+## Все ли правильно открылось?
 
 ```{r}
 str(minch) # Структура данных
-```
-
-## Просмотреть, что получилось можно так:
-
-```{r}
 head(minch)     # Первые несколько строк файла
 ```
+
+## Знакомимся с данными
+
+Есть ли пропущенные значения?
+
+```{r}
+sapply(minch, function(x) sum(is.na(x)))
+```
+
+Каковы объемы выборок?
+
+```{r}
+sum(!(is.na(minch$site == "A")))
+sum(!(is.na(minch$site == "B")))
+```
+
 
 ## Боксплоты числа улиток
 
 Нормальное ли тут распределение?
 
 ```{r fig.width = 7, out.width='7cm', fig.height=3, out.height='3cm'}
+library(ggplot2)
+theme_set(theme_bw())
 ggplot(data = minch, aes(x = site, y = limpt100)) +
   geom_boxplot() +
   labs(y = "Число улиток на 100 устриц", 

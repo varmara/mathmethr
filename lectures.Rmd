@@ -21,7 +21,7 @@ install.packages(c("downloader", "readxl", "effsize", "pwr"))
 
 - Презентация [pdf](02_power.pdf)
 - [код R](02_code_power.R)
-- Данные: [minch.xls](data/minch.xls)
+- Данные: [minch.xlsx](data/minch.xlsx) | [minch.csv](data/minch.csv)
 - [Примеры вопросов следующего теста](test_handouts/02-power-handout-test1.pdf)
 
 ## 3.Регрессионный анализ, часть 1

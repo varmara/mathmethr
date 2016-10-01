@@ -67,15 +67,36 @@ pwr_hal
 
 library(downloader)
 # в рабочем каталоге создаем суб-директорию для данных
-if(!dir.exists("data")) dir.create("data")
-# скачиваем файл
-download(
-  url = "https://varmara.github.io/mathmethr/data/minch.xls",
-  destfile = "data/minch.xls")
+if (!dir.exists("data")) dir.create("data")
+# скачиваем файл либо в xlsx, либо в текстовом формате
+if (!file.exists("data/minch.xlsx")) {
+  download(
+    url = "https://varmara.github.io/mathmethr/data/minch.xlsx",
+    destfile = "data/minch.xlsx")
+}
+if (!file.exists("data/minch.csv")) {
+  download(
+    url = "https://varmara.github.io/mathmethr/data/minch.xls",
+    destfile = "data/minch.csv")
+}
 
-#' ## Читаем данные из файла
+
+#' ## Читаем данные из файла одним из способов
+
+### Чтение из xlsx
 library(readxl)
-minch <- read_excel(path = "data/minch.xls", sheet = 1)
+minch <- read_excel(path = "data/minch.xlsx", sheet = 1)
+
+### Чтение из csv
+minch <- read.table("data/minch.csv", header = TRUE)
+
+## Знакомимся с данными
+# Есть ли пропущенные значения?
+sapply(minch, function(x) sum(is.na(x)))
+
+# Каковы объемы выборок?
+sum(!(is.na(minch$site == "A")))
+sum(!(is.na(minch$site == "B")))
 
 #' ## Боксплоты числа улиток
 ggplot(data = minch, aes(x = site, y = limpt100)) +
