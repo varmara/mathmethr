@@ -36,6 +36,10 @@ install.packages(c("downloader", "readxl", "effsize", "pwr"))
 
 ## 4.Регрессионный анализ, часть 2
 
+```{r eval=FALSE}
+install.packages("car")
+```
+
 - Презентация [pdf](04_regression2.pdf)
 - [код R](04_code_regression2.pdf)
 - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv)
