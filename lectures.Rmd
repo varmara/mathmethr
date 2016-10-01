@@ -32,6 +32,8 @@ install.packages(c("downloader", "readxl", "effsize", "pwr"))
 - Данные: [nelson.xlsx](data/nelson.xlsx)
 - [Примеры вопросов следующего теста]
 
+- [Домашнее задание №1](hw/hw1_lin-regr-cheddar-assump.zip)
+
 ## 4.Регрессионный анализ, часть 2
 
 - Презентация [html] | [pdf]
