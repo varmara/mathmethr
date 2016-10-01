@@ -1,14 +1,14 @@
 ---
 title: "Регрессионный анализ, часть 2"
+subtitle: "Математические методы в зоологии с использованием R"
 author: "Марина Варфоломеева"
-date: "осень 2015"
 output:
   beamer_presentation:
     colortheme: seagull
-    fonttheme: structurebold
     highlight: tango
+    fonttheme: structurebold
     includes:
-      in_header: ./../includes/header.tex
+      in_header: ./includes/header.tex
     pandoc_args:
     - --latex-engine=xelatex
     - -V fontsize=10pt
@@ -16,23 +16,21 @@ output:
     slide_level: 2
     theme: CambridgeUS
     toc: yes
-subtitle: Математические методы в зоологии - на R
-institution: СПбГУ
 ---
 
-```{r setup, include = FALSE, cache = FALSE}
-# output options
-options(width = 70, scipen = 6, digits = 3) 
+```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
+options(width = 70, scipen = 6, digits = 3)
 library(knitr)
-opts_chunk$set(fig.path='figure/fig-',fig.show='hold',size='footnotesize',comment="#",warning=FALSE, message=FALSE,dev='cairo_pdf', fig.height=1.8, fig.width=5.4)
-library("extrafont")
-# font_import()
-# loadfonts() ## for pdf()
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
 ```
 
+
 ### Вы сможете
-- Подобрать модель множественной линейной регрессии, проверить ее валидность и интерпретировать коэффициенты при разных предикторах.
-- Проверить условия применимости линейной регрессии при помощи анализа остатков
+
+- Подобрать модель множественной линейной регрессии
+- Протестировать значимость модели и ее коэффициентов
+- Интерпретировать коэффициенты множественной регрессии при разных предикторах
+- Проверить условия применимости простой и множественной линейной регрессии при помощи анализа остатков
 
 # Множественная линейная регрессия
 
@@ -52,52 +50,32 @@ library("extrafont")
 
 ```{r}
 # установите рабочую директорию
-# birds <- read.delim(file = "loyn.csv") # из .csv
+# birds <- read.delim(file = "data/loyn.csv") # из .csv
 library(readxl)
-birds <- read_excel("loyn.xls", sheet = 1)
+birds <- read_excel("data/loyn.xls", sheet = 1)
 str(birds)
 ```
 
-## Задача: запишите формулу модели регрессии
+## Задача
 
-Как зависит обилие птиц от характеристик леса? Запишите в обозначениях R модель множественной линейной регрессии
-
-$$Y _i = b _0 + b _1 x _{1 i} + b _2 x _{2 i} + b _3 x _{3 i} + b _4 x _{4 i}$$
-
-Используйте названия переменных вместо $x _{1 i} - x _{4 i}$
+- Подберите модель множественной линейной регрессии, чтобы описать, как зависит обилие птиц от характеристик леса
+- Проверьте значимость ее коэффициентов при помощи t-критерия
 
 - `abund` - Обилие птиц
 - `l10area` - Площадь леса, га
 - `l10dist` - Расстояние до ближайшего леса, км (логарифм)
 - `l10ldist` - Расстояние до ближайшего леса большего размера,
 км (логарифм)
-- `yr.isol` - Продолжительности изоляции, лет
+- `yr.isol` - Год изоляции лесного массива
 
 ## Решение
-
-В обозначениях R модель множественной линейной регрессии
-
-\[abund \sim l10area + l10dist + l10ldist + yr.isol\]
-
-Названия переменных:
-
-- `abund` - Обилие птиц
-- `l10area` - Площадь леса, га
-- `l10dist` - Расстояние до ближайшего леса, км (логарифм)
-- `l10ldist` - Расстояние до ближайшего леса большего размера,
-км (логарифм)
-- `yr.isol` - Продолжительности изоляции, лет
-
-## Подбираем параметры модели и проверяем валидность с помощью t-критерия
-
-$H _0: \beta _i = 0$
 
 ```{r}
 bird_lm <- lm(abund ~ l10area + l10dist + l10ldist + yr.isol, data = birds)
 summary(bird_lm)
 ```
 
-## Задача: Запишите уравнение множественной линейной регрессии
+## Задача
 
 Запишите уравнение множественной линейной регрессии
 
@@ -131,7 +109,9 @@ lm_equation <- function(fit, strict = TRUE){
 }
 ```
 
-## Уравнение множественной линейной регрессии
+## Решение
+
+Коэффициенты модели:
 
 ```{r}
 coef(bird_lm)
@@ -143,7 +123,7 @@ coef(bird_lm)
 lm_equation(bird_lm, strict=FALSE)
 ```
 
-более формальная запись:  
+Более формальная запись:  
 
 ```{r results='asis', echo=FALSE}
 lm_equation(bird_lm)
@@ -156,7 +136,9 @@ coef(bird_lm)
 ```
 
 ### Обычные коэффициенты
-- величина зависит от единиц измерения
+
+- Величина зависит от единиц измерения
+- Коэффициент при $Х_p$ показывают, на сколько изменяется $Y$, когда предиктор $Х_p$ меняется на единицу, при условии, что остальные предикторы не меняют своих значений.
 
 
 ## Сравнение влияния разных факторов
@@ -168,14 +150,19 @@ coef(scaled_bird_lm)
 ```
 
 ### Бета-коэффициенты 
-- измерены в стандартных отклонениях
-- относительная оценка влияния фактора
-- можно сравнивать
+- Измерены в стандартных отклонениях
+- Коэффициент при $Х_p$ показывают, на сколько изменяется $Y$, когда предиктор $Х_p$ меняется на одно стандартное отклонение, при условии, что остальные предикторы не меняют своих значений.
+- Относительная оценка влияния фактора
+- Можно сравнивать друг с другом
 
 
-## Задача: Сравните влияние разных факторов
+## Задача
+
+Сравните влияние разных факторов
 
 Определите по значениям beta-коэффициентов, какие факторы сильнее всего влияют на обилие птиц
+
+\fontsize{10pt}{10pt}
 
 ```{r}
 summary(scaled_bird_lm)
@@ -204,16 +191,16 @@ summary(bird_lm)$adj.r.squared
 
 ## 1. Независимость
 
-\begin{itemize}
-\item Значения $y _i$ должны быть независимы друг от друга
-\begin{itemize}
-\item берегитесь псевдоповторностей и автокорреляций (например, временных)
-\end{itemize}
-\item Контролируется на этапе планирования
-\item Проверяем на графике остатков
-\end{itemize}
 
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-12.png}
+- Значения $y _i$ должны быть независимы друг от друга
+
+- берегитесь псевдоповторностей и автокорреляций (например, временных)
+
+- Контролируется на этапе планирования
+- Проверяем на графике остатков
+
+
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/assumption-12.png}
 \vskip0pt plus 1filll
 Остаточная изменчивость (Рис. из кн. Diez et al., 2010, стр. 332, рис. 7.8)
 
@@ -222,14 +209,14 @@ summary(bird_lm)$adj.r.squared
 - проверяем на графике рассеяния исходных данных
 - проверяем на графике остатков
 
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-12.png}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/assumption-12.png}
 \vskip0pt plus 1filll
 Остаточная изменчивость (Рис. из кн. Diez et al., 2010, стр. 332, рис. 7.8)
 
 ## Что бывает, если неглядя применять линейную регрессию
 
-\begin{columns}
-\begin{column}{0.48\textwidth}
+\columnsbegin
+\column{0.48\textwidth}
 
 \href{http://ru.wikipedia.org/wiki/Квартет_Энскомба}{Квартет Энскомба} - примеры данных, где регрессии одинаковы во всех случаях (Anscombe, 1973)
 
@@ -239,182 +226,190 @@ summary(bird_lm)$adj.r.squared
 
 \[H _0: \beta _1 = 0, t = 4.24, p = 0.002\]
 
-\end{column}
-\begin{column}{0.48\textwidth}
-\begin{figure}
+
+\column{0.48\textwidth}
+
 \centering
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/anscombe.png}
-\caption{Квартет Энскомба (рис. из кн. Quinn, Keough, 2002, стр. 97, рис. 5.9}
-\end{figure}
-\end{column}
-\end{columns}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/anscombe.png}
+\tiny{Квартет Энскомба (рис. из кн. Quinn, Keough, 2002, стр. 97, рис. 5.9}
+
+
+\columnsend
 
 ## 3. Нормальное распределение остатков
 
-\begin{columns}
-\begin{column}{0.48\textwidth}
+\columnsbegin
+\column{0.48\textwidth}
 Нужно, т.к. в модели $Y _i = \beta _0 + \beta x _i + \epsilon _i$ зависимая переменная $Y \sim N(0,\sigma^2)$, а значит $\epsilon _i \sim N(0,\sigma^2)$
-\begin{itemize}
-\item Нужно для тестов параметров, а не для подбора методом наименьших квадратов
-\item Нарушение не страшно - тесты устойчивы к небольшим отклонениям от нормального распределения
-\item Проверяем распределение остатков на нормально-вероятностном графике
-\end{itemize}
-\end{column}
-\begin{column}{0.48\textwidth}
-\begin{figure}
+
+- Нужно для тестов параметров, а не для подбора методом наименьших квадратов
+- Нарушение не страшно - тесты устойчивы к небольшим отклонениям от нормального распределения
+- Проверяем распределение остатков на нормально-вероятностном графике
+
+
+\column{0.48\textwidth}
+
 \centering
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/normality-assumption.png}
-\caption{Условие нормальности и гомогенность дисперсий (рис. 11.4 из кн. Watkins et al., 2008, стр. 743)}
-\end{figure}
-\end{column}
-\end{columns}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/normality-assumption.png}
+\tiny{Условие нормальности и гомогенность дисперсий (рис. 11.4 из кн. Watkins et al., 2008, стр. 743)}
+
+
+\columnsend
 
 ## 4. Гомогенность дисперсий
 
-\begin{columns}
-\begin{column}{0.48\textwidth}
+\columnsbegin
+\column{0.48\textwidth}
 Нужно, т.к. в модели $Y _i = \beta _0 + \beta x _i + \epsilon _i$ зависимая переменная $Y \sim N(0,\sigma^2)$ и дисперсии $\sigma^2 _1 = \sigma^2 _2 = ... = \sigma^2 _i$ для каждого $Y _i$ \par
 Но, поскольку $\epsilon _i \sim N(0,\sigma^2)$, можно проверить равенство дисперсий остатков $\epsilon _i$
-\begin{itemize}
-\item Нужно и важно для тестов параметров
-\item Проверяем на графике остатков по отношению к предсказанным значениям
-\item Можно сделать тест С Кокрана (Cochran's C), но только если несколько значений y для каждого x
-\end{itemize}
-\end{column}
-\begin{column}{0.48\textwidth}
-\begin{figure}
+
+- Нужно и важно для тестов параметров
+- Проверяем на графике остатков по отношению к предсказанным значениям
+- Есть формальные тесты (Cochran's C), но только если несколько значений y для каждого x
+
+
+\column{0.48\textwidth}
+
 \centering
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/normality-assumption.png}
-\caption{Условие нормальности и гомогенность дисперсий (рис. 11.4 из кн. Watkins et al., 2008, стр. 743)}
-\end{figure}
-\end{column}
-\end{columns}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/normality-assumption.png}
+\tiny{Условие нормальности и гомогенность дисперсий (рис. 11.4 из кн. Watkins et al., 2008, стр. 743)}
+
+
+\columnsend
 
 ## Диагностика регрессии по графикам остатков
 
-\begin{columns}
-\begin{column}{0.48\textwidth}
-\begin{figure}
+\columnsbegin
+\column{0.48\textwidth}
+
 \centering
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-violations-on-residual-plots.png}
-\caption{Диагностика регрессии по графикам остатков (рис. 8.5 d из кн. Logan, 2010, стр. 174)}
-\end{figure}
-\end{column}
-\begin{column}{0.48\textwidth}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/assumption-violations-on-residual-plots.png}
+\tiny{Диагностика регрессии по графикам остатков (рис. 8.5 d из кн. Logan, 2010, стр. 174)}
+
+
+\column{0.48\textwidth}
 \begin{enumerate}[(a)]
-\item все условия выполнены
-\item разброс остатков разный (wedge-shaped pattern)
-\item разброс остатков одинаковый, но нужны дополнительные предикторы
-\item к нелинейной зависимости применили линейную регрессию
+- все условия выполнены
+- разброс остатков разный (wedge-shaped pattern)
+- разброс остатков одинаковый, но нужны дополнительные предикторы
+- к нелинейной зависимости применили линейную регрессию
 \end{enumerate}
-\end{column}
-\end{columns}
+
+\columnsend
 
 ## Задача: Проанализируйте графики остатков
 
 Скажите пожалуйста
 
-\begin{itemize}
-\item какой регрессии соответствует какой график остатков?
-\item все ли условия применимости регрессии здесь выполняются?
-\item назовите случаи, в которых можно и нельзя применить линейную регрессию?
-\end{itemize}
-\vskip0pt plus 1filll
-\begin{figure}[H]
-\begin{subfigure}[b]{0.48\textwidth}
+
+- какой регрессии соответствует какой график остатков?
+- все ли условия применимости регрессии здесь выполняются?
+- назовите случаи, в которых можно и нельзя применить линейную регрессию?
+
+\columnsbegin
+\column{0.48\textwidth}
+
 \centering
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-quiz1.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-quiz2.png}
-\end{subfigure}
-\caption{Графики регрессий и остатков (рис. 3.84-3.85 из кн. Watkins et al. 2008, стр. 177)}
-\end{figure}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/assumption-quiz1.png}
+
+\column{0.48\textwidth}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/assumption-quiz2.png}
+
+\columnsend
+
+\tiny{Из кн. Watkins et al. 2008, стр. 177, рис. 3.84-3.85}
+
 
 ## Решение
 
 - A-I - нелинейная связь - нельзя; 
 - B-II - все в порядке, можно; 
 - C-III - все в порядке, можно; 
-- D-IV - синусоидальный тренд в остатках, нарушено условие независимости или зависимость нелинейная - нельзя.
+- D-IV - синусоидальный паттерн в остатках, нарушено условие независимости или зависимость нелинейная - нельзя.
 
 \vskip0pt plus 1filll
 
-\begin{figure}[H]
-\begin{subfigure}[b]{0.48\textwidth}
+\columnsbegin
+\column{0.48\textwidth}
 \centering
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-quiz1.png}
-\end{subfigure}
-\begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/assumption-quiz2.png}
-\end{subfigure}
-\caption{Графики регрессий и остатков (рис. 3.84-3.85 из кн. Watkins et al. 2008, стр. 177)}
-\end{figure}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/assumption-quiz1.png}
+\column{0.48\textwidth}
+
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/assumption-quiz2.png}
+\columnsend
+
+
+\tiny Рис. из кн. Watkins et al. 2008, стр. 177, рис. 3.84-3.85
+
 
 ## Какие наблюдения влияют на ход регрессии больше других?
 
-\begin{columns}
-\begin{column}{0.48\textwidth}
-\begin{block}<2,3>{Влиятельные наблюдения, выбросы, outliers}
-\begin{itemize}
-\item большая абсолютная величина остатка
-\item близость к краям области определения (leverage - рычаг, сила; иногда называют hat)
-\end{itemize}
-\end{block}
-\uncover<3>{На графике точки и линии регрессии построенные с их включением}
-\begin{itemize}
-\item<3> 1 - не влияет
-\item<3> 2 - умеренно влияет (большой остаток, малая сила влияния)
-\item<3> 3 - очень сильно влияет (большой остаток, большая сила влияния)
-\end{itemize}
-\end{column}
-\begin{column}{0.48\textwidth}
-\begin{figure}
+\columnsbegin
+\column{0.48\textwidth}
+
+Влиятельные наблюдения, выбросы, outliers
+
+- большая абсолютная величина остатка
+- близость к краям области определения (leverage - рычаг, сила; иногда называют hat)
+
+На графике точки и линии регрессии построенные с их включением:
+
+- 1 - не влияет на ход регрессии, т.к. лежит на прямой
+- 2 - умеренно влияет (большой остаток, малая сила влияния)
+- 3 - очень сильно влияет (большой остаток, большая сила влияния)
+
+
+\column{0.48\textwidth}
+
 \centering
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/influential-observations.png}
-\caption{Влиятельные наблюдения (рис. 5.8 из кн. Quinn, Keough, 2002, стр. 96)}
-\end{figure}
-\end{column}
-\end{columns}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/influential-observations.png}
+\tiny{Влиятельные наблюдения (рис. 5.8 из кн. Quinn, Keough, 2002, стр. 96)}
+
+\columnsend
 
 ## Как оценить влиятельность наблюдений?
 
-\begin{columns}
-\begin{column}{0.48\textwidth}
-\begin{block}{Расстояние Кука (Cook's d, Cook, 1977)}
-\begin{itemize}
-\item Учитывает одновременно величину остатка и близость к краям области определения (leverage)
-\item Условное пороговое значение: выброс, если $d \ge 4/(N - k - 1)$, где $N$ - объем выборки, $k$ - число предикторов.
-\end{itemize}
-\end{block}
-\uncover<2>{Дж. Фокс советует не обращать внимания на пороговые значения (Fox, 1991)}
-\end{column}
-\begin{column}{0.48\textwidth}
-\begin{figure}
+\columnsbegin
+\column{0.48\textwidth}
+
+\blockbegin{Расстояние Кука (Cook's d, Cook, 1977)}
+
+- Учитывает одновременно величину остатка и близость к краям области определения (leverage)
+- Условное пороговое значение: выброс, если $d \ge 4/(N - k - 1)$, где $N$ - объем выборки, $k$ - число предикторов.
+
+\blockend
+
+\pause
+
+- Дж. Фокс советует не обращать внимания на пороговые значения (Fox, 1991)
+
+\column{0.48\textwidth}
+
 \centering
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/influential-observations.png}
-\caption{Влиятельные наблюдения (рис. 5.8 из кн. Quinn, Keough, 2002, стр. 96)}
-\end{figure}
-\end{column}
-\end{columns}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/influential-observations.png}
+
+\tiny{Влиятельные наблюдения (рис. 5.8 из кн. Quinn, Keough, 2002, стр. 96)}
+
+
+\columnsend
 
 ## Что делать с влиятельными точками и с выбросами?
 
-\begin{columns}
-\begin{column}{0.48\textwidth}
-\begin{itemize}
-\item Проверить, не ошибка ли это. Если нет, не удалять - обсуждать!
-\item Проверить, что будет, если их исключить из модели
-\end{itemize}
-\end{column}
-\begin{column}{0.48\textwidth}
-\begin{figure}
+\columnsbegin
+\column{0.48\textwidth}
+
+- Проверить, не ошибка ли это. Если нет, не удалять - обсуждать!
+- Проверить, что будет, если их исключить из модели
+
+
+\column{0.48\textwidth}
+
 \centering
-\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{./img/influential-observations.png}
-\caption{Влиятельные наблюдения (рис. 5.8 из кн. Quinn, Keough, 2002, стр. 96)}
-\end{figure}
-\end{column}
-\end{columns}
+\includegraphics[width=\linewidth,height=\textheight,keepaspectratio]{images/influential-observations.png}
+\tiny{Влиятельные наблюдения (рис. 5.8 из кн. Quinn, Keough, 2002, стр. 96)}
+
+
+\columnsend
 
 ## Колинеарность предикторов
 
@@ -452,9 +447,21 @@ $\sqrt{VIF} > 2$  - коллинеарность
 
 ## Как проверить условия применимости?
 
-- Величина остатков, влиятельность наблюдений, тренды - на графике остатков от предсказанных значений
-- Форма распределения остатков - нормальновероятностный график
-- Колинеарность предикторов - толерантность и показатель инфляции для дисперсии
+1. VIF --- колинеарность предикторов (для множественной регрессии)
+2. График остатков от предсказанных значений --- величина остатков, влиятельность наблюдений, отсутствие паттернов, гомогенность дисперсий.
+3. График квантилей остатков --- распределение остатков
+
+## 1. Проверим, есть ли в этих данных колинеарность предикторов
+
+```{r message = FALSE}
+library(car)
+vif(bird_lm) # variance inflation factors
+sqrt(vif(bird_lm)) > 2 # есть ли проблемы?
+1/vif(bird_lm) # tolerance
+```
+
+\pause
+Все в порядке, предикторы независимы
 
 ## Для анализа остатков выделим нужные данные в новый датафрейм
 
@@ -465,14 +472,14 @@ bird_diag <- fortify(bird_lm)
 head(bird_diag, 2)
 ```
 
-Кроме `abund`, `l10area`, `l10dist`, `l10ldist` и `yr.isol` нам понадобятся
-
 - `.cooksd` - расстояние Кука  
 - `.fitted` - предсказанные значения  
 - `.resid` - остатки  
 - `.stdresid` - стандартизованные остатки
 
-## Задача: Постройте график зависимости стандартизованных остатков от предсказанных значений
+## Задача
+
+Постройте график зависимости стандартизованных остатков от предсказанных значений
 
 Используйте данные из `bird_diag`
 
@@ -491,60 +498,49 @@ $$\frac {y _i - \hat y _i} {\sqrt{MS _e}}$$
     - $\le 2 SD$ - обычные
     - $> 3 SD$ - редкие
 
-## Решение:
+## Решение
 
 График зависимости стандартизованных остатков от предсказанных значений
-```{r}
-theme_set(theme_bw(base_size = 8) + theme(legend.key = element_blank()))
-gg_resid <- ggplot(data = bird_diag, aes(x = .fitted, y = .stdresid))
-gg_resid + geom_point()
-```
-
-## График стандартизованных остатков от предсказанных значений
-
-График станет информативнее, если кое-что добавить
-
-```{r,res-plot}
-gg_resid <- gg_resid + geom_point(aes(size = .cooksd)) +          # расстояние Кука
-  geom_smooth(method="loess", se = FALSE) +  # линия тренда
-  geom_hline(yintercept = 0)                 # горизонтальная линия y = 0
-gg_resid
-```
-
-## Можно подписать остатки больше двух стандартных отклонений на предыдущем графике
-
-Стандартизованные остатки $\le 2 SD$ - обычные, $> 3 SD$ - редкие
 
 ```{r}
-# Создаем логический вектор, где TRUE, если стандартизованный остаток больше 2
+ggplot(data = bird_diag, aes(x = .fitted, y = .stdresid)) + geom_point()
+```
+
+## График станет информативнее, если кое-что добавить
+
+```{r}
+# Создаем логический вектор, где TRUE, 
+# если стандартизованный остаток больше 2
 f_outlier <- abs(bird_diag$.stdresid) > 2
 # Создаем будущие ярлыки
 labs <- ifelse(test = f_outlier,
                yes = row(bird_diag), # Если test == TRUE
                no = "") # Если test == FALSE
 
-gg_resid_lab <- gg_resid + 
-  geom_text(aes(label = labs), hjust=2, colour = "blue", size = 2)
-gg_resid_lab
+gg_resid <- ggplot(data = bird_diag, 
+                   aes(x = .fitted, y = .stdresid)) + 
+  geom_point(aes(size = .cooksd)) + # расстояние Кука
+  geom_hline(yintercept = 0) +   # горизонтальная линия y = 0
+  geom_text(aes(label = labs), hjust = 2, colour = "blue", 
+            size = 2) # номера наблюдений с остатками больше 2SD
 ```
-
-
 
 ## Интерпретируем график стандартизованных остатков от предсказанных значений
 
 Какие выводы можно сделать по графику остатков?
 
-```{r,res-plot, echo=FALSE}
+```{r echo=FALSE}
+gg_resid
 ```
 
 \pause
-\begin{itemize}
-\item Большая часть стандартизованных остатков в пределах двух стандартных отклонений. Есть отдельные влиятельные наблюдения, которые нужно проверить
-\item Разброс остатков не совсем одинаков. Похоже на гетерогенность дисперсий
-\item Тренда среди остатков нет
-\end{itemize}
 
-## Нормальновероятностный график стандартизованных остатков
+- Большая часть стандартизованных остатков в пределах двух стандартных отклонений. Есть отдельные влиятельные наблюдения, которые нужно проверить
+- Разброс остатков не совсем одинаков. Похоже на гетерогенность дисперсий
+- Тренда среди остатков нет
+
+
+## 3. Нормальновероятностный график стандартизованных остатков
 
 Используется, чтобы оценить форму распределения.
 Если точки лежат на одной прямой - нормальное распределение.
@@ -564,21 +560,11 @@ geom_abline(intercept = mean_val, slope = sd_val) + # точки должны б
 ```{r qqplot, warning = FALSE, message=FALSE, echo=FALSE}
 ```
 \pause
-\begin{itemize}
-\item Отклонений от нормального распределения нет
-\end{itemize}
 
-## Проверим, есть ли в этих данных колинеарность предикторов
+- Отклонений от нормального распределения нет
 
-```{r message = FALSE}
-library(car)
-vif(bird_lm) # variance inflation factors
-sqrt(vif(bird_lm)) > 2 # есть ли проблемы?
-1/vif(bird_lm) # tolerance
-```
 
-\pause
-Все в порядке, предикторы независимы
+
 
 ## Take home messages
 
