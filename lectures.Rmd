@@ -29,7 +29,7 @@ install.packages(c("downloader", "readxl", "effsize", "pwr"))
 
 - Презентация [pdf](03_regression1.pdf)
 - [код R](03_code_regression1.pdf)
-- Данные: [nelson.xlsx](data/nelson.xlsx)
+- Данные: [nelson.xlsx](data/nelson.xlsx) | [nelson.csv](data/nelson.csv)
 - [Примеры вопросов следующего теста]
 
 - [Домашнее задание №1](hw/hw1_lin-regr-cheddar-assump.zip)
