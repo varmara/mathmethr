@@ -22,11 +22,10 @@ output:
 # output options
 options(width = 70, scipen = 6)
 library(knitr)
-# chunk default options
-# opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
 opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
-# library("extrafont")
+source("support_mathmethr.R")
 ```
+
 ```{r libs, echo=FALSE}
 library(ggplot2)
 theme_set(theme_bw())
@@ -98,27 +97,6 @@ t-статистика подчиняется t-распределению.
 
 ```{r gg-t, echo=FALSE, purl=FALSE}
 t_df <- data.frame(t = seq(-6, 6, length.out = 1000))
-
-dt_limit <- function(x, alph = 0.05, df = 18, sides = 2, ncp = 0, what = "alpha") {
-  if(sides == 1) alph <- alph
-  if(sides == 2) alph <- alph/2
-  t_cr <- abs(qt(p = alph, df = df))
-  
-  if(what == "alpha"){
-  y <- dt(x, df, ncp = ncp)
-  y[!(x < -t_cr | x > t_cr)] <- NA
-  }
-    if(what == "beta"){
-  y <- dt(x, df, ncp = ncp)
-  y[!(x >= -t_cr & x <= t_cr)] <- NA
-    }
-      if(what == "power"){
-  y <- dt(x, df, ncp = ncp)
-  y[!(x < -t_cr | x > t_cr)] <- NA
-  }
-  return(y)
-}
-
 
 gg_t <- ggplot(data = t_df, aes(x = t)) +
   stat_function(fun = dt, args=list(df=18), size = 1, geom="line", colour="darkred") + 

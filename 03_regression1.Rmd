@@ -19,9 +19,10 @@ output:
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-options(width = 70, scipen = 6, digits = 3)
+options(width = 70, scipen = 6)
 library(knitr)
 opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+source("support_mathmethr.R")
 ```
 
 ### Вы сможете
@@ -444,8 +445,29 @@ summary(nelson_lm)
 
 Коэффициенты линейной регрессии:
 
-- $b _0 =  `r round(coef(nelson_lm)[1], 2)`$
-- $b _1 =  `r round(coef(nelson_lm)[2], 2)`$
+- $b _0 =  `r format(coef(nelson_lm)[1], digits = 2)` \pm `r format(coef(summary(nelson_lm))[1, 2], digits = 1)`$
+- $b _1 =  `r format(coef(nelson_lm)[2], digits = 2)` \pm `r format(coef(summary(nelson_lm))[2, 2], digits = 1)`$
+
+## Записываем уравнение линейной регрессии
+
+Коэффициенты модели:
+
+```{r}
+coef(nelson_lm)
+```
+
+Уравнение регрессии:  
+
+```{r results='asis', echo=FALSE, purl=FALSE}
+lm_equation(nelson_lm, strict=FALSE, digits = 1)
+```
+
+Более формальная запись:  
+
+```{r results='asis', echo=FALSE, purl=FALSE}
+lm_equation(nelson_lm, digits = 1)
+```
+
 
 # Неопределенность оценок коэффициентов
 
@@ -679,19 +701,19 @@ $SS _{total} = SS _{regression} + SS _{error}$
 ## Что оценивают средние квадраты отклонений?
 
 \resizebox{1\textwidth}{!}{
-\begin{tabular}{ L{2.3cm} C{2cm} C{1.5cm} C{2.5cm} C{4cm}}
+\begin{tabular}{ L{2.3cm} C{1.5cm} C{2cm} C{2.5cm} C{4cm}}
 \hline\noalign{\smallskip}
-Источник \linebreak[4] изменчивости & Суммы квадратов отклонений SS &  Число степеней свободы df & Средний квадрат отклонений MS & Ожидаемый средний квадрат \\
+Источник \linebreak[4] изменчивости &  Число степеней свободы df & Суммы квадратов отклонений SS & Средний квадрат отклонений MS & Ожидаемый средний квадрат \\
 \hline\noalign{\smallskip}
-Регрессия & $\sum{(\bar y - \hat y _i)^2}$ & $1$ & $\frac{\sum _{i=1}^{n}{(\bar y - \hat y _i)^2}}{1}$ & $\sigma _{\varepsilon} ^2 + {\beta _1} ^2 \sum _{i=1}^{n} {(x _i - \bar x)^2}$ \\
-Остаточная & $\sum{(y _i - \hat y _i)^2}$ & $n - 2$ & $\frac{\sum _{i=1}^{n}{(y _i - \hat y _i)^2}}{n - 2}$ & $\sigma _{\varepsilon} ^2$ \\
-Общая & $\sum {(\bar y - y _i)^2}$ & $n - 1$ &  & \\
+Регрессия & $1$ & $\sum{(\bar y - \hat y _i)^2}$ & $\frac{\sum _{i=1}^{n}{(\bar y - \hat y _i)^2}}{1}$ & $\sigma _{\varepsilon} ^2 + {\beta _1} ^2 \sum _{i=1}^{n} {(x _i - \bar x)^2}$ \\
+Остаточная & $n - 2$ & $\sum{(y _i - \hat y _i)^2}$ & $\frac{\sum _{i=1}^{n}{(y _i - \hat y _i)^2}}{n - 2}$ & $\sigma _{\varepsilon} ^2$ \\
+Общая & $n - 1$ & $\sum {(\bar y - y _i)^2}$ &  & \\
 \hline\noalign{\smallskip}
 \end{tabular}
 }
 
 
-Если $b _1 = 0$, тогда $\hat y _i = \bar y _i$ и $MS _{regression} \approx MS _{error}$
+Если $b _1 = 0$, тогда $\hat y _i = \bar y _i$ и $MS _{r} \approx MS _{e}$
 
 Тестируем:
 
@@ -702,12 +724,12 @@ $$F = {MS _{regression} \over MS _{error}}$$
 \columnsbegin
 \column{0.38\linewidth}
 F - соотношение объясненной и не объясненной изменчивости
-$$F = \frac {MS _{regression}} {MS _{error}}$$
+$$F = \frac {MS _{r}} {MS _{e}}$$
 Зависит от
 
 - $\alpha$
-- $df _{regression}$
-- $df _{error}$
+- $df _{r}$
+- $df _{e}$
 
 
 \column{0.58\linewidth}
@@ -727,11 +749,11 @@ $$F = \frac {MS _{regression}} {MS _{error}}$$
 \resizebox{1\textwidth}{!}{
 \begin{tabular}{L{2.2cm} c c c c}
 \hline\noalign{\smallskip}
-Источник \linebreak[2] изменчивости  & SS & df & MS & F  \\
+Источник \linebreak[2] изменчивости  & df & SS & MS & F  \\
 \hline\noalign{\smallskip}
-Регрессия & $SS _r = \sum{(\bar y - \hat y _i)^2}$ & $df _r = 1$ & $MS _r = \frac{SS _r}{df _r}$ & $F _{df _r, df _e} = \frac{MS _r}{MS _e}$ \\
-Остаточная & $SS _e = \sum{(y _i - \hat y _i)^2}$ & $df _e = n - 2$ & $MS _e = \frac{SS _e}{df _e}$ \\
-Общая & $SS _t = \sum {(\bar y - y _i)^2}$ & $df _t = n - 1$ & & \\
+Регрессия & $df _r = 1$ & $SS _r = \sum{(\bar y - \hat y _i)^2}$ & $MS _r = \frac{SS _r}{df _r}$ & $F _{df _r, df _e} = \frac{MS _r}{MS _e}$ \\
+Остаточная & $df _e = n - 2$ & $SS _e = \sum{(y _i - \hat y _i)^2}$ & $MS _e = \frac{SS _e}{df _e}$ \\
+Общая & $df _t = n - 1$ & $SS _t = \sum {(\bar y - y _i)^2}$ & & \\
 \hline\noalign{\smallskip}
 \end{tabular}
 }
@@ -754,27 +776,15 @@ summary(nelson_aov)
 - Количество влаги, потерянной жуками в период эксперимента, достоверно зависело от уровня относительной влажности \linebreak[2] (Табл. \autoref{tab:reg-anova}).
 
 ```{r echo=FALSE, results='asis', purl=FALSE}
-fix_aov_smr <- function(aov_obj, lang = "en", rown = NULL, coln = NULL){
-  pvals <- aov_obj[[1]][, ncol(aov_obj[[1]])]
-  pvals <- format.pval(pvals, eps = 0.01)
-  pvals[pvals == "NA"] <- NA
-aov_obj[[1]][, ncol(aov_obj[[1]])] <- pvals
-if(!is.null(rown)){
-  rownames(aov_obj[[1]]) <- rown
-}
-if(!is.null(coln)){
-  colnames(aov_obj[[1]]) <- coln
-}
-return(aov_obj)
-}
-
 library(xtable)
-rown <- c("Влажность", "Остаточная")
-coln <- c("Ст.св.", "Сум.кв.", "Сред.кв.", "F критерий", "P")
-capt <- "Результаты дисперсионного анализа зависимости потери веса мучных хрущаков от относительной влажности воздуха. Ст.св. --- число степеней свободы, Сум.кв. --- суммы квадратов, Сред. кв. --- Средние квадраты, F --- значение F-критерия, P --- доверительная вероятность."
-lab <- "tab:reg-anova"
-smr <- fix_aov_smr(summary(nelson_aov), rown = rown, coln = coln)
-xtb <- xtable(smr, caption = capt, label = lab)
+smr <- fix_aov_smr(
+  summary(nelson_aov), 
+  rown = c("Влажность", "Остаточная"), 
+  coln = c("df", "SS", "MS", "F", "P"))
+xtb <- xtable(
+  smr,
+  caption = "Результаты дисперсионного анализа зависимости потери веса мучных хрущаков от относительной влажности воздуха. df --- число степеней свободы, SS --- суммы квадратов отклонений, MS --- средние квадраты отклонений, F --- значение F-критерия, P --- доверительная вероятность.",
+  label = "tab:reg-anova")
 print.xtable(xtb, comment = F, caption.placement = "top")
 ```
 
@@ -787,7 +797,7 @@ print.xtable(xtb, comment = F, caption.placement = "top")
 
 доля общей изменчивости, объясненная линейной связью x и y
 
-$$R^2 =\frac{SS_{model}}{SS_{total}} = 1 - \frac{SS_{error}}{SS_{total}}$$
+$$R^2 =\frac{SS_{r}}{SS_{t}} = 1 - \frac{SS_{e}}{SS_{t}}$$
 
 $$0 \le R^2 \le 1$$
 
@@ -807,9 +817,9 @@ summary(nelson_lm)
 
 ### $R^2_{adj}$ --- cкорректированный $R^2$
 
-$$R^2_{adj} = 1 - \frac{SS_{error} / df_{error}}{SS_{total} / df_{total}}$$
+$$R^2_{adj} = 1 - \frac{SS_{e} / df_{e}}{SS_{t} / df_{t}}$$
 
-где $df_{error} = n - p - 1$, $df_{total} = n - 1$
+где $df_{e} = n - p - 1$, $df_{t} = n - 1$
 
 $R^2_{adj}$ учитывает число переменных в модели, вводится штраф за каждый новый параметр.
 

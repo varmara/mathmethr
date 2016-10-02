@@ -19,9 +19,10 @@ output:
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-options(width = 70, scipen = 6, digits = 3)
+options(width = 70, scipen = 6)
 library(knitr)
 opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+source("support_mathmethr.R")
 ```
 
 
@@ -129,6 +130,28 @@ bird_lm <- lm(abund ~ l10area + l10dist + l10ldist + yr.isol, data = bird)
 summary(bird_lm)
 ```
 
+## Можно привести в виде таблицы результаты t-теста для коэффициентов
+
+- Обилие птиц увеличивалось с увеличением площади леса, и с уменьшением продолжительности изоляции \linebreak[2] (Табл. \autoref{tab:mreg-coef}).
+
+```{r echo=FALSE, results='asis', purl=FALSE}
+library(xtable)
+library(tidyr)
+smr <- coef(summary(bird_lm)) %>% data.frame() %>% round(., 2)
+# %>% format.data.frame(., digits = 2, nsmall = 1)
+smr$Pr...t.. <- format.pval(smr$Pr...t.., eps = 0.01)
+rownames(smr)[1] <- "Отрезок"
+colnames(smr) <- c("Оценка", "Ст.ошибка", "t", "P")
+
+xtb <- xtable(
+  smr,
+  caption = "Коэффициенты линейной регрессии обилия птиц от различных характеристк леса: l10area - логарифм площади леса, l10dist --- логарифм расстояния до ближайшего леса, l10ldist --- логарифм расстояния до ближайшего большого леса, yr.isol --- год изоляции лесного массива. t --- значение t-критерия, P --- доверительная вероятность.",
+  label = "tab:mreg-coef")
+
+print.xtable(xtb, comment = F, caption.placement = "top")
+```
+
+
 ## Задача
 
 Запишите уравнение множественной линейной регрессии
@@ -138,29 +161,6 @@ summary(bird_lm)
 ```{r}
 coef(bird_lm)
 bird_lm$call
-```
-
-```{r echo=FALSE, purl=FALSE}
-lm_equation <- function(fit, strict = TRUE){
-#   extracting call formula 
-  frml <- as.character(fit$call)[2]
-#   extract signs
-    sign <- ifelse(grepl("-", coef(fit)[-1]), " - ", " + ")
-  # extract coefficients
-  coeffs <- format(abs(coef(fit)), digits = 2, trim = TRUE)
-  if(strict == TRUE){
-    i <- 1:(length(coeffs) - 1)
-    vars <- c("Y", paste0(" X", i))
-    
-  } else {
-# extract vector of variable names
-  vars <- unlist(strsplit(frml, "[~+]"))
-# combine everything
-  }
-  start <- ifelse(coef(fit)[1] > 0, paste(vars[1], coeffs[1], sep = " = "), paste(vars[1], coeffs[1], sep = " = - "))
-  end <- paste(sign, coeffs[-1], vars[-1], sep = "", collapse = "")
-  return(cat(start, end, sep = ""))
-}
 ```
 
 ## Решение
@@ -465,10 +465,6 @@ $R^2_{adj}$ учитывает число переменных в модели, 
 
 \blockend
 
-\pause
-
-- Дж. Фокс советует не обращать внимания на пороговые значения (Fox, 1991)
-
 \column{0.48\textwidth}
 
 \centering
@@ -477,8 +473,12 @@ $R^2_{adj}$ учитывает число переменных в модели, 
 \raggedright
 \tiny Из кн. Quinn, Keough, 2002, стр. 96, рис. 5.8
 
-
 \columnsend
+
+\pause
+
+- Дж. Фокс советует не обращать внимания на пороговые значения (Fox, 1991)
+
 
 ## Что делать с влиятельными точками и с выбросами?
 
