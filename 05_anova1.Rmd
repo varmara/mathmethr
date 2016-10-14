@@ -1,31 +1,32 @@
 ---
 title       : Дисперсионный анализ, часть 1
-subtitle    : Математические методы в зоологии - на R, осень 2015
-author      : Марина Варфоломеева
+subtitle: "Математические методы в зоологии с использованием R"
+author: "Марина Варфоломеева"
 output:
-  ioslides_presentation:
-    css: assets/my_styles.css
-    widescreen: yes
+  beamer_presentation:
+    colortheme: seagull
+    highlight: tango
+    fonttheme: structurebold
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: CambridgeUS
+    toc: yes
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 70, scipen = 6, digits = 3)
+options(width = 70, scipen = 6)
 library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
 ```
 
 ## Знакомимся дисперсионным анализом
 
-- Опасности множественных сравнений
-- Почему можно использовать дисперсии для сравнения средних
-- Модель дисперсионного анализа
-- Условия применимости дисперсионного анализа
-- Post hoc тесты
-- Представление результатов дисперсионного анализа
-
-## Вы сможете
+### Вы сможете
 
 - Объяснить, в чем опасность множественных сравнений, и как с ними можно бороться
 - Рассказать, как в дисперсионном анализе моделируются значения зависимой переменной
@@ -33,142 +34,233 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 - Интерпретировать и описать результаты, записанные в таблице дисперсионного анализа
 - Провести множественные попарные сравнения при помощи post hoc теста Тьюки, представить и описать их результаты
 
+# Множественные сравнения
+
 ## Пример: сон у млекопитающих
 
 - `TotalSleep` - общая продолжительность сна. В нашем анализе это будет зависимая переменная
 - `Danger`  - уровень опасности среды для вида, пять градаций (1 - 5)
 
+\vskip0pt plus 1filll
+\tiny Данные: Allison, Cicchetti (1976), электронная версия [Statlib database](http://lib.stat.cmu.edu)
+
+
+## Скачиваем данные с сайта
+
+Не забудьте войти в вашу директорию для матметодов при помощи `setwd()`
+
+```{r eval=FALSE}
+library(downloader)
+
+# в рабочем каталоге создаем суб-директорию для данных
+if(!dir.exists("data")) dir.create("data")
+
+# скачиваем файл в xlsx, либо в текстовом формате
+if (!file.exists("data/sleep.xlsx")) {
+  download(
+    url = "https://varmara.github.io/mathmethr/data/sleep.xlsx",
+    destfile = "data/sleep.xlsx")
+}
+
+if (!file.exists("data/sleep.csv")) {
+  download(
+    url = "https://varmara.github.io/mathmethr/data/sleep.xls",
+    destfile = "data/sleep.csv")
+}
+```
+
+
+## Читаем данные из файла одним из способов
+
+### Чтение из xlsx
 ```{r}
 library(readxl)
-sleep <- read_excel("sleep.xlsx", sheet = 1)
-head(sleep, 2)
+sleep <- read_excel(path = "data/sleep.xlsx", sheet = 1)
+```
+
+### Чтение из csv
+
+```{r}
+sleep <- read.table("data/sleep.csv", header = TRUE, sep = "\t")
+```
+
+## Все ли правильно открылось?
+
+```{r}
+str(sleep) # Структура данных
+head(sleep, 2)     # Первые несколько строк файла
+```
+
+
+```{r}
 # Сделаем sleep$Danger фактором
 sleep$Danger <- factor(sleep$Danger, levels = 1:5, labels = c("очень низкий", "низкий", "средний", "высокий", "очень высокий"))
 ```
 
-<div class = "footnote">Данные: Allison, Cicchetti (1976), электронная версия [Statlib database](http://lib.stat.cmu.edu) </div>
 
-## Задание: Постройте график
+## Знакомимся с данными
 
-Постройте график зависимости общей продолжительности сна от уровня опасности среды. Какой геом лучше подойдет для изображения (`geom_point` или `geom_boxplot`)?
+Есть ли пропущенные значения?
+
+```{r}
+sapply(sleep, function(x)sum(is.na(x)))
+```
+
+К счастью про уровень опасности (`Danger`) информация есть для всех объектов.
+
+Но есть пропущенные значения продолжительности сна (`TotalSleep`). 
+
+## Каков объем выборки?
+
+В одной из переменных, которые нам интересны, есть пропущенные значения. Это нужно учесть при рассчете объема выборки.
+
+Удалим из датафрейма `sleep` строки, где `TotalSleep` принимает значение `NA`.
+
+```{r}
+flt <- ! is.na(sleep$TotalSleep)
+sl <- sleep[flt, ]
+```
+
+\small
+Дальше будем работать с датафреймом `sl`. В нем нет пропущенных значений в интересующих нас переменных
+
+```{r}
+nrow(sl)
+```
+
+Каков объем выборки в каждой группе?
+
+```{r}
+table(sl$Danger)
+```
+
+
+## Задание
+
+Постройте график зависимости общей продолжительности сна (`TotalSleep`) от уровня опасности среды (`Danger`). Используйте `geom_boxplot`.
 
 Раскрасьте график в зависимости от уровня опасности среды (используйте эстетики `fill` или `colour`)
 
 Придумайте, каким образом посчитать, в какой группе животных общая продолжительность сна больше?
 
+\vskip0pt plus 1filll
+
 ### Дополнительное задание:
 
 Попробуйте сменить палитру раскраски, используя `scale_colour_brewer` (варианты можно посмотреть в справке в подразделе примеров или в интернете [Colors (ggplot2): раздел RColorBrewer palette chart](http://www.cookbook-r.com/Graphs/Colors_%28ggplot2%29/) )
 
-## Решение {.smaller}
+## Решение
 
-```{r, fig.width=10}
+```{r}
 library(ggplot2) 
-theme_set(theme_bw(base_size = 14) + theme(legend.key = element_blank()))
+theme_set(theme_bw())
 
-gg_sleep <- ggplot(data = sleep, aes(x = Danger, y = TotalSleep, colour = Danger)) + 
+gg_sl <- ggplot(data = sl, aes(x = Danger, y = TotalSleep, colour = Danger)) + 
   labs(x = "Уровень опасности", y = "Продолжительность сна") + 
   scale_colour_brewer("Уровень опасности", palette = "Dark2")
-gg_sleep + geom_boxplot()
+gg_sl + geom_boxplot()
 ```
 
-# Опасности множественных сравнений
+## Множественные сравнения
 
-## Попарные сравнения средних
+Мы могли бы сравнить среднюю продолжительность сна в разных группах при помощи t-критерия.
 
-### 2 группы - 1 сравнение
+- 5 групп
+- 10 сравнений
 
-$\alpha _{для\ сравнения} = 0.05$
+Если для каждого сравнения вероятность ошибки первого рода будет $\alpha_{per\ comparison} = 0.05$, то для группы --- ?
 
-### 4 группы - 6 сравнений
+\pause
 
-$\alpha _{для\ сравнения} = 0.05$
+$\alpha_{family\ wise} = 0.05 * 10$
 
-### А какой будет $\alpha$ для группы из 6 сравнений?
+В половине случаев мы рискуем найти различия там где их нет!!!
 
->- $\alpha _{для\ группы\ сравнений} = 0.05 \cdot 6 = 0.3$
->- Опасно! Случайно найдем различия там, где их нет!
+## Поправка Бонферрони
 
+Если нужно много сравнений, можно снизить $\alpha _{per\ comparison}$
 
-## Если нужно много сравнений можно снизить $\alpha _{для\ сравнения}$
+$$\alpha _{per\ comparison} = \frac{\alpha _{family\ wise}}{n}$$
 
-$$\alpha _{для\ группы\ сравнений} = \alpha _{для\ сравнения} \cdot n$$
+\vfill
+\pause
 
-Хотим зафиксировать $\alpha _{для\ группы\ сравнений} = 0.05$
+Например, если хотим зафиксировать $\alpha _{family\ wise} = 0.05$
 
-Поправка Бонферрони:
+С поправкой Бонферрони $\alpha _{per\ comparison} = 0.05 / 10 = 0.005$
 
-$$\alpha _{для\ сравнения} = \frac{\alpha _{для\ группы\ сравнений}}{n}$$
+Очень жесткий критерий!
 
->- для 4 групп, 6 сравнений, $\alpha _{для\ сравнения} = 0.008$  
-  Очень жесткий критерий!
+\vskip0pt plus 1filll
+
 
 # Дисперсионный анализ
 
-## Модель дисперсионного анализа {.smaller}
+## Модель дисперсионного анализа
 
 <div class="columns-2">
 
-$$y _{ij} = \mu + a _i + \epsilon _{ij}$$
+$$y _{ij} = \mu + a _i + \varepsilon _{ij}$$
 
 Из чего складываются средние значения в группах по фактору? 
 
 Группа | Общее среднее | Эффект | <small>Случайная изменчивость</small>
 ----- | ----- | ----- | -----
-очень низкий | $$\mu$$ | $$a _1$$ | $$\epsilon _{1j}$$
-низкий | $$\mu$$ | $$a _2$$ | $$\epsilon _{2j}$$
+очень низкий | $$\mu$$ | $$a _1$$ | $$\varepsilon _{1j}$$
+низкий | $$\mu$$ | $$a _2$$ | $$\varepsilon _{2j}$$
 ... | ... | ... | ...
-очень высокий | $$\mu$$ | $$a _5$$ | $$\epsilon _{5j}$$
+очень высокий | $$\mu$$ | $$a _5$$ | $$\varepsilon _{5j}$$
 
 
 ```{r echo = FALSE}
-sleep[, c("Danger", "TotalSleep")]
+sl[, c("Danger", "TotalSleep")]
 ```
 
-</div>
 
-## Структура общей изменчивости {.smaller}
+## Структура общей изменчивости
 
 Общая изменчивость (SSt) = Факторная (SSx) + Случайная (SSe)
 
 ```{r echo = FALSE, warning=FALSE, fig.width = 10.5, fig.height=5}
+lims <- range(sl$TotalSleep) + c(-1, 1)
+yannot <- lims[1] + 0.5
+pos <- position_jitter(width = 0.2)
+gmean <- mean(sl$TotalSleep, na.rm = TRUE)
+
+gg_sl <- gg_sl + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8)) + ylim(lims[1], lims[2])
+
 # # Общая изменчивость (отклонения от общего среднего)
-gg_sleep_total <- gg_sleep + 
-  geom_jitter(position = position_jitter(width = 0.3)) +
-  geom_hline(yintercept = mean(sleep$TotalSleep, na.rm = TRUE), linetype = "dashed") + 
-  annotate("text", label = "Общее\nсреднее", 
-           x = 0,  y = mean(sleep$TotalSleep, na.rm = TRUE), hjust = -0.1, size = 4) + 
-    ylim(0, 22) +
+gg_sl_total <- gg_sl + 
+  geom_jitter(position = pos) +
+  geom_hline(yintercept = gmean, linetype = "dashed") + 
   ggtitle("Общая изменчивость\n(отклонения от общего среднего)") +
-  annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = 0,  y = 0.25, hjust = -0.1, size = 6) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8))
+  annotate("text", label = "Общее\nсреднее", 
+           x = 0,  y = gmean, hjust = -0.1, size = 4) + 
+  annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6) 
 
 library(plyr)
 # Межгрупповая изменчивость (связанная с фактором)
-gg_sleep_factor <- gg_sleep + 
-  geom_hline(yintercept = mean(sleep$TotalSleep, na.rm = TRUE), linetype = "dashed") + 
-  geom_errorbar(stat = "hline", size = 1, yintercept = function(TotalSleep) mean(TotalSleep, na.rm = TRUE), 
-                width = .8, aes(ymax = ..y.., ymin = ..y..)) + 
-    ylim(0, 22) +
+gg_sl_factor <- gg_sl + 
+  geom_hline(aes(yintercept = gmean), linetype = "dashed") + 
+  stat_summary(fun.y = "mean", geom = "point", size = 20, shape = 45) + 
   ggtitle("Факторная изменчивость\n(межгрупповая)")+
-    annotate("text", label = "SS[x] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = 0,  y = 0.25, hjust = -0.1, size = 6) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8))
+    annotate("text", label = "SS[x] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
 
 # Внутригрупповая изменчивость (случайная)
-gg_sleep_error <- gg_sleep + 
+gg_sl_error <- gg_sl + 
   geom_jitter(position = position_jitter(width = 0.3)) +
-  geom_errorbar(stat = "hline",  size = 1, yintercept = function(TotalSleep) mean(TotalSleep, na.rm = TRUE), 
-                width = .8, aes(ymax = ..y.., ymin = ..y..)) + 
-  ylim(0, 22) +
+  stat_summary(fun.y = "mean", geom = "point", size = 20, shape = 45, colour = "black") + 
   ggtitle("Случайная изменчивость\n(внутригрупповая)")+
-    annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = 0,  y = 0.25, hjust = -0.1, size = 6) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8))
+    annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
 
 library(gridExtra)
-grid.arrange(gg_sleep_total, gg_sleep_factor, gg_sleep_error, ncol = 3, widths = c(0.38, 0.31, 0.31))
+grid.arrange(gg_sl_total, gg_sl_factor, gg_sl_error, ncol = 3, widths = c(0.38, 0.31, 0.31))
 ```
 
 Если выборки из одной совокупности, то
 Факторная изменчивость = Случайная изменчивость
 
-## Таблица дисперсионного анализа  {.smaller}
+## Таблица дисперсионного анализа 
 
 Источник изменчивости  |  Суммы квадратов отклонений,<br /><br /> SS   |   Число степеней свободы,<br /><br /> df   | Средний квадрат отклонений<br />(дисперсия),<br /> MS | <br /><br /><br /> F  
 ---------------------- | --------- | ------ | ------------------- | -----
@@ -176,13 +268,13 @@ grid.arrange(gg_sleep_total, gg_sleep_factor, gg_sleep_error, ncol = 3, widths =
 Случайная | $$SS _e = \sum{(y _i - \hat y _i)^2}$$ | $$df _e = N - a$$ | $$MS _e = \frac{SS _e}{df _e}$$ | 
 Общая | $$SS _t = \sum {(\bar y - y _i)^2}$$ | $$df _t = N - 1$$ | 
 
-<br />
+
 Гипотезы:
 
 $H _0: MS _x = MS _e$, $H _A: MS _x ≠ MS _e$
 
 
-## Дисперсионный анализ в R {.smaller}
+## Дисперсионный анализ в R
 
 Используем Anova из пакета car, хотя есть и другие функции. Зачем? Когда факторов будет больше одного, эта функция сможет правильно оценить достоверность каждого из них независимо от других.
 
@@ -190,13 +282,13 @@ Anova(результат_функции_lm) - дисперсионный ана�
 
 ```{r}
 library(car)
-mod <- lm(TotalSleep ~ Danger, data=sleep)
-sleep_anova <- Anova(mod)
-sleep_anova
+mod <- lm(TotalSleep ~ Danger, data=sl)
+sl_anova <- Anova(mod)
+sl_anova
 ```
 
 ```{r,echo=FALSE}
-result <- sleep_anova
+result <- sl_anova
 dfs <- paste0(result$Df, collapse= ",")
 fval <- round(result$'F value'[1], 2)
 sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[1] <= 0.05, "$p < 0.05$", ""))
@@ -234,14 +326,14 @@ sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[
 
 ```{r}
 # Данные для анализа остатков
-sleep_diag <- fortify(mod)
-head(sleep_diag)
+sl_diag <- fortify(mod)
+head(sl_diag)
 ```
 
-## 2. Выбросы, гомогенность дисперсий {.smaller}
+## 2. Выбросы, гомогенность дисперсий
 
 ```{r fig.width=10, tidy=FALSE}
-gg_res <- ggplot(sleep_diag, aes(x = .fitted, y = .stdresid)) + 
+gg_res <- ggplot(sl_diag, aes(x = .fitted, y = .stdresid)) + 
   geom_hline(yintercept = 0)
 gg_1 <- gg_res + geom_point(aes(size = .cooksd))
 gg_2 <- gg_res + geom_boxplot(aes(x = Danger))
@@ -255,8 +347,8 @@ grid.arrange(gg_1, gg_2, ncol = 2)
 ## 3. Нормальность распределения
 
 ```{r}
-ggplot(sleep_diag) + geom_point(stat = "qq", aes(sample = .stdresid)) + 
-  geom_abline(yintercept = 0, slope = sd(sleep_diag$.stdresid))
+ggplot(sl_diag) + geom_point(stat = "qq", aes(sample = .stdresid)) + 
+  geom_abline(intercept = 0, slope = sd(sl_diag$.stdresid))
 ```
 
 >- Распределение практически нормальное
@@ -301,14 +393,14 @@ qqPlot(mod)
 
 ```{r, warning=FALSE, message=FALSE}
 library(multcomp)
-sleep_pht <- glht(mod, linfct = mcp(Danger = "Tukey"))
+sl_pht <- glht(mod, linfct = mcp(Danger = "Tukey"))
 ```
 
-## Результаты попарных сравнений (тест Тьюки) {.smaller}
+## Результаты попарных сравнений (тест Тьюки)
 
 
 ```{r, R.options=list(width = 80)}
-summary(sleep_pht)
+summary(sl_pht)
 ```
 
 ## Описываем результаты пост-хок теста
@@ -321,7 +413,7 @@ summary(sleep_pht)
 
 ```{r, tidy=FALSE, message=FALSE}
 library(dplyr) # есть удобные функции для описания данных
-sleep_summary <- sleep %>% # берем датафрейм sleep
+sl_summary <- sl %>% # берем датафрейм sl
   group_by(Danger) %>% # делим на группы по Danger
   # по каждой группе считаем разное
   summarise(
@@ -330,13 +422,13 @@ sleep_summary <- sleep %>% # берем датафрейм sleep
     .sd = sd(TotalSleep, na.rm = TRUE),
     .upper_cl = .mean + 1.98*.sd,
     .lower_cl = .mean - 1.98*.sd)
-sleep_summary
+sl_summary
 ```
 
-## Этот график можно использовать для представления результатов {.smaller}
+## Этот график можно использовать для представления результатов
 
 ```{r tidy=FALSE}
-gg_means <- ggplot(sleep_summary, aes(x = Danger, y = .mean)) + 
+gg_means <- ggplot(sl_summary, aes(x = Danger, y = .mean)) + 
   geom_bar(stat = "identity", fill = "turquoise3", colour = "black", width = 0.5) + 
   geom_errorbar(aes(ymin = .lower_cl, ymax = .upper_cl), width = 0.1) +
   labs(x = "Обработка", y = "Вес, г") +
@@ -349,7 +441,7 @@ gg_means
 ## Можно "опустить" прямоугольники на ось х
 
 ```{r fig.height = 4, tidy=FALSE}
-upperlimit <- max(sleep_summary$.upper_cl + 1)
+upperlimit <- max(sl_summary$.upper_cl + 1)
 gg_means +
   scale_y_continuous(expand = c(0,0),
     limit = c(0, upperlimit))
@@ -359,17 +451,17 @@ gg_means +
 
 ```{r eval = FALSE, tidy=FALSE}
 # 1) в csv
-write.csv(sleep_anova, file = "medley_res.csv")
+write.csv(sl_anova, file = "medley_res.csv")
 
 # 2) в xls или xlsx с помощью XLConnect
 library(XLConnect)
-writeWorksheetToFile(data = sleep_anova, file = "medley_res.xls", 
+writeWorksheetToFile(data = sl_anova, file = "medley_res.xls", 
                      sheet = "anova_table")
 
 # или
 
 # 3) отправляем в буфер обмена (только Windows) для вставки в Word-Excel
-write.table(file = "clipboard", x = sleep_anova, sep = "\t")
+write.table(file = "clipboard", x = sl_anova, sep = "\t")
 ```
 
 
