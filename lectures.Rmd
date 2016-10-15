@@ -28,7 +28,7 @@ install.packages(c("downloader", "readxl", "effsize", "pwr"))
 
 
 - Презентация [pdf](03_regression1.pdf)
-- [код R](03_code_regression1.pdf)
+- [код R](03_code_regression1.R)
 - Данные: [nelson.xlsx](data/nelson.xlsx) | [nelson.csv](data/nelson.csv)
 - [Примеры вопросов следующего теста](test_handouts/03-regr-handout-test1.pdf)
 
