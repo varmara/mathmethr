@@ -41,7 +41,7 @@ install.packages("car")
 ```
 
 - Презентация [pdf](04_regression2.pdf)
-- [код R](04_code_regression2.pdf)
+- [код R](04_code_regression2.R)
 - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv)
 - [Примеры вопросов следующего теста](test_handouts/04-mregr-handout-test1.pdf)
 
