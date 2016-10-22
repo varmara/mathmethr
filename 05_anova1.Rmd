@@ -1,5 +1,5 @@
 ---
-title       : Дисперсионный анализ, часть 1
+title: "Дисперсионный анализ, часть 1"
 subtitle: "Математические методы в зоологии с использованием R"
 author: "Марина Варфоломеева"
 output:
@@ -106,7 +106,7 @@ sleep$Danger <- factor(sleep$Danger, levels = 1:5, labels = c("очень низ
 sapply(sleep, function(x)sum(is.na(x)))
 ```
 
-К счастью про уровень опасности (`Danger`) информация есть для всех объектов.
+К счастью, про уровень опасности (`Danger`) информация есть для всех объектов.
 
 Но есть пропущенные значения продолжительности сна (`TotalSleep`). 
 
@@ -151,7 +151,7 @@ table(sl$Danger)
 
 ## Решение
 
-```{r}
+```{r purl=FALSE}
 library(ggplot2) 
 theme_set(theme_bw())
 
@@ -204,7 +204,7 @@ $$y _{ij} = \mu + a _i + \varepsilon _{ij}$$
 
 Из чего складываются средние значения в группах по фактору? 
 
-Группа | Общее среднее | Эффект | <small>Случайная изменчивость</small>
+Группа | Общее среднее | Эффект | Случайная изменчивость
 ----- | ----- | ----- | -----
 очень низкий | $$\mu$$ | $$a _1$$ | $$\varepsilon _{1j}$$
 низкий | $$\mu$$ | $$a _2$$ | $$\varepsilon _{2j}$$
@@ -212,16 +212,11 @@ $$y _{ij} = \mu + a _i + \varepsilon _{ij}$$
 очень высокий | $$\mu$$ | $$a _5$$ | $$\varepsilon _{5j}$$
 
 
-```{r echo = FALSE}
-sl[, c("Danger", "TotalSleep")]
-```
-
-
 ## Структура общей изменчивости
 
 Общая изменчивость (SSt) = Факторная (SSx) + Случайная (SSe)
 
-```{r echo = FALSE, warning=FALSE, fig.width = 10.5, fig.height=5}
+```{r purl=FALSE, echo = FALSE, warning=FALSE, fig.width = 10.5, fig.height=5}
 lims <- range(sl$TotalSleep) + c(-1, 1)
 yannot <- lims[1] + 0.5
 pos <- position_jitter(width = 0.2)
@@ -262,32 +257,41 @@ grid.arrange(gg_sl_total, gg_sl_factor, gg_sl_error, ncol = 3, widths = c(0.38, 
 
 ## Таблица дисперсионного анализа 
 
-Источник изменчивости  |  Суммы квадратов отклонений,<br /><br /> SS   |   Число степеней свободы,<br /><br /> df   | Средний квадрат отклонений<br />(дисперсия),<br /> MS | <br /><br /><br /> F  
----------------------- | --------- | ------ | ------------------- | -----
-Название фактора | $$SS _x = \sum{(\bar y - \hat y _i)^2}$$ | $$df _x = a - 1$$ | $$MS _x = \frac{SS _x}{df _x}$$ | $$F _{df _r, df _e} = \frac{MS _r}{MS _e}$$
-Случайная | $$SS _e = \sum{(y _i - \hat y _i)^2}$$ | $$df _e = N - a$$ | $$MS _e = \frac{SS _e}{df _e}$$ | 
-Общая | $$SS _t = \sum {(\bar y - y _i)^2}$$ | $$df _t = N - 1$$ | 
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{L{2.2cm} c c c c}
+\hline\noalign{\smallskip}
+Источник \linebreak[2] изменчивости  & SS & df & MS & F  \\
+\hline\noalign{\smallskip}
+Название фактора & $SS _x = \sum{(\bar y - \hat y _i)^2}$ & $df _x = a - 1$ & $MS _x = \frac{SS _x}{df _x}$ & $F _{df _x df _e} = \frac{MS _x}{MS _e}$ \\
+Случайная & $SS _e = \sum{(y _i - \hat y _i)^2}$ & $df _e = N - a$ & $MS _e = \frac{SS _e}{df _e}$ \\
+Общая & $SS _t = \sum {(\bar y - y _i)^2}$ & $df _t = N - 1$ & & \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
 
+Гипотезы: $H _0: MS _x = MS _e$, $H _A: MS _x ≠ MS _e$
 
-Гипотезы:
-
-$H _0: MS _x = MS _e$, $H _A: MS _x ≠ MS _e$
+\large Минимальное упоминание результатов в тексте должно содержать $F _{df _x, df _e}$ и $p$.
 
 
 ## Дисперсионный анализ в R
 
-Используем Anova из пакета car, хотя есть и другие функции. Зачем? Когда факторов будет больше одного, эта функция сможет правильно оценить достоверность каждого из них независимо от других.
+Используем Anova из пакета car, хотя есть и другие функции. Зачем? Когда факторов будет больше одного, эта функция сможет правильно оценить значимость каждого из них независимо от других.
 
 Anova(результат_функции_lm) - дисперсионный анализ
 
+\small
+
 ```{r}
 library(car)
-mod <- lm(TotalSleep ~ Danger, data=sl)
-sl_anova <- Anova(mod)
+sl_mod <- lm(TotalSleep ~ Danger, data=sl)
+sl_anova <- Anova(sl_mod)
 sl_anova
 ```
 
-```{r,echo=FALSE}
+\normalsize
+
+```{r purl=FALSE, echo=FALSE}
 result <- sl_anova
 dfs <- paste0(result$Df, collapse= ",")
 fval <- round(result$'F value'[1], 2)
@@ -297,42 +301,87 @@ sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[
 >- Общая продолжительность сна различается у видов животных, которые в разной степени подвержены опасностям в течение жизни ($F _{`r dfs`} = `r fval`$, `r sign`).
 
 
+## Результаты дисперсионного анализа
+
+Результаты дисперсионного анализа можно представить в виде таблицы
+
+- Общая продолжительность сна различается у видов животных, которые в разной степени подвержены опасностям в течение жизни (Табл. \autoref{tab:one-anova-sl}).
+
+```{r purl=FALSE, echo=FALSE, results='asis'}
+library(xtable)
+smr <- fix_Anova(sl_anova,
+                 rown = c("Уровень опасности", "Остаточная"), 
+                 coln = c("SS", "df", "F", "P"))
+xtb <- xtable(
+  smr,
+  caption = "Результаты дисперсионного анализа продолжительности сна млекопитающих в зависимости от уровня опасностей, которым они подвергаются в течении жизни. SS --- суммы квадратов отклонений, df --- число степеней свободы, F --- значение F-критерия, P --- доверительная вероятность.",
+  label = "tab:one-anova-sl")
+print.xtable(xtb, comment = F, caption.placement = "top")
+```
+
+
 ## Вопрос: 
 
 Назовите условия применимости дисперсионного анализа
 
 >- Подсказка: дисперсионный анализ - линейная модель, как и регрессия
 
-## Ответ:
+\pause
 
-Условия примененимости дисперсионного анализа:
+### Условия примененимости дисперсионного анализа:
 
 - Случайность и независимость групп и наблюдений внутри групп
 - Нормальное распределение остатков
 - Гомогенность дисперсий остатков
 
-Другие ограничения:
+\pause
+
+### Другие ограничения
 
 - Лучше работает, если размеры групп примерно одинаковы (т.наз. сбалансированный дисперсионный комплекс)
 - Устойчив к отклонениям от нормального распределения (при равных объемах групп или при больших выборках)
 
 ## Задание: Проверьте условия применимости
 
-Проверьте условия применимости дисперсионного анализа используя графики остатков
+Проверьте условия применимости дисперсионного анализа, используя графики остатков
 
-## Решение
+## Решение: 1. Данные для проверки условий применимости на графиках остатков
 
-## 1. Данные для проверки условий применимости на графиках остатков
-
-```{r}
+```{r purl=FALSE}
 # Данные для анализа остатков
-sl_diag <- fortify(mod)
+sl_diag <- fortify(sl_mod)
 head(sl_diag)
 ```
 
-## 2. Выбросы, гомогенность дисперсий
+## Решение: 2. Нормальность распределения
 
-```{r fig.width=10, tidy=FALSE}
+```{r purl=FALSE}
+ggplot(sl_diag) + geom_point(stat = "qq", aes(sample = .stdresid)) + 
+  geom_abline(intercept = 0, slope = sd(sl_diag$.stdresid))
+```
+
+\pause
+
+- Распределение практически нормальное
+
+## Немного более удобный квантильный график для проверки нормальности распределения
+
+qqPlot() из пакета car
+
+```{r purl=FALSE, echo=FALSE}
+set.seed(93)
+```
+```{r purl=FALSE, fig.height=4}
+qqPlot(sl_mod)
+```
+
+\pause
+
+- Нет отклонений от нормального распределения
+
+## Решение: 3. Выбросы, гомогенность дисперсий, паттерны в остатках
+
+```{r purl=FALSE, fig.width=10}
 gg_res <- ggplot(sl_diag, aes(x = .fitted, y = .stdresid)) + 
   geom_hline(yintercept = 0)
 gg_1 <- gg_res + geom_point(aes(size = .cooksd))
@@ -341,29 +390,37 @@ library(gridExtra)
 grid.arrange(gg_1, gg_2, ncol = 2)
 ```
 
->- Остатки в пределах двух стандартных отклонений, расстояния Кука маленькие - можно продолжать.
+\pause
+
+- Остатки в пределах двух стандартных отклонений, расстояния Кука маленькие - можно продолжать.
 - Подозрительно маленькая дисперсия продолжительности сна в группе с очень высоким уровнем опасности.
 
-## 3. Нормальность распределения
+## Решение: 4. Паттерны в остатках (графики остатков от переменных в модели и вне ее).
 
-```{r}
-ggplot(sl_diag) + geom_point(stat = "qq", aes(sample = .stdresid)) + 
-  geom_abline(intercept = 0, slope = sd(sl_diag$.stdresid))
+На самом деле, нужно еще построить графики остатков от переменных в модели и вне ее --- чтобы выяснить, не забыли ли мы включить другие важные предикторы.
+
+Построй те самостоятельно графики, используя код. Какие из переменных хорошо было бы добавить в модель?
+
+\small
+
+```{r purl=FALSE, eval=FALSE}
+sl_diag_full <- data.frame(sl_diag, sl)
+gg_other <- ggplot(sl_diag_full, aes(y = .stdresid)) + geom_hline(yintercept = 0)
+gg_other + geom_point(aes(x = log(BodyWt)))
+gg_other + geom_point(aes(x = log(BrainWt)))
+gg_other + geom_point(aes(x = NonDreaming))
+gg_other + geom_point(aes(x = Dreaming))
+gg_other + geom_point(aes(x = log(LifeSpan)))
+gg_other + geom_point(aes(x = Gestation))
+gg_other + geom_point(aes(x = Predation))
+gg_other + geom_point(aes(x = Exposure))
 ```
 
->- Распределение практически нормальное
+\pause
 
-## Немного более удобный квантильный график для проверки нормальности распределения
+\normalsize
 
-qqPlot() из пакета car
-```{r, echo=FALSE}
-set.seed(93)
-```
-```{r, fig.height=4}
-qqPlot(mod)
-```
-
->- Нет отклонений от нормального распределения
+- На всех графиках, кроме Predation и Exposure, величина остатков зависит от переменных, не включенных в модель. Правильно было бы их добавить. Но сейчас, в учебных целях, мы продолжим работать с простым однофакторным дисперсионным анализом.
 
 # Post hoc тесты
 
@@ -393,11 +450,12 @@ qqPlot(mod)
 
 ```{r, warning=FALSE, message=FALSE}
 library(multcomp)
-sl_pht <- glht(mod, linfct = mcp(Danger = "Tukey"))
+sl_pht <- glht(sl_mod, linfct = mcp(Danger = "Tukey"))
 ```
 
 ## Результаты попарных сравнений (тест Тьюки)
 
+\small
 
 ```{r, R.options=list(width = 80)}
 summary(sl_pht)
@@ -407,72 +465,50 @@ summary(sl_pht)
 
 - Продолжительность сна у видов, подвергающихся очень высокому уровню опасности в течение жизни, значительно меньше, чем у тех, кто живет при среднем, низком и очень низком уровне опасности (тест Тьюки, $p < 0.05$). 
 
-# Графическое представление результатов пост-хок теста
+\pause
 
-## Посчитаем описательную статистику по группам
+Но лучше еще и нарисовать график.
 
-```{r, tidy=FALSE, message=FALSE}
-library(dplyr) # есть удобные функции для описания данных
-sl_summary <- sl %>% # берем датафрейм sl
-  group_by(Danger) %>% # делим на группы по Danger
-  # по каждой группе считаем разное
-  summarise(
-    .n = sum(!is.na(TotalSleep)),
-    .mean = mean(TotalSleep, na.rm = TRUE),
-    .sd = sd(TotalSleep, na.rm = TRUE),
-    .upper_cl = .mean + 1.98*.sd,
-    .lower_cl = .mean - 1.98*.sd)
-sl_summary
+## Данные для графика при помощи `predict()`
+
+```{r}
+MyData <- data.frame(Danger = levels(sl$Danger))
+MyData$Danger <- factor(
+  MyData$Danger, 
+  levels = c("очень низкий", "низкий", "средний", "высокий", "очень высокий"), 
+  labels = c("очень низкий", "низкий", "средний", "высокий", "очень высокий"))
+MyData <- data.frame(MyData, 
+                     predict(sl_mod, newdata = MyData, 
+                             interval = "confidence"))
+MyData
 ```
 
 ## Этот график можно использовать для представления результатов
 
 ```{r tidy=FALSE}
-gg_means <- ggplot(sl_summary, aes(x = Danger, y = .mean)) + 
+gg_means <- ggplot(MyData, aes(x = Danger, y = fit)) + 
   geom_bar(stat = "identity", fill = "turquoise3", colour = "black", width = 0.5) + 
-  geom_errorbar(aes(ymin = .lower_cl, ymax = .upper_cl), width = 0.1) +
-  labs(x = "Обработка", y = "Вес, г") +
-  geom_text(aes(label = c("A", "A", "A", "AB", "B"), vjust = -0.3, hjust = 1.5), size = 6)
+  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
+  labs(x = "Уровень опасности", y = "Продолжительность сна, ч")
 gg_means
 ```
 
->- Достоверно различающиеся по пост-хок тесту группы обозначим разными буквами.
+## Достоверно различающиеся по пост-хок тесту группы обозначим разными буквами
 
-## Можно "опустить" прямоугольники на ось х
-
-```{r fig.height = 4, tidy=FALSE}
-upperlimit <- max(sl_summary$.upper_cl + 1)
+```{r}
 gg_means +
-  scale_y_continuous(expand = c(0,0),
-    limit = c(0, upperlimit))
+  geom_text(aes(label = c("A", "A", "A", "AB", "B"), 
+                vjust = -0.3, hjust = 1.5), size = 6)
 ```
-
-## Сохраняем таблицу дисперсионного анализа в файл
-
-```{r eval = FALSE, tidy=FALSE}
-# 1) в csv
-write.csv(sl_anova, file = "medley_res.csv")
-
-# 2) в xls или xlsx с помощью XLConnect
-library(XLConnect)
-writeWorksheetToFile(data = sl_anova, file = "medley_res.xls", 
-                     sheet = "anova_table")
-
-# или
-
-# 3) отправляем в буфер обмена (только Windows) для вставки в Word-Excel
-write.table(file = "clipboard", x = sl_anova, sep = "\t")
-```
-
 
 ## Take home messages
 
->- При множественных попарных сравнениях увеличивается вероятность ошибки первого рода. Поправка Бонферрони - способ точно рассчитать, насколько нужно снизить уровень значимости для каждого из сравнений
+- При множественных попарных сравнениях увеличивается вероятность ошибки первого рода. Поправка Бонферрони - способ точно рассчитать, насколько нужно снизить уровень значимости для каждого из сравнений
 - При помощи дисперсионного анализа можно проверить гипотезу о равенстве средних значений
 - Условия применимости (должны выполняться, чтобы тестировать гипотезы)
-  - Случайность и независимость групп и наблюдений внутри групп
-  - Нормальное распределение
-  - Гомогенность дисперсий
+    - Случайность и независимость групп и наблюдений внутри групп
+    - Нормальное распределение
+    - Гомогенность дисперсий
 - Post hoc тесты - это попарные сравнения после дисперсионного анализа, которые позволяют сказать, какие именно средние различаются
 
 
