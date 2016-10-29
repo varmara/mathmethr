@@ -55,9 +55,9 @@ install.packages("multcomp")
 - [код R](05_code_anova1.R)
 - Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv)
 - [Примеры вопросов следующего теста](test_handouts/05-anova1-handout-test1.pdf)
-- [Домашнее задание №2]
+- [Домашнее задание №2](hw/hw2_anova2-moon.zip)
 
-## 6. Дисперсионный анализ, часть 2.
+## 6. Дисперсионный анализ, часть 2
 
 - Презентация [pdf]
 - [код R]
