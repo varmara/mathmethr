@@ -1,36 +1,39 @@
 ---
-title       : Дисперсионный анализ, часть 2
-subtitle    : Математические методы в зоологии - на R, осень 2015
-author      : Марина Варфоломеева
+title: "Дисперсионный анализ, часть 2"
+subtitle: "Математические методы в зоологии с использованием R"
+author: "Марина Варфоломеева"
 output:
-  ioslides_presentation:
-    css: assets/my_styles.css
-    widescreen: yes
+  beamer_presentation:
+    colortheme: seagull
+    highlight: tango
+    fonttheme: structurebold
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: CambridgeUS
+    toc: yes
 ---
 
+
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 70, scipen = 6, digits = 3)
+options(width = 70, scipen = 6)
 library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
 ```
 
 ## Многофакторный дисперсионный анализ
 
-- Модель многофакторного дисперсионного анализа
-- Взаимодействие факторов
-- Несбалансированные данные, типы сумм квадратов
-- Многофакторный дисперсионный анализ в R
-- Фиксированные и случайные факторы
-
 ### Вы сможете
 
-- Проводить многофакторный дисперсионный анализ и интерпретироваот его результаты с учетом взаимодействия факторов
+- Проводить многофакторный дисперсионный анализ и интерпретироватm его результаты с учетом взаимодействия факторов
 - Отличать фиксированные и случайные факторы и выбирать подходящую модель дисперсионного анализа
 
-# Модель многофакторного дисперсионного анализа
 
+# Модель многофакторного дисперсионного анализа
 
 ## Линейные модели для факторных дисперсионных анализов
 
@@ -38,44 +41,46 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 
 $y _{ijk} = \mu + \alpha _i + \beta _j + (\alpha \beta) _{ij} + \epsilon _{ijk}$
 
-<br /><br />
-
 - Три фактора A, B и C, двухфакторные взаимодействия, трехфакторное взаимодействия
 
 $y _{ijkl} = \mu + \alpha _i + \beta _j + \gamma _k + (\alpha \beta) _{ij} + (\alpha \gamma) _{ik} + (\beta \gamma) _{jk} + (\alpha \beta \gamma) _{ijk} + \epsilon _{ijkl}$
 
 # Взаимодействие факторов
 
-
 ## Взаимодействие факторов
 
-Взаимодействие факторов - когда эффект фактора B разный в зависимости от уровней фактора A и наоборот
+Взаимодействие факторов --- когда эффект фактора B разный в зависимости от уровней фактора A и наоборот
 
-<div class="columns-2">
+\columnsbegin
+\column{0.5\textwidth}
+
+\includegraphics{images/interaction.png}
+
+\column{0.5\textwidth}
 
 На каких рисунках есть взаимодействие факторов?
 
->- b, c - нет взаимодействия 
-- a, d - есть взаимодействие
+\pause
 
-![Взаимодействие факторов](img/interaction.png "Взаимодействие факторов")
-</div>
+- b, c - нет взаимодействия (эффект фактора B одинаковый для групп по фактору A, линии для разных групп по фактору B на графиках расположены параллельно)
+- a, d - есть взаимодействие (эффект фактора B разный для групп по фактору A, на графиках линии для разных групп по фактору B расположены под наклоном).
 
-<div class = "footnote">Рисунок из Logan, 2010, fig.12.2</div>
+\columnsend
+
+\vskip0pt plus 1filll
+\tiny Рисунок из Logan, 2010, fig.12.2
 
 ## Взаимодействие факторов может маскировать главные эффекты
 
-<div class="columns-2">
+\includegraphics{images/interaction1.png}
 
-- Если есть значимое взаимодействие
-  - пост хок тесты только по нему.
-  - главные эффекты обсуждать не имеет смысла  
+### Если есть значимое взаимодействие
+- главные эффекты обсуждать не имеет смысла  
+- пост хок тесты проводятся только для ваимодействия
 
-![Взаимодействие факторов](img/interaction1.png "Взаимодействие факторов")
+\vskip0pt plus 1filll
+\tiny Рисунок из Quinn, Keough, 2002, fig.9.3
 
-</div>
-
-<div class = "footnote">Рисунок из Quinn, Keough, 2002, fig.9.3</div>
 
 ## Задаем модель со взаимодействием в R
 
@@ -105,11 +110,12 @@ Y ~ A*B
 - ANOVA менее устойчив к отклонениям от условий применимости (особенно от гомогенности дисперсий) при разных размерах групп (Quinn Keough 2002, section 8.3)
 - Проблемы с рассчетом мощности. Если $\sigma _{\epsilon}^2 > 0$ и размеры выборок разные, то $MS _{groups} \over MS _{residuals}$ не следует F-распределению (Searle et al. 1992).
 
+\vfill
+\pause
 
-> - Для фикс. эффектов неравные размеры - проблема только если значения p близкие к $\alpha$
-> - Мораль: старайтесь _планировать_ группы равной численности!
-
-
+- Cтарайтесь _планировать_ группы равной численности!
+- Но если не получилось - не страшно:
+    - Для фикс. эффектов неравные размеры - проблема только если значения доверительной вероятности _p_ близки к выбранному критическому уровню значимости $\alpha$
 
 ## Если несбалансированные данные, выберите правильный тип сумм квадратов
 
@@ -117,17 +123,26 @@ Y ~ A*B
 - SSa, SSb - три способа расчета
 
 - Для сбалансированных дизайнов - результаты одинаковы
-- Для несбалансированных дизайнов рекомендуют __суммы квадратов III типа__ если есть взаимодействие факторов (Maxwell & Delaney 1990, Milliken, Johnson 1984, Searle 1993, Yandell 1997)
+- Для несбалансированных дизайнов рекомендуют __суммы квадратов III типа__ если есть взаимодействие факторов (Maxwell & Delaney 1990, Milliken, Johnson 1984, Searle 1993, Yandell 1997). (Правда, этот способ не самый правильный с точки зрения статистики, т.к. основные эффекты факторов тестируются так, как если бы взаимодействие было включено в модель).
 
 ## Типы сумм квадратов в дисперсионном анализе
 
-Типы сумм квадратов | I тип | II тип | III тип
-- | - | -- | -
-Название | Последовательная | Без учета взаимодействий высоких порядков | Иерархическая
-SS | SS(A),</br>SS(B &#8739; A)</br>SS(AB &#8739; B, A) | SS(A &#8739; B)</br>SS(B &#8739; A)</br>SS(AB &#8739; B, A) | SS(A &#8739; B, AB)</br>SS(B &#8739; A, AB)</br>SS(AB &#8739; B, A)
-Величина эффекта зависит от выборки в группе | Да | Да | Нет
-Результат зависит от порядка включения факторов в модель | Да | Да | Нет
-Команда R | `aov()` | `Anova()` (пакет `car`) |  `Anova()` (пакет `car`) 
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{L{0.25\textwidth} C{0.25\textwidth} C{0.25\textwidth} C{0.25\textwidth}}
+\hline\noalign{\smallskip}
+"Типы сумм квадратов" & I тип & II тип & III тип \\
+\hline\noalign{\smallskip}
+Название & Последовательная & Без учета взаимодействий высоких порядков & Иерархическая \\
+SS & 
+SS(A) \linebreak SS(B | A)  \linebreak SS(AB | B, A) & 
+SS(A | B) \linebreak SS(B | A) \linebreak SS(AB | B, A) & 
+SS(A | B, AB) \linebreak SS(B | A, AB) \linebreak SS(AB | B, A) \\
+Величина эффекта зависит от выборки в группе & Да & Да & Нет \\
+Результат зависит от порядка включения факторов в модель & Да & Нет & Нет \\
+Команда R & aov() & Anova() (пакет car) &  Anova() (пакет car) \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
 
 
  
@@ -153,18 +168,19 @@ SS | SS(A),</br>SS(B &#8739; A)</br>SS(AB &#8739; B, A) | SS(A &#8739; B)</br>SS
 
 Зависимая переменная - `Words` - сколько вспомнили слов
 
-<div class = "footnote">http://www.statsci.org/data/general/eysenck.html</div>
+\vskip0pt plus 1filll
+\tiny Пример из http://www.statsci.org/data/general/eysenck.html
 
 ## Открываем данные
 
-```{r, message = FALSE}
-memory <- read.delim(file="eysenck.csv")
+```{r}
+memory <- read.delim(file = "data/eysenck.csv")
 head(memory, 10)
 ```
 
 ##   Посмотрим на боксплот
 
-```{r tidy=FALSE}
+```{r purl=FALSE}
 library(ggplot2)
 theme_set(theme_bw(base_size = 16) + theme(legend.key = element_blank()))
 ggplot(data = memory, aes(x = Age, y = Words)) +
@@ -176,27 +192,31 @@ ggplot(data = memory, aes(x = Age, y = Words)) +
 
 
 ## Боксплот с правильным порядком уровней
-```{r tidy=FALSE}
+
+```{r}
 # переставляем в порядке следования средних значений memory$Words
-memory$Process <- reorder(memory$Process, memory$Words, FUN=mean)
-mem_p <- ggplot(data = memory, aes(x = Age, y = Words)) +
+memory$Process <- reorder(memory$Process, memory$Words, FUN = mean)
+```
+```{r purl=FALSE}
+ggplot(data = memory, aes(x = Age, y = Words)) +
   geom_boxplot(aes(fill = Process))
-mem_p
 ```
 
 ## Подбираем линейную модель
 
-Внимание: при использовании III типа сумм квадратов, нужно при подборе линейной модели __обязательно указывать тип контрастов для факторов__. В данном случае - `contrasts=list(Age=contr.sum, Process=contr.sum)`
+Внимание: при использовании III типа сумм квадратов, нужно при подборе линейной модели __обязательно указывать тип контрастов для факторов__. В данном случае --- `contrasts = list(Age = contr.sum, Process = contr.sum)`
 
 ```{r tidy=FALSE}
 memory_fit <- lm(formula = Words ~ Age * Process, data = memory,
-contrasts=list(Age=contr.sum, Process=contr.sum))
+contrasts = list(Age = contr.sum, Process = contr.sum))
 ```
 
-## Задание: Проверьте условия применимости дисперсионного анализа
+## Задание
+
+Проверьте условия применимости дисперсионного анализа
 
 - Есть ли гомогенность дисперсий?
-- Не видно ли трендов в остатках?
+- Не видно ли паттернов в остатках?
 - Нормальное ли у остатков распределение?
 
 ## Решение: 1. Проверяем условия применимости
@@ -204,23 +224,21 @@ contrasts=list(Age=contr.sum, Process=contr.sum))
 - Есть ли гомогенность дисперсий?
 - Не видно ли трендов в остатках?
 
-```{r}
+```{r purl=FALSE}
 memory_diag <- fortify(memory_fit)
 ggplot(memory_diag, aes(x = .fitted, y = .stdresid)) + 
   geom_point(aes(size = .cooksd), position = position_jitter(width = .2)) + 
   geom_hline(yintercept = 0)
 ```
 
-
-
 ## Решение: 2. Проверяем условия применимости
 
 - Нормальное ли у остатков распределение?
 
-```{r}
+```{r purl=FALSE}
 ggplot(memory_diag) + 
   geom_point(stat = "qq", aes(sample = .stdresid)) + 
-  geom_abline(yintercept = 0, slope = sd(memory_diag$.stdresid))
+  geom_abline(aes(intercept = 0, slope = sd(memory_diag$.stdresid)))
 ```
 
 
@@ -231,104 +249,102 @@ library(car)
 Anova(memory_fit, type = 3)
 ```
 
-> - Взаимодействие достоверно, факторы отдельно можно не тестировать, тк. взаимодействие может все равно изменять их эффект до неузнаваемости.
-- Нужно делать пост хок тест по взаимодействию факторов
+\pause
 
-
-
+- Взаимодействие достоверно, факторы отдельно можно не тестировать, тк. взаимодействие может все равно изменять их эффект до неузнаваемости.
+- Нужно делать пост хок тест по взаимодействию факторов.
 
 
 ## Пост хок тест по взаимодействию факторов
 
-```{r phoc, message=FALSE, warning=FALSE}
-# 1. создаем переменную-взаимодействие 
+Пост хок тест для взаимодействия факторов делается легче всего "обходным путем" 
+
+1. Создаем переменную-взаимодействие 
+2. Подбираем модель без свободного члена 
+3. Делаем пост хок тест для этой модели
+
+```{r phoc, eval=FALSE}
 memory$AgeProc <- interaction(memory$Age, memory$Process)
-# 2. подбираем модель без intercept 
 cell_means <- lm(Words ~ AgeProc - 1, data = memory)
-# 3. делаем пост хок тест
 library(multcomp)
 memory_tukey <- glht(cell_means, linfct = mcp(AgeProc = "Tukey"))
-options(width = 90)
 summary(memory_tukey)
 ```
 
-## Смотрим на результаты пост хок теста {.smaller}
+## Смотрим на результаты пост хок теста
 
-В виде таблицы результаты практически не читаемы. Лучше построить график.
+В виде таблицы результаты нечитаемы. Лучше построить график.
 
-```{r phoc, echo=FALSE, message=FALSE, warning=FALSE}
+\small
+
+```{r phoc, echo=FALSE, R.options=list(width = 90)}
 ```
 
 
 ## Данные для графиков
 
-```{r, message = FALSE, tidy=FALSE}
-# __Статистика по столбцам и по группам__ одновременно (n, средние, 
-# стандартные отклонения)
-library(dplyr)
-memory_summary <- memory %>%
-  group_by(Age, Process) %>%
-  summarise(
-    .n = sum(!is.na(Words)),
-    .mean = mean(Words, na.rm = TRUE),
-    .sd = sd(Words, na.rm = TRUE))
-memory_summary
+```{r}
+process <- levels(memory$Process)
+fprocess <- factor(process, levels = process)
+MyData <- expand.grid(Age = levels(memory$Age),
+                      Process = fprocess)
+MyData <- data.frame(MyData,
+  predict(memory_fit, newdata = MyData,
+          interval = "confidence"))
 ```
-
-
 
 ## Графики для результатов: Столбчатый график
 
-```{r message = FALSE, tidy=FALSE}
-mem_barp <- ggplot(data = memory_summary, 
-                   aes(x = Age, y = .mean, ymin = .mean - 1.98*.sd, 
-                       ymax = .mean + 1.98*.sd, fill = Process)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  geom_errorbar(width = 0.3, position = position_dodge(width = 0.9))
-mem_barp
+```{r tidy.opts=list(width.cutoff=60)}
+pos <- position_dodge(width = 0.3)
+gg_barp <- ggplot(data = MyData, aes(x = Process, y = fit, 
+            ymin = lwr,  ymax = upr, fill = Age)) +  
+  geom_bar(stat = "identity", position = pos, width = 0.3) +  
+  geom_errorbar(width = 0.1, position = pos)
+gg_barp
 ```
 
 
+## Графики для результатов: Точки
 
-## Графики для результатов: Линии с точками
-
-```{r, tidy=FALSE}
-pos <- position_dodge(width = 0.9)
-mem_linep <- ggplot(data = memory_summary, 
-                    aes(x = Age, y = .mean, ymin = .mean - .sd, 
-                        ymax = .mean + .sd, colour = Process, 
-                        group = Process)) + 
-  geom_point(size = 3, position = pos) +
-  geom_line(position = pos) +
-  geom_errorbar(width = 0.3, position = pos) 
-mem_linep
+```{r tidy.opts=list(width.cutoff=60)}
+gg_pointp <- ggplot(data = MyData, aes(x = Process, y = fit, 
+              ymin = lwr,  ymax = upr, colour = Age)) + 
+  geom_point(aes(shape = Age), size = 3, position = pos) +
+  # geom_line(aes(group = Age), position = pos) +
+  geom_errorbar(width = 0.1, position = pos) 
+gg_pointp
 ```
-
 
 
 ## Какой график лучше выбрать?
 
 ```{r message = FALSE, fig.width = 10, fig.height = 4}
 library(gridExtra)
-grid.arrange(mem_barp, mem_linep, ncol = 2)
+grid.arrange(gg_barp + theme(legend.position = "bottom"), 
+             gg_pointp + theme(legend.position = "bottom"), 
+             ncol = 2)
 ```
 
->- Должен быть максимум данных в минимуме чернил (Tufte, 1983)
+\pause
 
-
+- Максимум данных в минимуме чернил (Tufte, 1983)
 
 ## Приводим понравившийся график в приличный вид
 
-```{r, message=FALSE, tidy=FALSE}
-mem_linep <- mem_linep + labs(x = "Возраст",  y = "Число запомненных слов") + 
-  scale_x_discrete(labels = c("Пожилые", "Молодые")) + 
-  scale_colour_brewer(name = "Процесс", palette = "Dark2", 
-                      labels = c("Счет", "Рифма", "Прилагательное",
-                                 "Образ", "Запоминание")) + 
-  theme(legend.key = element_blank())
-mem_linep
+```{r tidy.opts=list(width.cutoff=60)}
+gg_final <- gg_pointp + 
+  labs(y = "Число слов") +
+   scale_colour_brewer(name = "Возраст", palette = "Dark2", 
+                      labels = c("Пожилые", "Молодые")) +
+  scale_shape_discrete(name = "Возраст", 
+                      labels = c("Пожилые", "Молодые")) +
+  scale_x_discrete(name = "Процесс", palette = "Dark2", 
+                      labels = c("Счет", "Рифма", 
+                                 "Прилагательное", "Образ", "Запоминание"))
+  
+gg_final
 ```
-
  
 
 # Фиксированные и случайные факторы
@@ -336,15 +352,18 @@ mem_linep
 
 ## Фиксированные и случайные факторы
 
->- Фиксированные факторы
-    - возможные градации фактора заранее известны, уровни фактора выбраны не случайно из небольшого числа возможных
-    - предсказывать можно только для существующих в модели значений факторов
-
->- Случайные факторы
-    - возможные градации фактора неизвестны заранее, уровни фактора выбраны случайно из множества возможных
-    - предсказывать можно для любых значений факторов
-
-</div>
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{L{0.2\textwidth} C{0.4\textwidth} C{0.4\textwidth}}
+\hline\noalign{\smallskip}
+Свойства & Фиксированные факторы & Случайные факторы \\
+\hline\noalign{\smallskip}
+Уровни фактора & фиксированные, заранее определенные и потенциально воспроизводимые уровни & случайная выборка из всех возможных уровней \\
+Используются для тестирования гипотез & о средних значениях отклика между уровнями фактора \linebreak $H _{0}: \mu _1 = \mu _2 = \ldots = \mu _i = \mu$ & о дисперсии отклика между уровнями фактора \linebreak $H _{0}: \sigma_{rand.fact.}^2 = 0$ \\
+Выводы можно экстраполировать & только на уровни из анализа & на все возможные уровни \\
+Число уровней фактора & Осторожно! Если уровней фактора слишком много, то нужно подбирать слишком много коэффициентов --- должно быть много данных & Важно! Для точной оценки $\sigma$ нужно нужно много уровней фактора --- не менее 5 \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
 
 ## Задание: Примеры фиксированных и случайных факторов
 
@@ -356,32 +375,9 @@ mem_linep
   
   - Деление губы Чупа на зоны с разной степенью распреснения.
 
-</br></br>
+\pause
 
->- Приведите другие примеры того, как тип фактора будет зависеть от проверяемых гипотез
-
-
-
-## Гипотезы в разных моделях многофакторного дисперсионного анализа
-
-Тип фактора | Фиксированные факторы |  Случайные факторы
---- | --- | ----
-Модель дисп.анализа | I-модель | II-модель
-Гипотезы | средние равны | нет увеличения дисперсии связанного с фактором
-Для А | $$H _{0(A)}: \mu _1 = \mu _2 = · · · = \mu _i = \mu$$ | $$H _{0(A)}:  σ _\alpha^2 = 0$$
-Для B | $$H _{0(B)}: \mu _1 = \mu _2 = · · · = \mu _i = \mu$$ | $$H _{0(B)}: σ _\beta^2 = 0$$
-Для AB | $$H _{0(AB)}: \mu _{ij} = \mu _i + \mu _j − \mu$$ | $$H _{0(AB)}: σ _{\alpha\beta}^2 = 0$$
-
-
-
-## Рассчет F-критерия для I и II моделей дисперсионного анализа
-
-Факторы | A и B фиксированные |  A и B случайные | A фиксированный, B случайный
--- | --- | --- | ---
-A  | $$F = MS _a \over MS _e$$ | $$F = MS _a \over MS _{ab}$$ | $$F = MS _a \over MS _e$$
-B  | $$F = MS _b \over MS _e$$ | $$F = MS _b \over MS _{ab}$$ | $$F = MS _b \over MS _ab$$
-AB | $$F = MS _{ab} \over MS _e$$ | $$F = MS _{ab} \over MS _e$$ | $$F = MS _{ab} \over MS _e$$
-
+- Приведите другие примеры того, как тип фактора будет зависеть от проверяемых гипотез
 
 
 ## Внимание: сегодня говорили только про фиксированные факторы. 
@@ -396,15 +392,12 @@ AB | $$F = MS _{ab} \over MS _e$$ | $$F = MS _{ab} \over MS _e$$ | $$F = MS _{ab
 - Zuur, A.F., Ieno, E.N., Walker, N., Saveliev, A.A., Smith, G.M., 2009. Mixed Effects Models and Extensions in Ecology With R. Springer.
 
 
-
-
 ## Take home messages
 
 - Многофакторный дисперсионный анализ позволяет оценить взаимодействие факторов. Если оно значимо, то лучше воздержаться от интерпретации их индивидуальных эффектов
 - Если численности групп равны - получаются одинаковые результаты с использованием I, II, III типы сумм квадратов
 - В случае, если численности групп неравны (несбалансированные данные) по разному тестируется значимость факторов (I, II, III типы сумм квадратов)
->- В зависимости от типа факторов (фиксированные или случайные) по разному формулируются гипотезы и рассчитывается F-критерий.
-
+- В зависимости от типа факторов (фиксированные или случайные) по разному формулируются гипотезы и рассчитывается F-критерий.
 
 
 ## Дополнительные ресурсы
