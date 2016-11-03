@@ -62,7 +62,7 @@ install.packages("multcomp")
 - Презентация [pdf](06_anova2.pdf)
 - [код R](06_code_anova2.R)
 - Данные: [eysenck.csv](data/eysenck.csv)
-- [Примеры вопросов следующего теста]
+- [Примеры вопросов следующего теста](test_handouts/06-anova2-handout-test1.pdf)
 
 ## 7. Анализ главных компонент
 
