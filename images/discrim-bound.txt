@@ -1,0 +1,2 @@
+http://statweb.stanford.edu/~jtaylo/courses/stats202/lda.html
+http://statweb.stanford.edu/~jtaylo/courses/stats202/_images/lda_fig_03.png
