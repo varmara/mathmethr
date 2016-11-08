@@ -1,25 +1,31 @@
 ---
-title       : Ординация и классификация с использованием мер сходства-различия
-subtitle    : Математические методы в зоологии - на R, осень 2015
+title: "Ординация и классификация с использованием мер сходства-различия"
+subtitle: "Математические методы в зоологии с использованием R"
+author: "Марина Варфоломеева"
 output:
-  ioslides_presentation:
-    css: assets/my_styles.css
-    widescreen: yes
+  beamer_presentation:
+    colortheme: seagull
+    highlight: tango
+    fonttheme: structurebold
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: CambridgeUS
+    toc: yes
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 70, scipen = 6, digits = 3)
+options(width = 70, scipen = 6)
 library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
 ```
 
-## Меры сходства и различия, ординация, классификация
 
-- Коэффициенты сходства и различия
-- Неметрическое многомерное шкалирование
-- Иерархическая кластеризация
+## Меры сходства и различия, ординация, классификация
 
 ### Вы сможете
 
@@ -32,25 +38,35 @@ opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, 
 
 ## Коэффициенты сходства и различия
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
-Расстояния 
+\textbf{Расстояния}
 
-$d \ge 0$
-```{r echo=FALSE, fig.width=4.5, fig.height=0.5}
-library(DiagrammeR)
-DiagrammeR("img/dist.gv", type = "grViz")
-```
+$$d \ge 0$$
 
-Сходства 
+<!-- ```{r echo=FALSE, fig.width=4.5, fig.height=0.5} -->
+<!-- library(DiagrammeR) -->
+<!-- DiagrammeR("images/dist.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/dist.gv -o images/dist.pdf') -->
+<!-- ``` -->
+
+\includegraphics{images/dist.pdf}
+
+\column{0.48\textwidth}
+
+\textbf{Сходства}
 
 $0 \le S \le 1$ или $-1 \le S \le 1$
 
-```{r echo=FALSE, fig.width=4.5, fig.height=0.5}
-DiagrammeR("img/sim.gv", type = "grViz")
-```
+<!-- ```{r echo=FALSE, fig.width=4.5, fig.height=0.5} -->
+<!-- DiagrammeR("images/sim.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/sim.gv -o images/sim.pdf') -->
+<!-- ``` -->
 
-</div>
+\includegraphics{images/sim.pdf}
+
+\columnsend
 
 - Используются в качестве исходных данных для многих видов многомерных анализов, в т.ч. для неметрического многомерного шкалирования и некоторых видов кластерного анализа
 - Из сходств можно получить расстояния и наоборот
@@ -58,51 +74,66 @@ DiagrammeR("img/sim.gv", type = "grViz")
 
 ## Свойства коэффициентов сходства-различия
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
-### Метрики и полуметрики
+\textbf{Метрики и полуметрики}
 
 Адекватность: $d_{A, A} = 0$
 
-```{r, echo=FALSE, fig.width=4, fig.height=.5}
-DiagrammeR("img/adequa.gv", type = "grViz")
-```
+<!-- ```{r, echo=FALSE, fig.width=4, fig.height=.5} -->
+<!-- DiagrammeR("images/adequa.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/adequa.gv -o images/adequa.pdf') -->
+<!-- ``` -->
+
+\includegraphics{images/adequa.pdf}
+
 
 Симметричность: $d_{A, B} = d_{B, A}$
 
-```{r, echo=FALSE, fig.width=4, fig.height=.5}
-# DiagrammeR("img/symmetry.mmd")
-DiagrammeR("img/symmetry.gv", type = "grViz")
-```
+<!-- ```{r, echo=FALSE, fig.width=4, fig.height=.5} -->
+<!-- # DiagrammeR("images/symmetry.mmd") -->
+<!-- DiagrammeR("images/symmetry.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/symmetry.gv -o images/symmetry.pdf') -->
+<!-- ``` -->
 
-### Только метрики
+\includegraphics{images/symmetry.pdf}
+
+
+\column{0.48\textwidth}
+
+\textbf{Только метрики}
 
 Триангулярность: $d_{A, B} \le d_{A, C} + d_{C, B}$
-```{r, echo=FALSE, fig.width=4, fig.height=1}
-DiagrammeR("img/triang.gv", type = "grViz")
-```
 
-</div>
+<!-- ```{r, echo=FALSE, fig.width=4, fig.height=1} -->
+<!-- DiagrammeR("images/triang.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/triang.gv -o images/triang.pdf') -->
+<!-- ``` -->
 
-<div class="centered">
-### Неметрики
-</div>
+\includegraphics{images/triang.pdf}
 
-<div class="centered">
+\vfill
+
+\textbf{Неметрики}
+
 Все остальное
-</div>
+
+\columnsend
+
 
 ## Свойства коэффициентов сходства-различия
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
-### Нестандартные
+\textbf{Нестандартные}
 
 $$-\inf \le d \le \inf$$
 
-<br /><br /><br /><br /><br /><br />
+\column{0.48\textwidth}
 
-### Стандартные
+\textbf{Стандартные}
 
 $$d_{min} \le d \le d_{max}$$
 
@@ -110,13 +141,15 @@ $$d_{min} \le d \le d_{max}$$
 
 $$-1 \le S \le 1$$
 
-</div>
+\columnsend
+
 
 ## Примеры коэффициентов
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
-Метрики:
+\textbf{Метрики:}
 
 - без стандартизации:
     - Евклидово расстояние
@@ -127,13 +160,14 @@ $$-1 \le S \le 1$$
     - хи-квадрат
     - Евклидово расстояние, рассчитанное по стандартизованным данным
 
-Полуметрики:
+\textbf{Полуметрики:}
 
 - расстояние Махаланобиса
 
-<br />
 
-Неметрики:
+\column{0.48\textwidth}
+
+\textbf{Неметрики:}
 
 - со стандартизацией:
     - коррелятивные:
@@ -141,62 +175,62 @@ $$-1 \le S \le 1$$
     - некоррелятивные:
         - коэффициент Брея-Куртиса
 
-<br /><br /><br /><br /><br />
-
-</div>
+\columnsend
 
 ## Если количественные признаки измерены в одинаковых шкалах
 
-### Метрики без стандартизации
+\textbf{Метрики без стандартизации}
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
-- Евклидово расстояние  
+- Евклидово расстояние
 
-![](img/dist-euclid.png)
+\includegraphics{images/dist-euclid.png}
 
-<br /><br />
+\column{0.48\textwidth}
 
 Неевклидовы метрики
 
 - Квадрат Евклидова расстояния
 
-![](img/dist-euclid-sq.png)
+\includegraphics{images/dist-euclid-sq.png}
 
 - Манхэттеновское расстояние
 
-![](img/dist-manhat.png)
+\includegraphics{images/dist-manhat.png}
 
-</div>
+\columnsend
 
-## Если количественные признаки измерены в разных шкалах {.smaller}
 
-### Можно стандартизовать исходные данные
+## Если количественные признаки измерены в разных шкалах
+
+\textbf{Можно стандартизовать исходные данные}
 
   - Евклидово (или другое) расстояние, рассчитанное по стандартизованным данным
 
-### Можно использовать коэффициенты со стандартизацией {.smaller}
+\textbf{Можно использовать коэффициенты со стандартизацией}
 
-  - Канберра (метрика) $d = {\sum \frac {|x _{ik} - x _{jk}|} {|x _{ik}|+|x _{jk}|}}$
-  - хи-квадрат (метрика) $\chi^2 = \sqrt {\sum{ {\frac {1} {c _k}} (x _{ik} - x _{jk})^2 }}$
-  - Коэффициент Махаланобиса (неметрика, not a distance) $d = \frac {\sum {x _{ik} - x _{jk}}} {\sigma^2}$
+- Канберра (метрика) $d = {\sum \frac {|x _{ik} - x _{jk}|} {|x _{ik}|+|x _{jk}|}}$
+- хи-квадрат (метрика) $\chi^2 = \sqrt {\sum{ {\frac {1} {c _k}} (x _{ik} - x _{jk})^2 }}$
+- Коэффициент Махаланобиса (неметрика, not a distance) $d = \frac {\sum {x _{ik} - x _{jk}}} {\sigma^2}$
 
-  - Корреляция Браве-Пирсона (коррелятивный) $S = \frac {\sum {(x _{ik} - \bar x _{i})(x _{ik} - \bar x _{j})}} {n \sigma^2 _{i} \sigma^2 _{j}}$
+- Корреляция Браве-Пирсона (коррелятивный) $S = \frac {\sum {(x _{ik} - \bar x _{i})(x _{ik} - \bar x _{j})}} {n \sigma^2 _{i} \sigma^2 _{j}}$
 
-  - Коэффициент Брея-Куртиса (не метрика) $BC _{ij} = \frac { 2C _{ij}} {S _i + S _j}$,  
-  где $C _{ij}$ - сумма минимальных значений из тех, которые не равны нулю для обоих объектов, $S _i$ и $S _j$ - общее число ненулевых значений признаков для обоих объектов.
+- Коэффициент Брея-Куртиса (не метрика) $BC _{ij} = \frac { 2C _{ij}} {S _i + S _j}$,
+где $C _{ij}$ - сумма минимальных значений из тех, которые не равны нулю для обоих объектов, $S _i$ и $S _j$ - общее число ненулевых значений признаков для обоих объектов.
 
 
 ## Если признаки - __подсчеты численности__
 
-### Можно стандартизовать исходные данные
+\textbf{Можно стандартизовать исходные данные}
 
-Простая стандартизация не подходит (счет, не может быть среднее 0)  
+Простая стандартизация не подходит (счет, не может быть среднее 0)
 Можно использовать трансформации:
 - корень, корень 4-й степени
 - логарифмирование со сдвигом (log10(1+n))
 
-### Можно использовать коэффициенты со стандартизацией
+\textbf{Можно использовать коэффициенты со стандартизацией}
 
 - Канберра (метрика) $d = {\sum \frac {|x _{ik} - x _{jk}|} {|x _{ik}|+|x _{jk}|}}$
 
@@ -213,15 +247,15 @@ $$-1 \le S \le 1$$
 
 ## Если используются бинарные данные (присутствие-отсутствие признака)
 
-![](img/qual.png)
+\includegraphics{images/qual.png}
 
 ## Примеры коэффициентов для качественных данных
 
-![](img/jaccard.png)
+\includegraphics{images/jaccard.png}
 
 ## Если данные смешанные (качественные и количественные)
 
-### Коэффициенты для смешанных данных
+\textbf{Коэффициенты для смешанных данных}
 
 - расстояние Говера
 
@@ -229,11 +263,12 @@ $$-1 \le S \le 1$$
 # Неметрическое многомерное шкалирование
 
 
-## Неметрическое многомерное шкалирование визуализирует отношения между объектами на основе расстояний между ними {.smaller}
+## Неметрическое многомерное шкалирование визуализирует отношения между объектами на основе расстояний между ними
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
-```{r, gg-eu, message = FALSE, echo = FALSE, cache=TRUE, fig.height = 6, fig.width = 5}
+```{r, gg-eu, message = FALSE, echo = FALSE, fig.height = 6, fig.width = 5}
 # data(eurodist)
 # cities <- attr(eurodist, "Labels")
 # library(geonames)
@@ -249,16 +284,19 @@ $$-1 \le S \le 1$$
 #   x <- as.numeric(x)
 # return(x)
 # })
-# write.table(eu_coord, file = "cities.csv", quote = FALSE, sep = "\t")
-eu_coord <- read.delim("cities.csv", stringsAsFactors = FALSE)
+# write.table(eu_coord, file = "data/cities.csv", quote = FALSE, sep = "\t")
+eu_coord <- read.delim("data/cities.csv", stringsAsFactors = FALSE)
 library(ggmap); library(mapproj)
 theme_set(theme_bw(base_size = 14) + theme(legend.key = element_blank()))
 update_geom_defaults("point", list(shape = 19, size = 3))
-map <- get_map(location = 'Europe', zoom = 4, maptype = "satellite")
-gg_eu <- ggmap(map) + geom_point(aes(x = lng, y = lat, size = population/1000000), data = eu_coord, alpha = 0.8, colour = "red") + geom_text(aes(x = lng, y = lat, label = name), data = eu_coord, vjust = -0.3, hjust = -0.05, colour = "grey80", alpha = 0.8) + theme(legend.position = "bottom") + xlim(-10, 26) + ylim(36, 62) + labs(x = "Долгота", y = "Широта", size = "Население,\nмлн. чел.")
+# map_dat <- get_map(location = 'Europe', zoom = 4, maptype = "satellite")
+# save(map_dat, file = "data/09_dist_map_dat.RData")
+load(file = "data/09_dist_map_dat.RData")
+gg_eu <- ggmap(map_dat) + geom_point(aes(x = lng, y = lat, size = population/1000000), data = eu_coord, alpha = 0.8, colour = "red") + geom_text(aes(x = lng, y = lat, label = name), data = eu_coord, vjust = -0.3, hjust = -0.05, colour = "grey80", alpha = 0.8) + theme(legend.position = "bottom") + xlim(-10, 26) + ylim(36, 62) + labs(x = "Долгота", y = "Широта", size = "Население,\nмлн. чел.")
 gg_eu
 ```
 
+\column{0.48\textwidth}
 
 Если бы мы знали расстояния по автодорогам между городами Европы
 
@@ -277,37 +315,43 @@ ordiplot(euro, type = "t", cex = 1.2)
 par(op)
 ```
 
-</div>
+\columnsend
 
-## Неметрическое многомерное шкалирование {.smaller}
+## Неметрическое многомерное шкалирование
 
 Неметрическое многомерное шкалирование (nonmetric multidimensional scaling, nMDS) - метод визуализации отношений между объектами в пространстве с небольшим числом измерений.
 
 Исходные данные - матрица расстояний между объектами в многомерном пространстве
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
 nMDS подбирает расстояния между объектами на графике так, чтобы сохранились соотношение исходных расстояний между ними. Т.е. если исходно A и B были ближе, чем B и С, то и в результате они должны быть ближе, чем B и С.
 
 Ординацию nMDS можно поворачивать,  отражать, сдвигать - результат от этого не изменится.
 
+\column{0.48\textwidth}
+
 ```{r eu, echo = FALSE, fig.width=4.5, fig.height=3.5}
 ```
 
+\columnsend
+
 ## Пример: Морфометрия поссумов
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
+\includegraphics{images/possum.jpg}
 
+\tiny{Possum by Hasitha Tudugalle on Flickr
+https://www.flickr.com/photos/hasitha\_tudugalle/6037880962}
 
-![possum](img/possum.jpg)
+\column{0.48\textwidth}
 
-<small>Possum by Hasitha Tudugalle on Flickr
-https://www.flickr.com/photos/hasitha_tudugalle/6037880962</small>
+\columnsend
 
-</div>
-
-<div class = "footnote">Данные Lindenmayer et al. (1995)</div>
+\tiny{Данные Lindenmayer et al. (1995)}
 
 ## Знакомимся с данными
 
@@ -367,21 +411,24 @@ ord_euclid$stress
 
 ## Ординация
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
 ```{r fig.width = 4.5, fig.height = 5}
 ordiplot(ord_euclid, type = "t")
 ```
 
+\column{0.48\textwidth}
+
 ```{r}
 head(ord_euclid$points, 10)
 ```
 
-</div>
+\columnsend
 
 ## Задание:
 
-При помощи `ggplot2` постройте график неметрического многомерного шкалирования. 
+При помощи `ggplot2` постройте график неметрического многомерного шкалирования.
 
 Для графика используйте координаты точек `ord_euclid$points` и исходные данные.
 
@@ -390,7 +437,7 @@ head(ord_euclid$points, 10)
 Изобразите поссумов разного пола на разных панелях
 
 
-## Решение: 
+## Решение:
 
 ```{r}
 library(ggplot2)
@@ -398,24 +445,17 @@ theme_set(theme_bw(base_size = 12) + theme(legend.key = element_blank()))
 
 ord_euclid_points <- data.frame(ord_euclid$points, possumc)
 gg <- ggplot(ord_euclid_points, aes(x = MDS1, y = MDS2)) +
-  geom_point() + facet_wrap(~sex) + 
+  geom_point() + facet_wrap(~sex) +
   theme(legend.key = element_blank())
 ```
 
-### Примеры графиков nMDS ординации
+Примеры графиков nMDS ординации
 
-<div class="columns-2">
-
-```{r fig.width = 5}
-gg + aes(colour = Pop)
+```{r}
+library(gridExtra)
+grid.arrange(gg + aes(colour = Pop),
+             gg + aes(colour = age), ncol = 2)
 ```
-
-
-```{r fig.width = 5}
-gg + aes(colour = age)
-```
-
-</div>
 
 ## Задание:
 
@@ -438,7 +478,7 @@ ord_euclid$stress
 ```
 
 
-## Графики ординации по матрице евклидовых расстояний без стандартизации {.smaller}
+## Графики ординации по матрице евклидовых расстояний без стандартизации
 
 ```{r, fig.width=10}
 ord_raw_points <- data.frame(ord_raw$points, possumc)
@@ -450,26 +490,31 @@ ncol = 2)
 
 Популяции можно различить, но возраста смешались
 
->- Это произошло потому, что нет стандартизации, и теперь на расстояния между поссумами влияют в основном переменные, измеренные в больших единицах (общая длина, длина ног), а возраст не влияет
+\pause
+
+- Это произошло потому, что нет стандартизации, и теперь на расстояния между поссумами влияют в основном переменные, измеренные в больших единицах (общая длина, длина ног), а возраст не влияет
 
 ## Как изменилась сама ординация?
 
-### Прокрустово преобразование
+\textbf{Прокрустово преобразование}
 
 `procrustes(что_стало, что_было)`
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
 ```{r}
 proc <- procrustes(ord_raw, ord_euclid)
 proc
 ```
 
+\column{0.48\textwidth}
+
 ```{r proc, fig.width=4.5, fig.height=5}
 plot(proc)
 ```
 
-</div>
+\columnsend
 
 ## Похоже, что в этом случае лучшая ординация была получена при использовании евклидова расстояния со стандартизацией
 
@@ -511,9 +556,13 @@ fossumc <- fossum[complete.cases(fossum), 5:14]
 
 ## Этапы кластеризации
 
-```{r echo=FALSE, fig.width=10, fig.height=6}
-DiagrammeR("img/clust-stages.gv", type = "grViz")
-```
+<!-- ```{r echo=FALSE, fig.width=10, fig.height=6} -->
+<!-- DiagrammeR("images/clust-stages.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/clust-stages.gv -o images/clust-stages.pdf') -->
+<!-- ``` -->
+
+<!-- \includegraphics{images/clust-stages.pdf} -->
+
 
 ## От чего зависит результат кластеризации
 
@@ -584,17 +633,22 @@ grid.arrange(gg_single + ggtitle("Метод ближайшего соседа")
 
 ## Метод ближайшего соседа
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
+
 - = nearest neighbour = single linkage
 - к кластеру присоединяется ближайший к нему кластер/объект
 - кластеры объединяются в один на расстоянии, которое равно расстоянию между ближайшими объектами этих кластеров
 
+\column{0.48\textwidth}
+
 ```{r, echo=FALSE, fig.width=4.5}
 gg_single
 ```
-</div>
 
-### Особенности:
+\columnsend
+
+\textbf{Особенности:}
 
 - Может быть сложно интерпретировать, если нужны группы
   - объекты на дендрограмме часто не образуют четко разделенных групп
@@ -614,17 +668,22 @@ axisPhylo()
 
 ## Метод отдаленного соседа
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
+
 - = furthest neighbour = complete linkage
 - к кластеру присоединяется отдаленный кластер/объект
 - кластеры объединяются в один на расстоянии, которое равно расстоянию между самыми отдаленными объектами этих кластеров (следствие - чем более крупная группа, тем сложнее к ней присоединиться)
 
+\column{0.48\textwidth}
+
 ```{r, echo=FALSE, fig.width=4.5}
 gg_complete
 ```
-</div>
 
-### Особенности:
+\columnsend
+
+\textbf{Особенности:}
 
 - На дендрограмме образуется много отдельных некрупных групп
 - Хорош для поиска дискретных групп в данных
@@ -640,22 +699,27 @@ axisPhylo()
 
 ## Метод невзвешенного попарного среднего
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
 - = UPGMA = Unweighted Pair Group Method with Arithmetic mean
 - кластеры объединяются в один на расстоянии, которое равно среднему значению всех возможных расстояний между объектами из разных кластеров.
 
+\column{0.48\textwidth}
+
 ```{r, echo=FALSE, fig.width=4.5, fig.height=2.5}
 gg_average
 ```
-</div>
 
-### Особенности:
+\columnsend
+
+\textbf{Особенности:}
+
 - UPGMA и WUPGMС иногда могут приводить к инверсиям на дендрограммах
 
-![Инверсии на дендрограммах](img/clust-revert.png)
+\includegraphics{images/clust-revert.png}
 
-<div class = "footnote">из Borcard et al., 2011</div>
+\tiny{из Borcard et al., 2011}
 
 
 ## Метод невзвешенного попарного среднего в R
@@ -668,14 +732,22 @@ axisPhylo()
 
 ## Метод Варда
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
+
 - = Ward's Minimum Variance Clustering
 - объекты объединяются в кластеры так, чтобы внутригрупповая дисперсия расстояний была минимальной
+
+\column{0.48\textwidth}
+
 ```{r, echo=FALSE, fig.width=4.5, fig.height=2.5}
 gg_ward
 ```
-</div>
-### Особенности:
+
+\columnsend
+
+\textbf{Особенности:}
+
 - метод годится и для неевклидовых расстояний несмотря на то, что внутригрупповая дисперсия расстояний рассчитывается так, как будто это евклидовы расстояния
 
 
@@ -726,7 +798,7 @@ cor(d, as.dist(c_w2))
 library(pvclust)
 ```
 ```{r}
-# итераций должно быть 1000 и больше
+# итераций должно быть 10000 и больше
 # здесь мало для скорости
 set.seed(42)
 cl_boot <- pvclust(scale(t(fossumc)), method.hclust = "average", nboot = 50, method.dist = "euclidean")
@@ -743,15 +815,28 @@ pvrect(cl_boot)
 
 ## И небольшая демонстрация - дерево по генетическим данным
 
-```{r, cache=TRUE, fig.height = 6, cache=TRUE}
+```{r, cache=TRUE, fig.height = 6, eval=FALSE}
 webpage <-"http://evolution.genetics.washington.edu/book/primates.dna"
 primates.dna <- read.dna(webpage)
-d_pri <- dist.dna(primates.dna)
+d_pri <- dist.dna(primates.dna, model = "K80")
 hc_pri <- hclust(d_pri, method = "average")
 ph_pri <- as.phylo(hc_pri)
 plot(ph_pri)
 axisPhylo()
 ```
+
+```{r, cache=TRUE, fig.height = 6, echo=FALSE}
+# webpage <-"http://evolution.genetics.washington.edu/book/primates.dna"
+# primates.dna <- read.dna(webpage)
+# save(primates.dna, file = "data/09_dist_primates.dna.RData")
+load(file = "data/09_dist_primates.dna.RData")
+d_pri <- dist.dna(primates.dna, model = "K80")
+hc_pri <- hclust(d_pri, method = "average")
+ph_pri <- as.phylo(hc_pri)
+plot(ph_pri)
+axisPhylo()
+```
+
 
 
 ## Take home messages
