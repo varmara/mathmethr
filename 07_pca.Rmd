@@ -1,161 +1,192 @@
 ---
-title       : Анализ главных компонент
-subtitle    : Математические методы в зоологии - на R, осень 2015
-author      : Марина Варфоломеева
+title: "Анализ главных компонент"
+subtitle: "Математические методы в зоологии с использованием R"
+author: "Марина Варфоломеева"
 output:
-  ioslides_presentation:
-    css: assets/my_styles.css
-    widescreen: yes
+  beamer_presentation:
+    colortheme: seagull
+    highlight: tango
+    fonttheme: structurebold
+    includes:
+      in_header: ./includes/header.tex
+    pandoc_args:
+    - --latex-engine=xelatex
+    - -V fontsize=10pt
+    - -V lang=russian
+    slide_level: 2
+    theme: CambridgeUS
+    toc: yes
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
-# output options
-options(width = 70, scipen = 6, digits = 3)
+options(width = 70, scipen = 6)
 library(knitr)
-# chunk default options
-opts_chunk$set(fig.align='center', tidy = FALSE, fig.width = 7, fig.height = 3, warning = FALSE)
+opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
 ```
 
-## Знакомимся с ординацией на примере метода главных компонент
 
-- Снижение размерности многомерных данных
-- Анализ главных компонент в R
+## Знакомимся с ординацией на примере метода главных компонент
 
 ### Вы сможете
 
 - Проводить анализ главных компонент
 - Снижать размерность данных, отбирая меньшее число главных компонент
 - Оценивать долю объясненной изменчивости
-- Интерпретировать компоненты по факторным нагрузкам
+- Интерпретировать компоненты по значениям факторных нагрузок
 - Строить ординацию объектов в пространстве главных компонент
 - Извлекать значения факторов объектов для дальнейшего использования с другими видами анализов
 
 
 # Снижение размерности многомерных данных
 
-## Анализ главных компонент - способ снижения размерности
+## Анализ главных компонент --- способ снижения размерности
 
-### Многомерные исходные данные
+\columnsbegin
+\column{0.48\textwidth}
+
+\blockbegin {Многомерные исходные данные}
 
 В этом примере для простоты - двумерные
 
-```{r echo = FALSE}
+```{r ex-data, echo=FALSE, purl=FALSE}
 x1 <- c(0.5, 1.0, 1.1, 1.5, 1.9, 2.0, 2.2, 2.3, 2.5, 3.1)
 x2 <- c(2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9)
 df <- data.frame(x1, x2)
 library(ggplot2)
 theme_set(theme_classic())
-p_raw <- ggplot(df) + geom_point(aes(x = x1, y = x2), colour = "black", size = 4) + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(df)), hjust = -0.6)
-```
-
-<div class="columns-2">
-
-```{r, echo = FALSE}
+p_raw <- ggplot(df) + geom_point(aes(x = x1, y = x2), colour = "black") + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(df)), hjust = -0.6)
 df
 ```
 
+\blockend
 
-```{r, echo=FALSE, fig.width=4}
+\column{0.48\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=4}
 p_raw
 ```
 
-</div>
+\columnsend
 
 ## Центрирование
 
-Если из каждого значения переменной вычесть среднее значение этой переменной, то центр координат переместится в точку $(\bar x _{1}, \bar x _{2})$
+\blockbegin{Центрирование}
 
-```{r echo = FALSE}
+Из каждого значения переменной нужно вычесть среднее значение этой переменной
+
+\blockend
+
+Если центрировать данные, то центр координат переместится в точку $(\bar x _{1}, \bar x _{2})$
+
+```{r echo=FALSE, purl=FALSE}
 # normalize
 dfnorm <- data.frame(x1=x1-mean(x1), x2=x2-mean(x2))
 dfnorm <- dfnorm[order(x1), ]
-p_normalized <- ggplot(dfnorm) + geom_point(aes(x = x1, y = x2), colour = "black", size = 4) + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(dfnorm)), hjust = -0.6)
+p_normalized <- ggplot(dfnorm) + geom_point(aes(x = x1, y = x2), colour = "black") + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(dfnorm)), hjust = -0.6)
 ```
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
+
 Центрированные данные:
 
-```{r echo=FALSE}
+```{r echo=FALSE, purl=FALSE}
 dfnorm
 ```
 
-```{r echo=FALSE, fig.width=4}
+\column{0.48\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=4}
 p_normalized
 ```
 
-</div>
+\columnsend
 
 ## Матрица ковариаций между признаками
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
 Исходные данные:
 
-```{r echo = FALSE}
+```{r echo=FALSE, purl=FALSE}
 dfnorm
 ```
 
-</br></br>
+\column{0.48\textwidth}
 
 Матрица ковариаций:
 
-```{r echo = FALSE}
+```{r echo=FALSE, purl=FALSE}
 xyCov <- cov(dfnorm)
 xyCov
 ```
 
+\blockbegin{Матрица ковариаций}
+
 - описывает совместное варьирование нескольких переменных
-- по диагонали - дисперсии признаков
-- выше и ниже диагонали - ковариации признаков друг с другом
+- по диагонали --- дисперсии признаков
+- выше и ниже диагонали --- ковариации признаков друг с другом
 
-</div>
+\blockend
 
+\columnsend
 
 ## Матрицу ковариаций можно представить в виде собственных векторов и собственных чисел
 
 Матрица ковариаций:
 
-```{r, echo=FALSE}
+```{r echo=FALSE, purl=FALSE}
 xyCov
 ```
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
-Собственные числа:
+\blockbegin{Собственные числа}
 
 - используются для оценки вклада главных компонент в общую изменчивость
 - дисперсия вдоль собственных векторов пропорциональна их собственным числам
 
-```{r echo=FALSE}
+\vskip0pt plus 1filll
+
+\blockend
+
+
+```{r echo=FALSE, purl=FALSE}
 #new axes
 eigen_values <- eigen(xyCov)$values
 eigen_values
 ```
-</br></br>
 
-Собственные вектора:
+\column{0.48\textwidth}
+
+\blockbegin{Собственные векторы}
 
 - задают направление осей главных компонент
 - перпендикулярны друг другу
-- вдоль первого - максимальная дисперсия данных, вдоль следующего - максимальная дисперсия из оставшейся
+- вдоль первого --- максимальная дисперсия данных, вдоль следующего --- максимальная дисперсия из оставшейся
 
-```{r echo=FALSE}
+\vskip0pt plus 1filll
+
+\blockend
+
+```{r echo=FALSE, purl=FALSE}
 eigen_vectors <- eigen(xyCov)$vectors
 eigen_vectors
 ```
 
-</div>
+\columnsend
 
 ## С помощью собственных векторов и собственных чисел можно найти в пространстве признаков новые оси, вдоль которых будет максимальный разброс точек.
 
-```{r echo=FALSE, fig.width=4}
+```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=4, out.height='2.5in', out.width='2.5in', fig.align='center'}
 dfnorm$pc1 <- eigen_vectors[2,1]/eigen_vectors[1,1] * dfnorm$x1
 dfnorm$pc2 <- eigen_vectors[2,2]/eigen_vectors[1,2] * dfnorm$x1
 # plot of future axes
 p_futureax <- p_normalized +
   geom_line(data = dfnorm, aes(x = x1, y = pc1), linetype = "dashed") +
-  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = "dashed") + 
-  geom_text(aes(x = x1, y = x2, label = rownames(dfnorm)), hjust = -0.6)
+  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = "dashed")
 p_futureax
 ```
 
@@ -163,66 +194,79 @@ p_futureax
 
 ## Можно найти новые координаты точек в получившемся новом пространстве
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
 Объекты и оси в пространстве исходных признаков:
 
-```{r echo=FALSE, fig.width=4}
-p_futureax
+```{r echo=FALSE, purl=FALSE, fig.height=4, fig.width=4}
+p_normalized +
+  geom_line(data = dfnorm, aes(x = x1, y = pc1), linetype = "dashed") +
+  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = "dashed")
 ```
+
+\column{0.48\textwidth}
 
 Объекты в пространстве новых осей (главных компонент):
 
-```{r pcaplot, echo=FALSE, fig.width=4, message=FALSE, warning=FALSE}
+```{r echo=FALSE, purl=FALSE, fig.height=4, fig.width=4}
 # rotation
 library(vegan)
 df_pca <- rda(df, scale = TRUE)
-library(autoplot)
-autoplot(df_pca, type = "obs", size = 5)
+
+df_scores <- data.frame(scores(df_pca, display = "sites", choices = c(1, 2), scaling = "sites"), Id = 1:10)
+library(ggrepel)
+pcaplot <- ggplot(df_scores, aes(x = PC1, y = PC2)) + geom_point() + geom_text_repel(aes(label = Id)) + coord_equal(xlim = c(-1.4, 1.4), ylim = c(-1.4, 1.4)) + geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
+pcaplot
 ```
 
-</div>
+\columnsend
 
 ## На графике ординации изображено новое пространство
 
-```{r pcaplot, echo=FALSE, fig.width=4, message=FALSE, warning=FALSE}
+```{r echo=FALSE, purl=FALSE, fig.align='center', fig.height=4, fig.width=4}
+pcaplot
 ```
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
 По собственным числам судим о доле изменчивости, объясненной новыми направлениями осей (компонентами)
 
-- PC1 - больше всего изменчивости
-- PC2 - то, что осталось
+- PC1 --- больше всего изменчивости
+- PC2 --- то, что осталось
 
-</br>
+\column{0.48\textwidth}
 
 По новым координатам судим о близости объектов
 
-</br>
+\vfill
 
 По факторным нагрузкам исходных переменных на компоненты интерпретируем новые направления
 
-</br>
+\vfill
 
-</div>
+\columnsend
 
 # Анализ главных компонент в R
 
 ## Пример: Морфометрия поссумов
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
+
+\includegraphics{images/possum.jpg}
+
+\tiny{Possum by Hasitha Tudugalle on Flickr
+https://www.flickr.com/photos/hasitha\_tudugalle/6037880962}
+
+\column{0.48\textwidth}
 
 
 
-![possum](img/possum.jpg)
+\columnsend
 
-<small>Possum by Hasitha Tudugalle on Flickr
-https://www.flickr.com/photos/hasitha_tudugalle/6037880962</small>
-
-</div>
-
-<div class = "footnote">Данные Lindenmayer et al. (1995)</div>
+\tiny {Данные Lindenmayer et al. (1995)}
 
 ## Знакомимся с данными
 
@@ -271,15 +315,16 @@ labels = c("Cambarville","Bellbird",
 
 ```{r pairs-pos, eval=FALSE, tidy.opts=list(blank=FALSE, width.cutoff=60)}
 library(RColorBrewer)
-# цвета
-cols <- brewer.pal(n = length(levels(possum$site)), name = "Set1")
+# цвета из Брюеровской палитры
+cols <- brewer.pal(n = length(levels(possum$site)), name = "Set2")
 # график
-pairs(possum[, c(6:14, 2)], col = cols[possum$site], pch =  as.numeric(possum$sex))
+pairs(possum[, c(6:14, 2)], col = cols[possum$site], 
+      pch =  as.numeric(possum$sex))
 ```
 
 ##
 
-```{r,pairs-pos,fig.height=6.5,fig.width=10,echo=FALSE,cache=TRUE}
+```{r,pairs-pos,fig.height=6.5,fig.width=10,out.height='4in', out.width='5in', echo=FALSE, purl=FALSE,cache=FALSE}
 ```
 
 
@@ -297,23 +342,25 @@ ord <- rda(possum[, 6:14], scale = TRUE)
 summary(ord)
 ```
 
-## Все результаты можно посмотреть при помощи функции `summary()` {.smaller}
+## Все результаты можно посмотреть при помощи функции `summary()`
 
-```{r, eval=TRUE, echo=FALSE}
+\small
+
+```{r, eval=TRUE, echo=FALSE, purl=FALSE}
 summary(ord)
 ```
 
 
 ## Части результатов в `summary()`
 
-- Importance of components - собственные числа (eigenvalues) и доля объясненной изменчивости
-- Species scores - факторные нагрузки исходных переменных на каждую из компонент
-- Site scores - факторные координаты объектов
+- Importance of components --- собственные числа (eigenvalues) и доля объясненной изменчивости
+- Species scores --- факторные нагрузки исходных переменных на каждую из компонент
+- Site scores --- факторные координаты объектов
 
-### Масштабирование - scaling
+### Масштабирование --- scaling
 
-- __scaling = "species", correlation = TRUE__ - отношения между переменными (нагрузки переменных пересчитаны с учетом соб. чисел, интерпретируются как корреляции)
-- __scaling = "sites"__ - отношения между объектами (факт. координаты пересчитаны с учетом соб. чисел)
+- __scaling = "species", correlation = TRUE__ --- отношения между переменными (нагрузки переменных пересчитаны с учетом соб. чисел, интерпретируются как корреляции)
+- __scaling = "sites"__ --- отношения между объектами (факт. координаты пересчитаны с учетом соб. чисел)
 
 ## Что нужно знать, чтобы интерпретировать результаты?
 
@@ -343,7 +390,7 @@ eigenvals(ord) > mean(eigenvals(ord))
 
 Строим график собственных чисел
 
-```{r}
+```{r, fig.height=3}
 screeplot(ord, bstick = TRUE, type = "lines")
 abline(h = 1, lty = 2)
 ```
@@ -353,6 +400,7 @@ abline(h = 1, lty = 2)
 Допустим, мы решили оставить первые две компоненты. 
 
 Изменчивость, объясненная каждой из компонент, в процентах
+
 ```{r}
 eigenvals(ord)/sum(eigenvals(ord))*100
 ```
@@ -367,107 +415,160 @@ eigenvals(ord)/sum(eigenvals(ord))*100
 - Вклад переменных в изменчивость вдоль компоненты тем сильнее, чем больше модуль их факторной нагрузки.
 - Знак факторной нагрузки означает направление изменения исходной переменной вдоль главной компоненты.
 
+\small
+
 ```{r}
-scores(ord, display = "species", choices = c(1, 2, 3), scaling = "species", correlation = TRUE)
+scores(ord, display = "species", choices = c(1, 2, 3),
+       scaling = "species", correlation = TRUE)
 ```
+
+## 3. Что означают получившиеся компоненты?
+
+                PC1         PC2          PC3
+\begin{lstlisting}
+hdlngth  |\textbf{-0.4713851}| -0.04837773  0.078655520
+skullw   |\textbf{-0.4194429}| -0.08480655  0.131206176
+totlngth |\textbf{-0.4542416}| -0.05969730 -0.177801904
+taill    -0.2098116 |\textbf{-0.36809068}| -0.279173018
+footlgth -0.3333944  |\textbf{0.38003868}| -0.041289909
+earconch -0.1504873  |\textbf{0.48821273}| -0.011420156
+eye      -0.2017138 -0.21130983  |\textbf{0.370315121}|
+chest    |\textbf{-0.4446740}|  0.06787162 -0.005893116
+belly    |\textbf{-0.3983862}| -0.06276943 -0.023506174
+\end{lstlisting}
+
+- Первая главная компонента --- это физические размеры поссумов (высокие нагрузки у переменных длина головы, общая длина, измерения черепа, груди и живота). У нагрузок отрицательный знак, значит у крупных поссумов будут маленькие значения координат по первой компоненте.
+- Вторая главная компонента --- длина ушей, ног и хвоста. Высокие значения по этой компоненте у поссумов с большими ушами, длинными ногами и коротким хвостом.
+- Третья главная компонента --- размеры глаз. Высокие значения по этой компоненте будут у поссумов с большими глазами.
+
 
 ## Можно нарисовать факторные нагрузки на графике
 
 - Чем ближе стрелки исходных признаков к оси компоненты, тем выше их нагрузка.
 - Стрелки направлены в сторону увеличения значения исходного признака
 
-```{r, fig.width=4, fig.height=4}
-biplot(ord, scaling = "species", correlation = TRUE, main = "PCA -  species scaling", display = "species")
+```{r fig.height=3.5, fig.width=4, out.width='2.5in', out.height='2in', fig.align='center'}
+biplot(ord, scaling = "species", correlation = TRUE, 
+       main = "PCA -  species scaling", display = "species")
 ```
 
 
-## График факторных нагрузок в ggplot {.smaller}
+## График факторных нагрузок в ggplot2
 
-```{r, ggload-pos, message=FALSE, warning=FALSE, fig.width=4}
-# install.packages("devtools")
-# library("devtools")
-# install_github("jiho/autoplot")
-library(autoplot)
-# fortify(ord) # исходные данные, если нужно
-ggloadings <- autoplot(ord, data = possum, type = "var", PC = c(1, 2))  +  labs (x = "PC1", y = "PC2") + xlim(c(-2, 2)) + ylim(c(-2, 2))
+```{r ggload-pos, eval=FALSE}
+library(ggplot2)
+theme_set(theme_bw())
+library(ggrepel) # для подписей
+library(grid) # для стрелочек
+ar <- arrow(length = unit(0.1, "cm"))
+
+df_load <- data.frame(scores(ord, display = "species",
+         choices = c(1, 2), scaling = "species"))
+
+ggloadings <- ggplot(df_load) + 
+  geom_text_repel(aes(x = PC1, y = PC2, 
+    label = rownames(df_load)), segment.alpha = 0.5) + 
+  geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), 
+    colour = "grey40", arrow = ar) + 
+  coord_equal(xlim = c(-2, 2), ylim = c(-2, 2))
 ggloadings
+```
+
+## График факторных нагрузок в ggplot2
+
+```{r ggload-pos, eval=TRUE, echo=FALSE, purl=FALSE, fig.align='center'}
 ```
 
 
 ## Интерпретируем компоненты по графику факторных нагрузок
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
-> - Первая главная компонента - это физические размеры поссумов (высокие нагрузки у переменных длина головы, общая длина, измерения черепа, груди и живота). У нагрузок отрицательный знак, значит у крупных поссумов будут маленькие значения координат по первой компоненте.
-> - Вторая главная компонента - длина ушей, ног и хвоста. Высокие значения по этой компоненте у поссумов с большими ушами, длинными ногами и коротким хвостом.
+- Первая главная компонента --- это физические размеры поссумов (высокие нагрузки у переменных длина головы, общая длина, измерения черепа, груди и живота). У нагрузок отрицательный знак, значит у крупных поссумов будут маленькие значения координат по первой компоненте.
+- Вторая главная компонента --- длина ушей, ног и хвоста. Высокие значения по этой компоненте у поссумов с большими ушами, длинными ногами и коротким хвостом.
 
+\column{0.48\textwidth}
 
-```{r, ggload-pos, message=FALSE, warning=FALSE, echo=FALSE, fig.height=4,fig.width=4}
+```{r, ggload-pos, message=FALSE, warning=FALSE, echo=FALSE, purl=FALSE, fig.height=4,fig.width=4}
 ```
 
-</div>
+\columnsend
 
-## 4. Значения факторов (= факторные координаты) - координаты объектов в пространстве главных компонент
+## 4. Значения факторов (= факторные координаты) --- координаты объектов в пространстве главных компонент
+
+\small
 
 ```{r}
-# Координаты можно добыть так (но на самом деле сейчас нам нужен только график)
+# Координаты можно добыть так (но сейчас нам нужен только график)
 scores(ord, display = "sites",  choices = c(1, 2, 3), scaling = "sites")
 ```
 
 ## График факторных координат (= график ординации)
 
-```{r,fig.width=5,fig.height=5, tidy.opts=list(width.cutoff = 60)}
-biplot(ord, scaling = "sites", main = "PCA - sites scaling", display = "sites", type = "t")
+```{r fig.height=5, fig.width=5, out.width='3in', out.height='3in', fig.align='center'}
+biplot(ord, scaling = "sites", display = "sites", 
+       type = "t", main = "PCA - sites scaling")
 ```
 
-## График факторных координат в ggplot
+## График факторных координат в ggplot2
 
-```{r, ggscor-pos, fig.height=4.5, fig.width=10}
-ggscores <- autoplot(ord, data = possum, type = "obs", PC = c(1, 2), aes(colour = site, shape = sex), size = 3)
+```{r ggscor-pos, eval=FALSE}
+df_scores <- data.frame(possum, scores(ord, display = "sites",
+                                       choices = c(1, 2, 3), 
+                                       scaling = "sites"))
+
+ggscores <- ggplot(df_scores, aes(x = PC1, y = PC2, 
+                        colour = site, shape = sex)) + 
+  geom_point(size = 2) +
+  coord_equal(xlim = c(-1, 1), ylim = c(-1, 1))
 ggscores
 ```
 
-## Делаем красивый график ординации.
+## График факторных координат в ggplot2
 
-```{r}
-# Подписи можно удалить из объекта `autoplot` и вставить свои.
-# Смотрим на слои графика, второй из них содержит geom_text и он нам не нужен
-ggscores$layers
-# удаляем слой с подписями
-ggscores$layers <- ggscores$layers[-2] 
+```{r ggscor-pos, eval=TRUE, echo=FALSE, purl=FALSE, fig.align='center', fig.width=8, fig.height=4, out.width='5in', out.height='3in'}
 ```
 
-
 ## Интерпретируем сходство объектов по графику ординации
-
-<div class="columns-2">
 
 Первые две компоненты объясняют 65% общей изменчивости
 
 44% общей изменчивости объясняет первая главная компонента, связанная с размером особей. Более крупные поссумы встречаются в популяциях из Камбарвиля и Бирангери
 
-Вторая компонента, которую мы интерпретировали как пропорции ног, ушей и хвоста, объясняет 21% общей изменчивости. Внутри отдельных популяций поссумы мало отличаются по этим параметрам (об этом говорит небольшой разброс точек вдоль второй компоненты). Зато поссумы из Камбарвиля и Беллберда не похожи на других: у них относительно более крупные уши, длинные ноги и короткие хвосты, чем у поссумов из других популяций.
+\columnsbegin
+\column{0.4\textwidth}
 
-```{r, fig.width=5, echo=FALSE}
+Вторая компонента --- которую мы интерпретировали как пропорции ног, ушей и хвоста --- объясняет 21% общей изменчивости. Внутри отдельных популяций поссумы мало отличаются по этим параметрам (об этом говорит небольшой разброс точек вдоль второй компоненты). Зато поссумы из Камбарвиля и Беллберда не похожи на других: у них относительно более крупные уши, длинные ноги и короткие хвосты, чем у поссумов из других популяций.
+
+\column{0.6\textwidth}
+
+```{r echo=FALSE, purl=FALSE, height = 6, width = 6, out.height='3.5in', out.width='2.5in'}
 ggscores
 ```
 
-</div>
+\columnsend
 
-##
+## Несколько графиков рядом: `grid.arrange()`
 
-```{r,fig.width=10, fig.height=4.5}
-# Несколько графиков рядом
+```{r}
+library(gridExtra)
+grid.arrange(ggloadings, ggscores, nrow = 1)
+```
+
+## Несколько графиков рядом: `gtable`
+
+```{r}
 library(gtable)
 g1 <- ggplotGrob(ggloadings)
 g2 <- ggplotGrob(ggscores)
-g <- gtable:::cbind_gtable(g1, g2, "first")
+g <- gtable:::cbind_gtable(g1, g2, size = "first")
 grid.newpage()
 grid.draw(g)
 ```
 
 
-## Факторные координаты можно использовать для снижения размерности данных {.smaller}
+## Факторные координаты можно использовать для снижения размерности данных
 
 Было 7 скоррелированных признаков, стало 2 __независимых__ (они ведь перпендикулярны) главных компоненты
 
@@ -478,9 +579,11 @@ grid.draw(g)
 - Дисперсионный анализ
 - Корреляция с другими признаками, которые не были использованы в анализе главных компонент, и т.д., и т.п.
 
+## Так можно экстрагировать компоненты с исходными данными
+
 ```{r}
-# Так можно экстрагировать компоненты с исходными данными
-scrs <- scores(ord, display = "sites",  choices = c(1, 2, 3), scaling = "sites")
+scrs <- scores(ord, display = "sites",  
+               choices = c(1, 2, 3), scaling = "sites")
 data_with_pc <- data.frame(possum, scrs)
 head(data_with_pc)
 ```
@@ -491,33 +594,35 @@ head(data_with_pc)
 
 - Линейные связи между переменными (т.к. матрица корреляций или ковариаций)
 - Исключить наблюдения, в которых есть пропущенные значения
-- Если много нулей - трансформация данных (например, трансформация Хелингера)
-- Если очень много нулей - удалить такие переменные из анализа
+- Если много нулей --- трансформация данных (например, трансформация Хелингера)
+- Если очень много нулей --- удалить такие переменные из анализа
 
-## Пример: Морфометрия египетских черепов {.smaller}
+## Пример: Морфометрия египетских черепов
 
-<div class="columns-2">
+\columnsbegin
+\column{0.48\textwidth}
 
 Измерения 150 черепов в мм:
 
-- mb - максимальная ширина
-- bh - высота от основания до макушки
-- bl - расстояние от основания черепа до края в. челюсти
-- nh - высота носа 
+- mb --- максимальная ширина
+- bh --- высота от основания до макушки
+- bl --- расстояние от основания черепа до края в. челюсти
+- nh --- высота носа 
 
 Эпоха (epoch):
 
-- 1 - ранний прединастический период (ок. 4000 до н.э.)
-- 2 - поздний прединастический период (ок. 3300 до н.э.)
-- 3 - 12 и 13 династии (ок. 1850 до н.э.)
-- 4 - Птолемейский период (ок. 200 до н.э.)
-- 5 - Римский период (ок. 150 н.э.)
+- 1 --- ранний прединастический период (ок. 4000 до н.э.)
+- 2 --- поздний прединастический период (ок. 3300 до н.э.)
+- 3 --- 12 и 13 династии (ок. 1850 до н.э.)
+- 4 --- Птолемейский период (ок. 200 до н.э.)
+- 5 --- Римский период (ок. 150 н.э.)
 
-![skulls](img/skulls.png)
+\column{0.48\textwidth}
 
-</div>
+\includegraphics{images/skulls.png}
+\columnsend
 
-<div class="footnote">Данные Thompson, Randall-Maciver (1905). Источник Manly (1994).</div>
+\tiny {Данные Thompson, Randall-Maciver (1905). Источник Manly (1994).}
 
 ## Знакомимся с данными
 
@@ -531,7 +636,7 @@ table(skulls$epoch)
 
 ##
 
-```{r, fig.width=10, fig.height=5}
+```{r fig.height=4}
 # цвета
 library(RColorBrewer)
 cols <- brewer.pal(n = length(levels(skulls$epoch)), name = "Set1")
@@ -549,60 +654,92 @@ pairs(skulls[, -1], col = cols[skulls$epoch])
 
 Не забудьте оставить в исходных данных только непрерывные переменные
 
-```{r}
+```{r purl=FALSE}
 ord1 <- rda(skulls[, -1], scale = TRUE)
 ```
 
 ## Cколько компонент нужно оставить?
 
-```{r}
+```{r purl=FALSE, fig.height=3}
 screeplot(ord1, bstick = TRUE, type = "lines")
 abline(h = 1, lty = 2)
 ```
 
-> - Оставляем две компоненты (можно даже одну)
+\pause
+
+- Оставляем две компоненты (можно даже одну)
 
 ## Сколько изменчивости объясняют компоненты?
 
-```{r}
+```{r purl=FALSE}
 eig <- eigenvals(ord1)
 explained <- sum(eig[1:2])/sum(eig) * 100
 explained
 ```
 
-> - Компоненты вместе объясняют `r round(explained, 0)` % общей изменчивости
+\pause
+
+- Компоненты вместе объясняют `r round(explained, 0)` % общей изменчивости
 
 ## Что означают получившиеся компоненты?
 
 - Вдоль 1й компоненты уменьшается расстояние от основания черепа до края в. челюсти (bl) и высота от основания до макушки (bh)
 - Вдоль 2й компоненты уменьшается высота носа (nh) и максимальная ширина (mb)
 
-```{r}
-scores(ord1, display = "species", choices = c(1, 2), scaling = "species", correlation = TRUE)
+```{r purl=FALSE}
+scores(ord1, display = "species", choices = c(1, 2), 
+       scaling = "species", correlation = TRUE)
 ```
 
 ## Что означают получившиеся компоненты?
 
+```{r loadings, purl=FALSE, eval=FALSE}
+df_load <- as.data.frame(scores(ord1, display = "species", choices = c(1, 2, 3), scaling = "species"))
+ar <- arrow(length = unit(0.1, "cm"))
+ggloadings1 <- ggplot(df_load) + 
+  geom_text_repel(aes(x = PC1, y = PC2, 
+                      label = rownames(df_load))) + 
+  geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), 
+               colour = "grey40", arrow = ar) + 
+  coord_equal(xlim = c(-2.3, 2), ylim = c(-2.3, 2))
+ggloadings1
+```
+
+## Что означают получившиеся компоненты?
+
+\columnsbegin
+
+\column{0.48\textwidth}
+
+```{r loadings, purl=FALSE, fig.height=3.5, echo=FALSE, purl=FALSE, eval=TRUE}
+```
+
+\column{0.48\textwidth}
+
 - Вдоль 1й компоненты уменьшается расстояние от основания черепа до края в. челюсти (bl) и высота от основания до макушки (bh)
 - Вдоль 2й компоненты уменьшается высота носа (nh) и максимальная ширина (mb)
 
-```{r, fig.height=3.5}
-ggloadings1 <- autoplot(ord1, data = skulls, type = "var", PC = c(1, 2)) + 
-    labs(x = "PC1", y = "PC2") + xlim(c(-2.3, 2)) + ylim(c(-2.3, 2))
-ggloadings1
+\columnsend
+
+
+## Как располагаются объекты в пространстве главных компонент?
+
+```{r skull-ord, purl=FALSE, eval=FALSE}
+df_scores1 <- data.frame(skulls, scores(ord1, display = "sites", choices = c(1, 2, 3), scaling = "sites"))
+
+ggscores1 <- ggplot(df_scores1, aes(x = PC1, y = PC2)) + geom_point(aes(colour = epoch)) +
+  coord_equal(xlim = c(-1, 1), ylim = c(-1, 1))
+ggscores1
 ```
 
 ## Как располагаются объекты в пространстве главных компонент?
 
-```{r}
-ggscores1 <- autoplot(ord1, data = skulls, type = "obs", PC = c(1, 2), aes(colour = epoch), size = 3) + scale_color_brewer(name = "Эпоха")
-ggscores1$layers <- ggscores1$layers[-2]
-ggscores1
+```{r skull-ord, eval=TRUE, echo=FALSE, purl=FALSE}
 ```
 
 ## Для облегчения интерпретации располагаем графики рядом
 
-```{r}
+```{r purl=FALSE, out.height='2in'}
 g1 <- ggplotGrob(ggloadings1)
 g2 <- ggplotGrob(ggscores1)
 g <- gtable:::cbind_gtable(g1, g2, "first")
@@ -610,7 +747,11 @@ grid.newpage()
 grid.draw(g)
 ```
 
-> - С течением времени форма черепов древних египтян изменялась. Постепенно увеличивались размеры черепа, а длина носа практически не изменялась.
+\pause
+
+\small
+
+- С течением времени форма черепов древних египтян изменялась. Постепенно увеличивались размеры черепа, а длина носа практически не изменялась.
 
 
 ## Take home messages
@@ -619,8 +760,8 @@ grid.draw(g)
     - исследование связей между переменными
     - построение ординации объектов
     - снижение размерности данных
-- Собственные числа - вклад компонент в общую изменчивость
-- Факторные нагрузки - связь исходных переменных с компонентами - используются для интерпретации
+- Собственные числа --- вклад компонент в общую изменчивость
+- Факторные нагрузки --- связь исходных переменных с компонентами --- используются для интерпретации
 - Значения факторов (факторные координаты) - новые координаты объектов в пространстве уменьшенной размерности
 - Значения факторов можно использовать как новые комплексные переменные в других видах анализов.
 
