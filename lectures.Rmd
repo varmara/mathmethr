@@ -66,9 +66,12 @@ install.packages("multcomp")
 
 ## 7. Анализ главных компонент
 
-- Презентация [pdf]
-- [код R]
-- Данные
+```{r eval=FALSE}
+install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "gtable", "HSAUR", "ggrepel"))
+```
+
+- Презентация [pdf](07_pca.pdf)
+- [код R](07_code_pca.R)
 - [Примеры вопросов следующего теста]
 - [Домашнее задание №3]
 
