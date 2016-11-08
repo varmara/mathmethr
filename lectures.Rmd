@@ -72,7 +72,7 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "gtable", "HSAUR", "
 
 - Презентация [pdf](07_pca.pdf)
 - [код R](07_code_pca.R)
-- [Примеры вопросов следующего теста]
+- [Примеры вопросов следующего теста](test_handouts/07-pca-handout-test1.pdf)
 - [Домашнее задание №3]
 
 ## 8. Дискриминантный анализ 
