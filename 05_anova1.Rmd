@@ -198,8 +198,6 @@ $$\alpha _{per\ comparison} = \frac{\alpha _{family\ wise}}{n}$$
 
 ## Модель дисперсионного анализа
 
-<div class="columns-2">
-
 $$y _{ij} = \mu + a _i + \varepsilon _{ij}$$
 
 Из чего складываются средние значения в группах по фактору? 
