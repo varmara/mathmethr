@@ -54,22 +54,24 @@ pairs(iris[, -5], col = iris$Species)
 
 ```{r ggpairs-plot, eval=FALSE}
 library(GGally)
+library(ggplot2)
 theme_set(theme_bw() + theme(legend.key = element_blank()))
 update_geom_defaults("point", list(shape = 19, size = 2))
 ggpairs(iris, aes(colour = Species, alpha = 0.5),
-        upper = list(continuous = "density", combo = "box"))
+        upper = list(continuous = "density", combo = "box", discrete =
+  "facetbar", na = "na"))
 ```
 
 ##
 
-```{r pairs-plot, echo=FALSE, fig.height=7, out.height='3.5in'}
+```{r pairs-plot, echo=FALSE, fig.height=7, out.height='3.5in', purl=FALSE}
 ```
 
 Группы не различимы, если использовать любую из переменных отдельно, или даже какую-то пару переменных. Что делать?
 
 ##
 
-```{r ggpairs-plot, echo=FALSE, fig.height=7, fig.width=9.8, out.height='3.5in', out.width='4.9in'}
+```{r ggpairs-plot, echo=FALSE, fig.height=7, fig.width=9.8, out.height='3.5in', out.width='4.9in', purl=FALSE}
 ```
 
 ## Дискриминантный анализ
@@ -145,9 +147,7 @@ $$LD _j = d _{1j} X _{1} + d _{2i} X _{2} + ... + d _p X _{p}$$
 
 \blockbegin{Функции классификации}
 
-- Описывают вероятность принадлежности объекта к группе согласно построенной классификации.
-
-- Таких функций столько же, сколько групп
+- Описывают вероятность принадлежности объекта к группе согласно построенной классификации
 
 \blockend
 
@@ -388,6 +388,33 @@ table(qda_tr_pred$class, iris$Species[in_train])
 qda_test_pred <- predict(qda_tr, iris[-in_train, -5])
 table(qda_test_pred$class, iris$Species[-in_train])
 ```
+
+## Задание: Поссумы
+
+- При помощи дискриминантного анализа классифицируйте популяции поссумов
+- Хорошо ли работает классификация?
+- Выполняются ли условия применимости?
+
+\columnsbegin
+\column{0.48\textwidth}
+
+\includegraphics{images/possum.jpg}
+
+\tiny{Possum by Hasitha Tudugalle on Flickr
+https://www.flickr.com/photos/hasitha\_tudugalle/6037880962}
+
+\column{0.48\textwidth}
+
+```{r}
+library(DAAG)
+data(possum)
+possum <- 
+  possum[complete.cases(possum), ]
+```
+
+\columnsend
+
+\tiny {Данные Lindenmayer et al. (1995)}
 
 
 ## Take home messages
