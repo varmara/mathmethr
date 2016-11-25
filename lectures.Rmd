@@ -95,4 +95,4 @@ install.packages(c("ape", "pvclust"))
 
 - Презентация [pdf]
 - [код R](09_code_dist.R)
-- [Примеры вопросов]
+- [Примеры вопросов](test_handouts/09-dist-handout-test1.pdf)
