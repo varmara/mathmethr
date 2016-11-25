@@ -23,10 +23,7 @@
 <script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
-<script src="site_libs/htmlwidgets-0.7/htmlwidgets.js"></script>
-<script src="site_libs/viz-0.3/viz.js"></script>
-<link href="site_libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="site_libs/grViz-binding-0.8.4/grViz.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -181,7 +178,6 @@ $(document).ready(function () {
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
-<script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
@@ -207,7 +203,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0
@@ -266,8 +262,9 @@ div.tocify {
 }
 
 .tocify-subheader .tocify-item {
-  font-size: 0.9em;
-  padding-left: 5px;
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -279,7 +276,6 @@ div.tocify {
 }
 .tocify-subheader .tocify-item {
   font-size: 0.95em;
-  padding-left: 10px;
 }
 
 </style>
@@ -351,15 +347,21 @@ div.tocify {
 <div id="----1" class="section level2">
 <h2>Коэффициенты сходства и различия</h2>
 <p></p>
-<p>Расстояния</p>
-<p><span class="math inline">\(d \ge 0\)</span></p>
-<div id="htmlwidget-3ac04c6eac1e0c977960" style="width:432px;height:48px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3ac04c6eac1e0c977960">{"x":{"diagram":"digraph symmetry {\n\n  # a \"graph\" statement\n  graph [overlap = false, fontsize = 10, rankdir = LR]\n\n  # several \"node\" statements\n  node [shape = circle,\n        fixedsize = true,\n        width = 0.5,\n        style = filled,\n        color = grey]\n  node [fillcolor = PowderBlue]\n  A; B\n\n  # several \"edge\" statements\n  A->B [dir = \"both\"]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p></p>
-<p>Сходства</p>
+<p><span class="math inline">\(d \ge 0\)</span></p>
+<!-- ```{r echo=FALSE, fig.width=4.5, fig.height=0.5} -->
+<!-- library(DiagrammeR) -->
+<!-- DiagrammeR("images/dist.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/dist.gv -o images/dist.pdf') -->
+<!-- ``` -->
+<p></p>
+<p> </p>
 <p><span class="math inline">\(0 \le S \le 1\)</span> или <span class="math inline">\(-1 \le S \le 1\)</span></p>
-<div id="htmlwidget-9078d95114e08bca6cff" style="width:432px;height:48px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-9078d95114e08bca6cff">{"x":{"diagram":"digraph symmetry {\n\n  # a \"graph\" statement\n  graph [overlap = false, fontsize = 10, rankdir = LR]\n\n  # several \"node\" statements\n  node [shape = circle,\n        fixedsize = true,\n        width = 0.5,\n        style = filled,\n        color = grey]\n  node [fillcolor = PowderBlue]\n  A; B\n\n  # several \"edge\" statements\n  A->B [dir = \"both\", arrowhead = inv arrowtail = inv]\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<!-- ```{r echo=FALSE, fig.width=4.5, fig.height=0.5} -->
+<!-- DiagrammeR("images/sim.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/sim.gv -o images/sim.pdf') -->
+<!-- ``` -->
+<p></p>
 <p></p>
 <ul>
 <li>Используются в качестве исходных данных для многих видов многомерных анализов, в т.ч. для неметрического многомерного шкалирования и некоторых видов кластерного анализа</li>
@@ -370,37 +372,40 @@ div.tocify {
 <div id="---" class="section level2">
 <h2>Свойства коэффициентов сходства-различия</h2>
 <p></p>
-<div id="--" class="section level3">
-<h3>Метрики и полуметрики</h3>
+<p></p>
 <p>Адекватность: <span class="math inline">\(d_{A, A} = 0\)</span></p>
-<div id="htmlwidget-7dbd100e4a74a05d3cd7" style="width:384px;height:48px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-7dbd100e4a74a05d3cd7">{"x":{"diagram":"digraph symmetry {\n\n  # a \"graph\" statement\n  graph [overlap = false, fontsize = 10, rankdir = LR/*,\n  label = <<font point-size=\"10\">d<sub><font point-size=\"5\">A, A\u003c/font>\u003c/sub> = 0\u003c/font>>*/, labelloc = t]\n\n  # several \"node\" statements\n  node [shape = circle,\n        fixedsize = true,\n        width = 0.5,\n        style = filled,\n        color = grey]\n  node [fillcolor = PowderBlue]\n  A\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<!-- ```{r, echo=FALSE, fig.width=4, fig.height=.5} -->
+<!-- DiagrammeR("images/adequa.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/adequa.gv -o images/adequa.pdf') -->
+<!-- ``` -->
+<p></p>
 <p>Симметричность: <span class="math inline">\(d_{A, B} = d_{B, A}\)</span></p>
-<div id="htmlwidget-4871dbad40d086689843" style="width:384px;height:48px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-4871dbad40d086689843">{"x":{"diagram":"digraph symmetry {\n\n  # a \"graph\" statement\n  graph [overlap = false, fontsize = 10, rankdir = LR, labelloc = t, labeljust = c/*, label = \"Симметричность\"*/]\n\n  # several \"node\" statements\n  node [shape = circle,\n        fixedsize = true,\n        width = 0.5,\n        style = filled,\n        color = grey]\n  node [fillcolor = PowderBlue]\n  A; B\n\n  # several \"edge\" statements\n  A->B /*[label=<<font point-size=\"10\">d<sub><font point-size=\"5\">A, B\u003c/font>\u003c/sub> = d<sub><font point-size=\"5\">B, A\u003c/font>\u003c/sub>\u003c/font>>]*/\n  B->A\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<!-- ```{r, echo=FALSE, fig.width=4, fig.height=.5} -->
+<!-- # DiagrammeR("images/symmetry.mmd") -->
+<!-- DiagrammeR("images/symmetry.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/symmetry.gv -o images/symmetry.pdf') -->
+<!-- ``` -->
 <p></p>
-</div>
-<div id="-" class="section level3">
-<h3>Только метрики</h3>
-<p>Триангулярность: <span class="math inline">\(d_{A, B} \le d_{A, C} + d_{C, B}\)</span> <div id="htmlwidget-a62d916a899b098515a6" style="width:384px;height:96px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-a62d916a899b098515a6">{"x":{"diagram":"digraph symmetry {\n\n  # a \"graph\" statement\n  graph [overlap = false, fontsize = 10, rankdir = LR]\n\n  # several \"node\" statements\n  node [shape = circle,\n        fixedsize = true,\n        width = 0.5,\n        style = filled,\n        color = grey]\n  node [fillcolor = PowderBlue]\n  A; B; C\n\n  # several \"edge\" statements\n  A->B A->C C->B\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script></p>
 <p></p>
-</div>
-<div class="section level3">
-<h3>Неметрики</h3>
+<p></p>
+<p>Триангулярность: <span class="math inline">\(d_{A, B} \le d_{A, C} + d_{C, B}\)</span></p>
+<!-- ```{r, echo=FALSE, fig.width=4, fig.height=1} -->
+<!-- DiagrammeR("images/triang.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/triang.gv -o images/triang.pdf') -->
+<!-- ``` -->
+<p></p>
+<p></p>
+<p></p>
 <p>Все остальное</p>
-</div>
+<p></p>
 </div>
 <div id="----1" class="section level2">
 <h2>Свойства коэффициентов сходства-различия</h2>
 <p></p>
-<div class="section level3">
-<h3>Нестандартные</h3>
+<p></p>
 <p><span class="math display">\[-\inf \le d \le \inf\]</span></p>
 <p></p>
-</div>
-<div class="section level3">
-<h3>Стандартные</h3>
+<p></p>
 <p><span class="math display">\[d_{min} \le d \le d_{max}\]</span></p>
 <ul>
 <li>частный случай стандартных коэффициентов - коррелятивные коэффициенты сходства</li>
@@ -408,11 +413,10 @@ div.tocify {
 <p><span class="math display">\[-1 \le S \le 1\]</span></p>
 <p></p>
 </div>
-</div>
-<div id="-" class="section level2">
-<h2>Примеры коэффициентов</h2>
+<div id="---" class="section level2">
+<h2>Примеры коэффициентов сходства-различия</h2>
 <p></p>
-<p>Метрики:</p>
+<p></p>
 <ul>
 <li>без стандартизации:
 <ul>
@@ -426,12 +430,12 @@ div.tocify {
 <li>Евклидово расстояние, рассчитанное по стандартизованным данным</li>
 </ul></li>
 </ul>
-<p>Полуметрики:</p>
+<p></p>
 <ul>
 <li>расстояние Махаланобиса</li>
 </ul>
 <p></p>
-<p>Неметрики:</p>
+<p></p>
 <ul>
 <li>со стандартизацией:
 <ul>
@@ -449,8 +453,7 @@ div.tocify {
 </div>
 <div id="------" class="section level2">
 <h2>Если количественные признаки измерены в одинаковых шкалах</h2>
-<div id="--" class="section level3">
-<h3>Метрики без стандартизации</h3>
+<p></p>
 <p></p>
 <ul>
 <li>Евклидово расстояние</li>
@@ -468,41 +471,35 @@ div.tocify {
 <p></p>
 <p></p>
 </div>
-</div>
 <div id="------" class="section level2">
 <h2>Если количественные признаки измерены в разных шкалах</h2>
-<div id="---" class="section level3">
-<h3>Можно стандартизовать исходные данные</h3>
+<p></p>
 <ul>
 <li>Евклидово (или другое) расстояние, рассчитанное по стандартизованным данным</li>
 </ul>
-</div>
-<div id="----" class="section level3 smaller">
-<h3>Можно использовать коэффициенты со стандартизацией</h3>
+<p></p>
 <ul>
 <li>Канберра (метрика) <span class="math inline">\(d = {\sum \frac {|x _{ik} - x _{jk}|} {|x _{ik}|+|x _{jk}|}}\)</span></li>
 <li>хи-квадрат (метрика) <span class="math inline">\(\chi^2 = \sqrt {\sum{ {\frac {1} {c _k}} (x _{ik} - x _{jk})^2 }}\)</span></li>
 <li><p>Коэффициент Махаланобиса (неметрика, not a distance) <span class="math inline">\(d = \frac {\sum {x _{ik} - x _{jk}}} {\sigma^2}\)</span></p></li>
 <li><p>Корреляция Браве-Пирсона (коррелятивный) <span class="math inline">\(S = \frac {\sum {(x _{ik} - \bar x _{i})(x _{ik} - \bar x _{j})}} {n \sigma^2 _{i} \sigma^2 _{j}}\)</span></p></li>
-<li><p>Коэффициент Брея-Куртиса (не метрика) <span class="math inline">\(BC _{ij} = \frac { 2C _{ij}} {S _i + S _j}\)</span>,<br />
-где <span class="math inline">\(C _{ij}\)</span> - сумма минимальных значений из тех, которые не равны нулю для обоих объектов, <span class="math inline">\(S _i\)</span> и <span class="math inline">\(S _j\)</span> - общее число ненулевых значений признаков для обоих объектов.</p></li>
+<li><p>Коэффициент Брея-Куртиса (не метрика) <span class="math inline">\(BC _{ij} = \frac { 2C _{ij}} {S _i + S _j}\)</span>, где <span class="math inline">\(C _{ij}\)</span> - сумма минимальных значений из тех, которые не равны нулю для обоих объектов, <span class="math inline">\(S _i\)</span> и <span class="math inline">\(S _j\)</span> - общее число ненулевых значений признаков для обоих объектов.</p></li>
 </ul>
 </div>
-</div>
-<div id="-----" class="section level2">
-<h2>Если признаки - <strong>подсчеты численности</strong></h2>
-<div id="----1" class="section level3">
-<h3>Можно стандартизовать исходные данные</h3>
-<p>Простая стандартизация не подходит (счет, не может быть среднее 0)<br />
-Можно использовать трансформации: - корень, корень 4-й степени - логарифмирование со сдвигом (log10(1+n))</p>
-</div>
-<div id="-----1" class="section level3">
-<h3>Можно использовать коэффициенты со стандартизацией</h3>
+<div id="---" class="section level2">
+<h2>Если признаки — <strong>подсчеты численности</strong></h2>
+<p></p>
+<p>Простая стандартизация не подходит (счет, не может быть среднее 0)</p>
+<p>Можно использовать трансформации:</p>
+<ul>
+<li>корень, корень 4-й степени</li>
+<li>логарифмирование со сдвигом (log10(x + 1))</li>
+</ul>
+<p></p>
 <ul>
 <li><p>Канберра (метрика) <span class="math inline">\(d = {\sum \frac {|x _{ik} - x _{jk}|} {|x _{ik}|+|x _{jk}|}}\)</span></p></li>
 <li><p>хи-квадрат (метрика) <span class="math inline">\(\chi^2 = \sqrt {\sum{ {\frac {1} {c _k}} (x _{ik} - x _{jk})^2 }}\)</span></p></li>
 </ul>
-</div>
 </div>
 <div id="------" class="section level2">
 <h2>Если признаки - доли или проценты</h2>
@@ -522,18 +519,17 @@ div.tocify {
 </div>
 <div id="-----" class="section level2">
 <h2>Если данные смешанные (качественные и количественные)</h2>
-<div id="---" class="section level3">
-<h3>Коэффициенты для смешанных данных</h3>
+<p></p>
 <ul>
 <li>расстояние Говера</li>
 </ul>
-</div>
 </div>
 </div>
 <div id="--" class="section level1">
 <h1>Неметрическое многомерное шкалирование</h1>
 <div id="-----------" class="section level2">
 <h2>Неметрическое многомерное шкалирование визуализирует отношения между объектами на основе расстояний между ними</h2>
+<p></p>
 <p></p>
 <p><img src="09_dist_files/figure-html/gg-eu-1.pdf" width="480" /></p>
 <p></p>
@@ -544,16 +540,19 @@ div.tocify {
 # Calais      3175      1326      204       
 # Cherbourg   3339      1294      583    460</code></pre>
 <p>мы бы смогли восстановить по ним карту</p>
-<p><img src="09_dist_files/figure-html/eu-1.pdf" width="432" /></p>
+<p><img src="09_dist_files/figure-html/eu-1.pdf" width="2in" height="1.9in" /></p>
 <p></p>
 </div>
 <div id="---1" class="section level2">
 <h2>Неметрическое многомерное шкалирование</h2>
-<p>Неметрическое многомерное шкалирование (nonmetric multidimensional scaling, nMDS) - метод визуализации отношений между объектами в пространстве с небольшим числом измерений.</p>
-<p>Исходные данные - матрица расстояний между объектами в многомерном пространстве</p>
+<p>Неметрическое многомерное шкалирование (nonmetric multidimensional scaling, nMDS) — метод визуализации отношений между объектами в пространстве с небольшим числом измерений.</p>
+<p>Исходные данные — матрица расстояний между объектами в многомерном пространстве</p>
 <p></p>
-<p>nMDS подбирает расстояния между объектами на графике так, чтобы сохранились соотношение исходных расстояний между ними. Т.е. если исходно A и B были ближе, чем B и С, то и в результате они должны быть ближе, чем B и С.</p>
-<p>Ординацию nMDS можно поворачивать, отражать, сдвигать - результат от этого не изменится.</p>
+<p></p>
+<ul>
+<li><p>nMDS подбирает расстояния между объектами на графике так, чтобы сохранились соотношение исходных расстояний между ними. Т.е. если исходно A и B были ближе, чем B и С, то и в результате они должны быть ближе, чем B и С.</p></li>
+<li><p>Ординацию nMDS можно поворачивать, отражать, сдвигать - результат от этого не изменится.</p></li>
+</ul>
 <p></p>
 <p><img src="09_dist_files/figure-html/eu-1.pdf" width="432" /></p>
 <p></p>
@@ -600,97 +599,89 @@ possum$site &lt;-<span class="st"> </span><span class="kw">factor</span>(possum$
 <pre><code>#  [1] &quot;case&quot;     &quot;site&quot;     &quot;Pop&quot;      &quot;sex&quot;      &quot;age&quot;      &quot;hdlngth&quot; 
 #  [7] &quot;skullw&quot;   &quot;totlngth&quot; &quot;taill&quot;    &quot;footlgth&quot; &quot;earconch&quot; &quot;eye&quot;     
 # [13] &quot;chest&quot;    &quot;belly&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">possumc &lt;-<span class="st"> </span>possum[<span class="kw">complete.cases</span>(possum), <span class="kw">c</span>(<span class="dv">3</span>:<span class="dv">4</span>, <span class="dv">5</span>:<span class="dv">14</span>)]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">possumc &lt;-<span class="st"> </span>possum[<span class="kw">complete.cases</span>(possum), <span class="kw">c</span>(<span class="dv">3</span>:<span class="dv">14</span>)]</code></pre></div>
 </div>
 <div id="---2" class="section level2">
 <h2>Неметрическое многомерное шкалирование</h2>
 <p>Построим ординацию поссумов на основе их сходства по морфометрии и возрасту.</p>
-<p>Функция metaMDS трансформирует и стандартизует данные, а затем итеративно подбирает координаты поссумов в новом пространстве (двумерном по умолчанию).</p>
+<p>Функция metaMDS много раз итеративно подбирает координаты поссумов в новом пространстве (двумерном по умолчанию) и сохраняет лучшую конфигурацию.</p>
+<p>Поскольку по умолчанию <code>autotransform = TRUE</code>, данные предварительно подвергаются двойной (“висконсинской”) стандартизации (см. <code>?metaMDS</code>). <strong>Если у вас не данные о сообществах, то это нужно отключить</strong>, но пока мы продолжим с трансформацией.</p>
+<p></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(vegan)
-ord_euclid &lt;-<span class="st"> </span><span class="kw">metaMDS</span>(possumc[, <span class="dv">3</span>:<span class="dv">10</span>], <span class="dt">distance =</span> <span class="st">&quot;euclid&quot;</span>)</code></pre></div>
+ord_euclid_wisk &lt;-<span class="st"> </span><span class="kw">metaMDS</span>(possumc[, <span class="dv">3</span>:<span class="dv">10</span>], <span class="dt">distance =</span> <span class="st">&quot;euclid&quot;</span>, <span class="dt">autotransform =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <pre><code># Square root transformation
 # Wisconsin double standardization
 # Run 0 stress 0.03822067 
-# Run 1 stress 0.03822133 
-# ... Procrustes: rmse 0.0001426977  max resid 0.001017908 
-# ... Similar to previous best
-# Run 2 stress 0.04029589 
-# Run 3 stress 0.03822107 
-# ... Procrustes: rmse 0.0001046041  max resid 0.0007087629 
-# ... Similar to previous best
-# Run 4 stress 0.03822752 
-# ... Procrustes: rmse 0.000540376  max resid 0.00419228 
-# ... Similar to previous best
-# Run 5 stress 0.03822056 
+# Run 1 stress 0.04041461 
+# Run 2 stress 0.03822058 
 # ... New best solution
-# ... Procrustes: rmse 0.0000656542  max resid 0.0003564359 
+# ... Procrustes: rmse 0.00003114906  max resid 0.0001649115 
 # ... Similar to previous best
-# Run 6 stress 0.03822743 
-# ... Procrustes: rmse 0.0005363384  max resid 0.00378389 
+# Run 3 stress 0.0403087 
+# Run 4 stress 0.04029072 
+# Run 5 stress 0.04029084 
+# Run 6 stress 0.03822161 
+# ... Procrustes: rmse 0.0001334453  max resid 0.0007486544 
 # ... Similar to previous best
-# Run 7 stress 0.03822114 
-# ... Procrustes: rmse 0.0001136126  max resid 0.0008841566 
+# Run 7 stress 0.4120448 
+# Run 8 stress 0.04562004 
+# Run 9 stress 0.04629984 
+# Run 10 stress 0.0403093 
+# Run 11 stress 0.0402905 
+# Run 12 stress 0.040303 
+# Run 13 stress 0.04558058 
+# Run 14 stress 0.04029655 
+# Run 15 stress 0.04364947 
+# Run 16 stress 0.04029063 
+# Run 17 stress 0.0382206 
+# ... Procrustes: rmse 0.00001382989  max resid 0.0000787073 
 # ... Similar to previous best
-# Run 8 stress 0.04030816 
-# Run 9 stress 0.07328624 
-# Run 10 stress 0.0382271 
-# ... Procrustes: rmse 0.0005285067  max resid 0.003857614 
-# ... Similar to previous best
-# Run 11 stress 0.04029057 
-# Run 12 stress 0.06856552 
-# Run 13 stress 0.04029629 
-# Run 14 stress 0.04030363 
-# Run 15 stress 0.03822669 
-# ... Procrustes: rmse 0.0005189244  max resid 0.003704368 
-# ... Similar to previous best
-# Run 16 stress 0.04029201 
-# Run 17 stress 0.03822843 
-# ... Procrustes: rmse 0.0005568416  max resid 0.004339571 
-# ... Similar to previous best
-# Run 18 stress 0.04029124 
-# Run 19 stress 0.04629408 
-# Run 20 stress 0.03822735 
-# ... Procrustes: rmse 0.0005336457  max resid 0.003771909 
-# ... Similar to previous best
+# Run 18 stress 0.04029608 
+# Run 19 stress 0.04030343 
+# Run 20 stress 0.07195648 
 # *** Solution reached</code></pre>
 </div>
 <div id="--" class="section level2">
 <h2>Качество подгонки модели</h2>
 <p><strong>stress</strong> - оценивает, насколько были искажены исходные расстояния между объектами при снижении размерности</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ord_euclid$stress</code></pre></div>
-<pre><code># [1] 0.03822056</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ord_euclid_wisk$stress</code></pre></div>
+<pre><code># [1] 0.03822058</code></pre>
 <ul>
-<li>Эмпирическое правило предложено Краскалом</li>
+<li>Эмпирическое правило предложено Краскалом:
+<ul>
 <li>S &gt; 20% плохо</li>
 <li>S = 10% нормально</li>
 <li>S &lt; 5% хорошо</li>
 <li>S = 0 прекрасно</li>
+</ul></li>
 </ul>
 </div>
 <div class="section level2">
 <h2>Ординация</h2>
 <p></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ordiplot</span>(ord_euclid, <span class="dt">type =</span> <span class="st">&quot;t&quot;</span>)</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-12-1.pdf" width="432" /></p>
-<p></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(ord_euclid$points, <span class="dv">10</span>)</code></pre></div>
+<p>Координаты наблюдений:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(ord_euclid_wisk$points, <span class="dv">10</span>)</code></pre></div>
 <pre><code>#            MDS1         MDS2
-# C3  -0.03857505 -0.008650099
-# C5  -0.02327273 -0.003785531
-# C10 -0.02193081 -0.003822538
-# C15 -0.02278841 -0.005940350
-# C23  0.02198111 -0.005715664
-# C24  0.04207125 -0.008629603
-# C26  0.02220937 -0.004637648
-# C27 -0.02331257 -0.007342230
-# C28 -0.04597404 -0.007937539
-# C31 -0.02402072 -0.006625690</code></pre>
+# C3  -0.03857062 -0.008639583
+# C5  -0.02326937 -0.003785813
+# C10 -0.02192729 -0.003823148
+# C15 -0.02278564 -0.005940490
+# C23  0.02197705 -0.005715596
+# C24  0.04206772 -0.008614101
+# C26  0.02220534 -0.004638045
+# C27 -0.02331011 -0.007341648
+# C28 -0.04597342 -0.007900418
+# C31 -0.02401851 -0.006625058</code></pre>
+<p></p>
+<p>График ординации:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ordiplot</span>(ord_euclid_wisk, <span class="dt">type =</span> <span class="st">&quot;t&quot;</span>)</code></pre></div>
+<p><img src="09_dist_files/figure-html/fig-ugly-ord-1.pdf" width="432" /></p>
 <p></p>
 </div>
 <div class="section level2">
 <h2>Задание:</h2>
 <p>При помощи <code>ggplot2</code> постройте график неметрического многомерного шкалирования.</p>
-<p>Для графика используйте координаты точек <code>ord_euclid$points</code> и исходные данные.</p>
+<p>Для графика используйте координаты точек <code>ord_euclid_wisk$points</code> и исходные данные.</p>
 <p>Раскрасьте график по значениям переменных <code>Pop</code> и <code>age</code></p>
 <p>Изобразите поссумов разного пола на разных панелях</p>
 </div>
@@ -699,20 +690,19 @@ ord_euclid &lt;-<span class="st"> </span><span class="kw">metaMDS</span>(possumc
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
 <span class="kw">theme_set</span>(<span class="kw">theme_bw</span>(<span class="dt">base_size =</span> <span class="dv">12</span>) +<span class="st"> </span><span class="kw">theme</span>(<span class="dt">legend.key =</span> <span class="kw">element_blank</span>()))
 
-ord_euclid_points &lt;-<span class="st"> </span><span class="kw">data.frame</span>(ord_euclid$points, possumc)
-gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ord_euclid_points, <span class="kw">aes</span>(<span class="dt">x =</span> MDS1, <span class="dt">y =</span> MDS2)) +
-<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">facet_wrap</span>(~sex) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.key =</span> <span class="kw">element_blank</span>())</code></pre></div>
-<div id="--nmds-" class="section level3">
-<h3>Примеры графиков nMDS ординации</h3>
-<p></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> Pop)</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-15-1.pdf" width="480" /></p>
-<p></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gg +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> age)</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-16-1.pdf" width="480" /></p>
-<p></p>
+ord_euclid_wisk_points &lt;-<span class="st"> </span><span class="kw">data.frame</span>(ord_euclid_wisk$points, possumc)
+gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ord_euclid_wisk_points, <span class="kw">aes</span>(<span class="dt">x =</span> MDS1, <span class="dt">y =</span> MDS2)) +
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">facet_wrap</span>(~sex) +
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.key =</span> <span class="kw">element_blank</span>())
+gg</code></pre></div>
+<p><img src="09_dist_files/figure-html/fig-ord-1.pdf" width="739.2" /></p>
 </div>
+<div id="--" class="section level2">
+<h2>Решение: раскрашенные графики</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gridExtra)
+<span class="kw">grid.arrange</span>(gg +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> Pop),
+             gg +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> age), <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="09_dist_files/figure-html/fig-ord-coloured-1.pdf" width="739.2" /></p>
 </div>
 <div id="-1" class="section level2">
 <h2>Задание:</h2>
@@ -721,65 +711,66 @@ gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ord_euclid_point
 </div>
 <div id="-1" class="section level2">
 <h2>Решение:</h2>
-<p>Стресс сильно вырос, эта ординация хуже. Почему так произошло?</p>
+<p></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ord_raw &lt;-<span class="st"> </span><span class="kw">metaMDS</span>(possumc[, <span class="dv">3</span>:<span class="dv">10</span>], <span class="dt">dis =</span> <span class="st">&quot;euclide&quot;</span>, <span class="dt">autotransform =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <pre><code># Run 0 stress 0.1008672 
-# Run 1 stress 0.1008672 
-# ... Procrustes: rmse 0.00004493979  max resid 0.0003175778 
+# Run 1 stress 0.1297468 
+# Run 2 stress 0.1008672 
+# ... Procrustes: rmse 0.00004944579  max resid 0.0003509345 
 # ... Similar to previous best
-# Run 2 stress 0.1180889 
 # Run 3 stress 0.1008672 
-# ... Procrustes: rmse 0.00003831356  max resid 0.0002694598 
+# ... New best solution
+# ... Procrustes: rmse 0.00002809474  max resid 0.0001942461 
 # ... Similar to previous best
-# Run 4 stress 0.1180944 
-# Run 5 stress 0.129747 
+# Run 4 stress 0.1008672 
+# ... New best solution
+# ... Procrustes: rmse 0.00001502487  max resid 0.0001027142 
+# ... Similar to previous best
+# Run 5 stress 0.1180964 
 # Run 6 stress 0.1008672 
-# ... New best solution
-# ... Procrustes: rmse 0.00003659672  max resid 0.0002576885 
+# ... Procrustes: rmse 0.00003520819  max resid 0.0002370516 
 # ... Similar to previous best
-# Run 7 stress 0.1008672 
-# ... Procrustes: rmse 0.000001636539  max resid 0.00001052904 
-# ... Similar to previous best
+# Run 7 stress 0.1180889 
 # Run 8 stress 0.1008672 
-# ... New best solution
-# ... Procrustes: rmse 0.00002529855  max resid 0.000181207 
+# ... Procrustes: rmse 0.00005497437  max resid 0.0003912616 
 # ... Similar to previous best
-# Run 9 stress 0.1008674 
-# ... Procrustes: rmse 0.00009417823  max resid 0.0006753003 
-# ... Similar to previous best
+# Run 9 stress 0.1297468 
 # Run 10 stress 0.1008672 
-# ... Procrustes: rmse 0.000006831885  max resid 0.00004137763 
+# ... Procrustes: rmse 0.00003754772  max resid 0.0002650573 
 # ... Similar to previous best
 # Run 11 stress 0.1008672 
-# ... Procrustes: rmse 0.00002432598  max resid 0.0001729202 
+# ... Procrustes: rmse 0.0000199892  max resid 0.0001359578 
 # ... Similar to previous best
-# Run 12 stress 0.1297469 
-# Run 13 stress 0.1297468 
-# Run 14 stress 0.1008672 
-# ... Procrustes: rmse 0.000009504825  max resid 0.00006615262 
+# Run 12 stress 0.129747 
+# Run 13 stress 0.1008672 
+# ... Procrustes: rmse 0.00004325049  max resid 0.000305491 
 # ... Similar to previous best
+# Run 14 stress 0.1180945 
 # Run 15 stress 0.1008672 
-# ... Procrustes: rmse 0.00003722152  max resid 0.0002654711 
+# ... Procrustes: rmse 0.00002904045  max resid 0.0002052466 
 # ... Similar to previous best
 # Run 16 stress 0.1008672 
-# ... Procrustes: rmse 0.0000226415  max resid 0.0001614197 
+# ... New best solution
+# ... Procrustes: rmse 0.000007043293  max resid 0.00003477769 
 # ... Similar to previous best
-# Run 17 stress 0.1297469 
+# Run 17 stress 0.1008672 
+# ... Procrustes: rmse 0.000007841551  max resid 0.00005356997 
+# ... Similar to previous best
 # Run 18 stress 0.1008672 
-# ... Procrustes: rmse 0.0000239048  max resid 0.0001710395 
+# ... Procrustes: rmse 0.00001740451  max resid 0.0001245359 
 # ... Similar to previous best
 # Run 19 stress 0.1008673 
-# ... Procrustes: rmse 0.00005788862  max resid 0.0004139648 
+# ... Procrustes: rmse 0.00004488893  max resid 0.0003189071 
 # ... Similar to previous best
-# Run 20 stress 0.1008673 
-# ... Procrustes: rmse 0.00004746121  max resid 0.0003410337 
+# Run 20 stress 0.1008672 
+# ... Procrustes: rmse 0.00001222232  max resid 0.000084428 
 # ... Similar to previous best
 # *** Solution reached</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ord_raw$stress</code></pre></div>
 <pre><code># [1] 0.1008672</code></pre>
 <p>Для сравнения, стресс был</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ord_euclid$stress</code></pre></div>
-<pre><code># [1] 0.03822056</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ord_euclid_wisk$stress</code></pre></div>
+<pre><code># [1] 0.03822058</code></pre>
 </div>
 <div id="-------" class="section level2">
 <h2>Графики ординации по матрице евклидовых расстояний без стандартизации</h2>
@@ -788,40 +779,33 @@ gg &lt;-<span class="st"> </span><span class="kw">ggplot</span>(ord_euclid_point
 <span class="kw">grid.arrange</span>(gg %+%<span class="st"> </span>ord_raw_points +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> Pop),
 gg %+%<span class="st"> </span>ord_raw_points +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> age),
 <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-19-1.pdf" width="960" /></p>
-<p>Популяции можно различить, но возраста смешались</p>
-<p></p>
-<ul>
-<li>Это произошло потому, что нет стандартизации, и теперь на расстояния между поссумами влияют в основном переменные, измеренные в больших единицах (общая длина, длина ног), а возраст не влияет</li>
-</ul>
+<p><img src="09_dist_files/figure-html/fig-ord-raw-1.pdf" width="960" /></p>
 </div>
 <div id="---" class="section level2">
 <h2>Как изменилась сама ординация?</h2>
-<div id="-" class="section level3">
-<h3>Прокрустово преобразование</h3>
+<p></p>
 <p><code>procrustes(что_стало, что_было)</code></p>
 <p></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">proc &lt;-<span class="st"> </span><span class="kw">procrustes</span>(ord_raw, ord_euclid)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">proc &lt;-<span class="st"> </span><span class="kw">procrustes</span>(ord_raw, 
+                   ord_euclid_wisk)
 proc</code></pre></div>
 <pre><code># 
 # Call:
-# procrustes(X = ord_raw, Y = ord_euclid) 
+# procrustes(X = ord_raw, Y = ord_euclid_wisk) 
 # 
 # Procrustes sum of squares:
 #  5669</code></pre>
 <p></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(proc)</code></pre></div>
-<p><img src="09_dist_files/figure-html/proc-1.pdf" width="432" /></p>
+<p><img src="09_dist_files/figure-html/fig-proc-1.pdf" width="432" /></p>
 <p></p>
 </div>
-</div>
-<div id="--------------" class="section level2">
-<h2>Похоже, что в этом случае лучшая ординация была получена при использовании евклидова расстояния со стандартизацией</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ord_euclid_points &lt;-<span class="st"> </span><span class="kw">data.frame</span>(ord_euclid$points, possumc)
-<span class="kw">grid.arrange</span>(gg %+%<span class="st"> </span>ord_euclid_points +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> Pop),
-gg %+%<span class="st"> </span>ord_euclid_points +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> age),
+<div id="---------------" class="section level2">
+<h2>Похоже, что в этом случае лучшая ординация была получена при использовании евклидова расстояния без висконсинской стандартизации</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">grid.arrange</span>(gg %+%<span class="st"> </span>ord_raw_points +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> Pop),
+gg %+%<span class="st"> </span>ord_raw_points +<span class="st"> </span><span class="kw">aes</span>(<span class="dt">colour =</span> age),
 <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-21-1.pdf" width="960" /></p>
+<p><img src="09_dist_files/figure-html/fig-ord-best-1.pdf" width="960" /></p>
 </div>
 </div>
 <div id="-" class="section level1">
@@ -829,8 +813,8 @@ gg %+%<span class="st"> </span>ord_euclid_points +<span class="st"> </span><span
 <div id="-" class="section level2">
 <h2>Пример: поссумы</h2>
 <p>Морфометрия самок поссумов</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DAAG)
-<span class="kw">data</span>(fossum)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># library(DAAG)</span>
+<span class="co"># data(fossum)</span>
 <span class="co"># создадим &quot;говорящие&quot; имена строк </span>
 <span class="kw">rownames</span>(fossum) &lt;-<span class="st"> </span><span class="kw">paste</span>(fossum$Pop, <span class="kw">rownames</span>(fossum), <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>)
 fossumc &lt;-<span class="st"> </span>fossum[<span class="kw">complete.cases</span>(fossum), <span class="dv">5</span>:<span class="dv">14</span>]</code></pre></div>
@@ -860,8 +844,11 @@ fossumc &lt;-<span class="st"> </span>fossum[<span class="kw">complete.cases</sp
 <h1>Методы класстеризации на основании расстояний</h1>
 <div id="-" class="section level2">
 <h2>Этапы кластеризации</h2>
-<div id="htmlwidget-34892551b6619c76ae4e" style="width:960px;height:576px;" class="grViz html-widget"></div>
-<script type="application/json" data-for="htmlwidget-34892551b6619c76ae4e">{"x":{"diagram":"digraph symmetry {\n\n  # a \"graph\" statement\n  graph [overlap = TRUE, fontsize = 10, rankdir = TD]\n\n  # several \"node\" statements\n  node [shape = box,\n        fixedsize = false,\n//        width = 0.5,\n        style = filled,\n        color = grey,\n        fillcolor = PowderBlue]\n  A [label=\"Набор признаков\"]\n  B [label=\"Матрица расстояний или сходств\"]\n  C [label=\"Группировка объектов\"]\n  D [label=\"Отношения между кластерами\"]\n  E [label=\"Поправки\"]\n\n  # several \"edge\" statements\n  A->B B->C C->D D->E E->A\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<!-- ```{r echo=FALSE, fig.width=10, fig.height=6} -->
+<!-- DiagrammeR("images/clust-stages.gv", type = "grViz") -->
+<!-- # system('dot -Tpdf images/clust-stages.gv -o images/clust-stages.pdf') -->
+<!-- ``` -->
+<!-- \includegraphics{images/clust-stages.pdf} -->
 </div>
 <div id="----" class="section level2">
 <h2>От чего зависит результат кластеризации</h2>
@@ -876,7 +863,7 @@ fossumc &lt;-<span class="st"> </span>fossum[<span class="kw">complete.cases</sp
 </div>
 <div id="-" class="section level2">
 <h2>Методы кластеризации</h2>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-25-1.pdf" width="739.2" /></p>
+<p><img src="09_dist_files/figure-html/gg-all-1.pdf" width="739.2" /></p>
 </div>
 <div id="--" class="section level2">
 <h2>Метод ближайшего соседа</h2>
@@ -887,10 +874,9 @@ fossumc &lt;-<span class="st"> </span>fossum[<span class="kw">complete.cases</sp
 <li>кластеры объединяются в один на расстоянии, которое равно расстоянию между ближайшими объектами этих кластеров</li>
 </ul>
 <p></p>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-26-1.pdf" width="432" /></p>
+<p><img src="09_dist_files/figure-html/gg-single-1.pdf" width="432" /></p>
 <p></p>
-<div class="section level3">
-<h3>Особенности:</h3>
+<p></p>
 <ul>
 <li>Может быть сложно интерпретировать, если нужны группы</li>
 <li>объекты на дендрограмме часто не образуют четко разделенных групп</li>
@@ -898,15 +884,15 @@ fossumc &lt;-<span class="st"> </span>fossum[<span class="kw">complete.cases</sp
 <li>Хорош для выявления градиентов</li>
 </ul>
 </div>
-</div>
 <div id="----r" class="section level2">
 <h2>Метод ближайшего соседа в R</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hc_single &lt;-<span class="st"> </span><span class="kw">hclust</span>(d, <span class="dt">method =</span> <span class="st">&quot;single&quot;</span>)
 <span class="kw">library</span>(ape)
 ph_single &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(hc_single)
-<span class="kw">plot</span>(ph_single, <span class="dt">type =</span> <span class="st">&quot;phylogram&quot;</span>, <span class="dt">cex =</span> <span class="fl">0.7</span>)
-<span class="kw">axisPhylo</span>()</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-27-1.pdf" width="960" /></p>
+<span class="kw">par</span>(<span class="dt">cex =</span> <span class="fl">0.9</span>) <span class="co"># уменьшаем размер шрифта</span>
+<span class="kw">plot</span>(ph_single, <span class="dt">type =</span> <span class="st">&quot;phylogram&quot;</span>, <span class="dt">direction =</span> <span class="st">&quot;downwards&quot;</span>)
+<span class="kw">axisPhylo</span>(<span class="dt">side =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="09_dist_files/figure-html/fig-single-1.pdf" width="768" /></p>
 </div>
 <div id="--" class="section level2">
 <h2>Метод отдаленного соседа</h2>
@@ -917,22 +903,20 @@ ph_single &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(hc_sing
 <li>кластеры объединяются в один на расстоянии, которое равно расстоянию между самыми отдаленными объектами этих кластеров (следствие - чем более крупная группа, тем сложнее к ней присоединиться)</li>
 </ul>
 <p></p>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-28-1.pdf" width="432" /></p>
+<p><img src="09_dist_files/figure-html/gg-compl-1.pdf" width="432" /></p>
 <p></p>
-<div id="-1" class="section level3">
-<h3>Особенности:</h3>
+<p></p>
 <ul>
 <li>На дендрограмме образуется много отдельных некрупных групп</li>
 <li>Хорош для поиска дискретных групп в данных</li>
 </ul>
 </div>
-</div>
 <div id="----r" class="section level2">
 <h2>Метод отдаленного соседа в R</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ph_compl &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(<span class="kw">hclust</span>(d, <span class="dt">method =</span> <span class="st">&quot;complete&quot;</span>))
-<span class="kw">plot</span>(ph_compl, <span class="dt">type =</span> <span class="st">&quot;phylogram&quot;</span>, <span class="dt">cex =</span> <span class="fl">0.7</span>)
-<span class="kw">axisPhylo</span>()</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-29-1.pdf" width="960" /></p>
+<span class="kw">plot</span>(ph_compl, <span class="dt">type =</span> <span class="st">&quot;phylogram&quot;</span>, <span class="dt">direction =</span> <span class="st">&quot;downwards&quot;</span>)
+<span class="kw">axisPhylo</span>(<span class="dt">side =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="09_dist_files/figure-html/fig-compl-1.pdf" width="960" /></p>
 </div>
 <div id="---" class="section level2">
 <h2>Метод невзвешенного попарного среднего</h2>
@@ -942,23 +926,21 @@ ph_single &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(hc_sing
 <li>кластеры объединяются в один на расстоянии, которое равно среднему значению всех возможных расстояний между объектами из разных кластеров.</li>
 </ul>
 <p></p>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-30-1.pdf" width="432" /></p>
+<p><img src="09_dist_files/figure-html/gg-avg-1.pdf" width="432" /></p>
 <p></p>
-<div id="-2" class="section level3">
-<h3>Особенности:</h3>
+<p></p>
 <ul>
 <li>UPGMA и WUPGMС иногда могут приводить к инверсиям на дендрограммах</li>
 </ul>
 <p></p>
 <p></p>
 </div>
-</div>
 <div id="-----r" class="section level2">
 <h2>Метод невзвешенного попарного среднего в R</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ph_avg &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(<span class="kw">hclust</span>(d, <span class="dt">method =</span> <span class="st">&quot;average&quot;</span>))
-<span class="kw">plot</span>(ph_avg, <span class="dt">type =</span> <span class="st">&quot;phylogram&quot;</span>, <span class="dt">cex =</span> <span class="fl">0.7</span>)
-<span class="kw">axisPhylo</span>()</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-31-1.pdf" width="960" /></p>
+<span class="kw">plot</span>(ph_avg, <span class="dt">type =</span> <span class="st">&quot;phylogram&quot;</span>, <span class="dt">direction =</span> <span class="st">&quot;downwards&quot;</span>)
+<span class="kw">axisPhylo</span>(<span class="dt">side =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="09_dist_files/figure-html/fig-avg-1.pdf" width="960" /></p>
 </div>
 <div id="-" class="section level2">
 <h2>Метод Варда</h2>
@@ -968,21 +950,19 @@ ph_single &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(hc_sing
 <li>объекты объединяются в кластеры так, чтобы внутригрупповая дисперсия расстояний была минимальной</li>
 </ul>
 <p></p>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-32-1.pdf" width="432" /></p>
+<p><img src="09_dist_files/figure-html/gg-ward-1.pdf" width="432" /></p>
 <p></p>
-<div id="-3" class="section level3">
-<h3>Особенности:</h3>
+<p></p>
 <ul>
 <li>метод годится и для неевклидовых расстояний несмотря на то, что внутригрупповая дисперсия расстояний рассчитывается так, как будто это евклидовы расстояния</li>
 </ul>
 </div>
-</div>
 <div id="---r" class="section level2">
 <h2>Метод Варда в R</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ph_w2&lt;-<span class="st"> </span><span class="kw">as.phylo</span>(<span class="kw">hclust</span>(d, <span class="dt">method =</span> <span class="st">&quot;ward.D2&quot;</span>))
-<span class="kw">plot</span>(ph_w2, <span class="dt">type =</span> <span class="st">&quot;phylogram&quot;</span>, <span class="dt">cex =</span> <span class="fl">0.7</span>)
-<span class="kw">axisPhylo</span>()</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-33-1.pdf" width="960" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ph_w2 &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(<span class="kw">hclust</span>(d, <span class="dt">method =</span> <span class="st">&quot;ward.D2&quot;</span>))
+<span class="kw">plot</span>(ph_w2, <span class="dt">type =</span> <span class="st">&quot;phylogram&quot;</span>, <span class="dt">direction =</span> <span class="st">&quot;downwards&quot;</span>)
+<span class="kw">axisPhylo</span>(<span class="dt">side =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="09_dist_files/figure-html/fig-ward-1.pdf" width="960" /></p>
 </div>
 </div>
 <div id="c----" class="section level1">
@@ -1023,7 +1003,10 @@ c_w2 &lt;-<span class="st"> </span><span class="kw">cophenetic</span>(ph_w2)
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># итераций должно быть 10000 и больше</span>
 <span class="co"># здесь мало для скорости</span>
 <span class="kw">set.seed</span>(<span class="dv">42</span>)
-cl_boot &lt;-<span class="st"> </span><span class="kw">pvclust</span>(<span class="kw">scale</span>(<span class="kw">t</span>(fossumc)), <span class="dt">method.hclust =</span> <span class="st">&quot;average&quot;</span>, <span class="dt">nboot =</span> <span class="dv">50</span>, <span class="dt">method.dist =</span> <span class="st">&quot;euclidean&quot;</span>)</code></pre></div>
+<span class="kw">system.time</span>({
+cl_boot &lt;-<span class="st"> </span><span class="kw">pvclust</span>(<span class="kw">scale</span>(<span class="kw">t</span>(fossumc)), <span class="dt">method.hclust =</span> <span class="st">&quot;average&quot;</span>, 
+                   <span class="dt">nboot =</span> <span class="dv">1000</span>, <span class="dt">method.dist =</span> <span class="st">&quot;euclidean&quot;</span>)
+})</code></pre></div>
 <pre><code># Bootstrap (r = 0.5)... Done.
 # Bootstrap (r = 0.6)... Done.
 # Bootstrap (r = 0.7)... Done.
@@ -1034,15 +1017,16 @@ cl_boot &lt;-<span class="st"> </span><span class="kw">pvclust</span>(<span clas
 # Bootstrap (r = 1.2)... Done.
 # Bootstrap (r = 1.3)... Done.
 # Bootstrap (r = 1.4)... Done.</code></pre>
+<pre><code>#    user  system elapsed 
+#  40.048   0.020  40.071</code></pre>
 </div>
 <div id="section-1" class="section level2">
 <h2></h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(cl_boot)
-<span class="kw">pvrect</span>(cl_boot)</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-37-1.pdf" width="960" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(cl_boot)</code></pre></div>
+<p><img src="09_dist_files/figure-html/fig-pvclust-1.pdf" width="960" /></p>
 </div>
-<div id="--------" class="section level2">
-<h2>И небольшая демонстрация - дерево по генетическим данным</h2>
+<div id="------" class="section level2">
+<h2>И небольшая демонстрация — дерево по генетическим данным</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">webpage &lt;-<span class="st">&quot;http://evolution.genetics.washington.edu/book/primates.dna&quot;</span>
 primates.dna &lt;-<span class="st"> </span><span class="kw">read.dna</span>(webpage)
 d_pri &lt;-<span class="st"> </span><span class="kw">dist.dna</span>(primates.dna, <span class="dt">model =</span> <span class="st">&quot;K80&quot;</span>)
@@ -1050,7 +1034,7 @@ hc_pri &lt;-<span class="st"> </span><span class="kw">hclust</span>(d_pri, <span
 ph_pri &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(hc_pri)
 <span class="kw">plot</span>(ph_pri)
 <span class="kw">axisPhylo</span>()</code></pre></div>
-<p><img src="09_dist_files/figure-html/unnamed-chunk-39-1.pdf" width="739.2" /></p>
+<p><img src="09_dist_files/figure-html/fig-gen-tree-1.pdf" width="4.5in" height="2in" /></p>
 </div>
 <div id="take-home-messages" class="section level2">
 <h2>Take home messages</h2>
@@ -1069,11 +1053,15 @@ ph_pri &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(hc_pri)
 <li>Quinn, G.G.P., Keough, M.J., 2002. Experimental design and data analysis for biologists. Cambridge University Press.</li>
 </ul>
 <p>Borcard, D., Gillet, F., Legendre, P., 2011. Numerical ecology with R. Springer.</p>
-<p>Как работает UPGMA можно посмотреть здесь: - <a href="http://www.southampton.ac.uk/~re1u06/teaching/upgma/" class="uri">http://www.southampton.ac.uk/~re1u06/teaching/upgma/</a></p>
+<p>Как работает UPGMA можно посмотреть здесь:</p>
 <ul>
+<li><a href="http://www.southampton.ac.uk/~re1u06/teaching/upgma/" class="uri">http://www.southampton.ac.uk/~re1u06/teaching/upgma/</a></li>
 <li>pvclust: An R package for hierarchical clustering with p-values [WWW Document], n.d. URL <a href="http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/" class="uri">http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/</a> (accessed 11.7.14).</li>
 </ul>
-<p>Для анализа молекулярных данных: - Paradis, E., 2011. Analysis of Phylogenetics and Evolution with R. Springer.</p>
+<p>Для анализа молекулярных данных:</p>
+<ul>
+<li>Paradis, E., 2011. Analysis of Phylogenetics and Evolution with R. Springer.</li>
+</ul>
 </div>
 </div>
 
@@ -1090,8 +1078,11 @@ ph_pri &lt;-<span class="st"> </span><span class="kw">as.phylo</span>(hc_pri)
 <script>
 
 // add bootstrap table styles to pandoc tables
-$(document).ready(function () {
+function bootstrapStylePandocTables() {
   $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
 });
 
 

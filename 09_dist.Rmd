@@ -24,7 +24,6 @@ library(knitr)
 opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
 ```
 
-
 ## Меры сходства и различия, ординация, классификация
 
 ### Вы сможете
@@ -41,9 +40,10 @@ opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE,
 \columnsbegin
 \column{0.48\textwidth}
 
+\centering
 \textbf{Расстояния}
 
-$$d \ge 0$$
+$d \ge 0$
 
 <!-- ```{r echo=FALSE, fig.width=4.5, fig.height=0.5} -->
 <!-- library(DiagrammeR) -->
@@ -54,7 +54,7 @@ $$d \ge 0$$
 \includegraphics{images/dist.pdf}
 
 \column{0.48\textwidth}
-
+\centering
 \textbf{Сходства}
 
 $0 \le S \le 1$ или $-1 \le S \le 1$
@@ -77,6 +77,7 @@ $0 \le S \le 1$ или $-1 \le S \le 1$
 \columnsbegin
 \column{0.48\textwidth}
 
+\centering
 \textbf{Метрики и полуметрики}
 
 Адекватность: $d_{A, A} = 0$
@@ -102,6 +103,7 @@ $0 \le S \le 1$ или $-1 \le S \le 1$
 
 \column{0.48\textwidth}
 
+\centering
 \textbf{Только метрики}
 
 Триангулярность: $d_{A, B} \le d_{A, C} + d_{C, B}$
@@ -127,12 +129,14 @@ $0 \le S \le 1$ или $-1 \le S \le 1$
 \columnsbegin
 \column{0.48\textwidth}
 
+\centering
 \textbf{Нестандартные}
 
 $$-\inf \le d \le \inf$$
 
 \column{0.48\textwidth}
 
+\centering
 \textbf{Стандартные}
 
 $$d_{min} \le d \le d_{max}$$
@@ -144,12 +148,12 @@ $$-1 \le S \le 1$$
 \columnsend
 
 
-## Примеры коэффициентов
+## Примеры коэффициентов сходства-различия
 
 \columnsbegin
 \column{0.48\textwidth}
 
-\textbf{Метрики:}
+\textbf{Метрики (расстояния):}
 
 - без стандартизации:
     - Евклидово расстояние
@@ -221,14 +225,16 @@ $$-1 \le S \le 1$$
 где $C _{ij}$ - сумма минимальных значений из тех, которые не равны нулю для обоих объектов, $S _i$ и $S _j$ - общее число ненулевых значений признаков для обоих объектов.
 
 
-## Если признаки - __подсчеты численности__
+## Если признаки --- __подсчеты численности__
 
 \textbf{Можно стандартизовать исходные данные}
 
 Простая стандартизация не подходит (счет, не может быть среднее 0)
+
 Можно использовать трансформации:
+
 - корень, корень 4-й степени
-- логарифмирование со сдвигом (log10(1+n))
+- логарифмирование со сдвигом (log10(x + 1))
 
 \textbf{Можно использовать коэффициенты со стандартизацией}
 
@@ -265,10 +271,12 @@ $$-1 \le S \le 1$$
 
 ## Неметрическое многомерное шкалирование визуализирует отношения между объектами на основе расстояний между ними
 
+\small
+
 \columnsbegin
 \column{0.48\textwidth}
 
-```{r, gg-eu, message = FALSE, echo = FALSE, fig.height = 6, fig.width = 5}
+```{r, gg-eu, message = FALSE, echo = FALSE, fig.height = 6, fig.width = 5, purl=FALSE}
 # data(eurodist)
 # cities <- attr(eurodist, "Labels")
 # library(geonames)
@@ -300,14 +308,14 @@ gg_eu
 
 Если бы мы знали расстояния по автодорогам между городами Европы
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, purl=FALSE}
 data(eurodist)
 as.dist(as.matrix(eurodist)[1:5, 1:5])
 ```
 
 мы бы смогли восстановить по ним карту
 
-```{r eu, echo = FALSE, fig.width=4.5, fig.height=3.5}
+```{r eu, echo = FALSE, fig.width=2, fig.height=2, out.width='2in', out.height='1.9in', purl=FALSE}
 library(vegan)
 euro <- metaMDS(eurodist, trace = 0)
 op <- par(mar = c(3, 3, 0.1, 0.1), mgp = c(2, 1, 0), cex = 0.8)
@@ -319,20 +327,22 @@ par(op)
 
 ## Неметрическое многомерное шкалирование
 
-Неметрическое многомерное шкалирование (nonmetric multidimensional scaling, nMDS) - метод визуализации отношений между объектами в пространстве с небольшим числом измерений.
+Неметрическое многомерное шкалирование (nonmetric multidimensional scaling, nMDS) --- метод визуализации отношений между объектами в пространстве с небольшим числом измерений.
 
-Исходные данные - матрица расстояний между объектами в многомерном пространстве
+Исходные данные --- матрица расстояний между объектами в многомерном пространстве
+
+\vfill
 
 \columnsbegin
 \column{0.48\textwidth}
 
-nMDS подбирает расстояния между объектами на графике так, чтобы сохранились соотношение исходных расстояний между ними. Т.е. если исходно A и B были ближе, чем B и С, то и в результате они должны быть ближе, чем B и С.
+- nMDS подбирает расстояния между объектами на графике так, чтобы сохранились соотношение исходных расстояний между ними. Т.е. если исходно A и B были ближе, чем B и С, то и в результате они должны быть ближе, чем B и С.
 
-Ординацию nMDS можно поворачивать,  отражать, сдвигать - результат от этого не изменится.
+- Ординацию nMDS можно поворачивать,  отражать, сдвигать - результат от этого не изменится.
 
 \column{0.48\textwidth}
 
-```{r eu, echo = FALSE, fig.width=4.5, fig.height=3.5}
+```{r eu, echo = FALSE, fig.width=4.5, fig.height=3.5, purl=FALSE}
 ```
 
 \columnsend
@@ -379,7 +389,7 @@ labels = c("Cambarville","Bellbird",
 
 ```{r}
 colnames(possum)
-possumc <- possum[complete.cases(possum), c(3:4, 5:14)]
+possumc <- possum[complete.cases(possum), c(3:14)]
 ```
 
 
@@ -387,11 +397,16 @@ possumc <- possum[complete.cases(possum), c(3:4, 5:14)]
 
 Построим ординацию поссумов на основе их сходства по морфометрии и возрасту.
 
-Функция metaMDS трансформирует и стандартизует данные, а затем итеративно подбирает координаты поссумов в новом пространстве (двумерном по умолчанию).
+
+Функция metaMDS много раз итеративно подбирает координаты поссумов в новом пространстве (двумерном по умолчанию) и сохраняет лучшую конфигурацию.
+
+Поскольку по умолчанию `autotransform = TRUE`, данные предварительно подвергаются двойной ("висконсинской") стандартизации (см. `?metaMDS`). __Если у вас не данные о сообществах, то это нужно отключить__, но пока мы продолжим с трансформацией.
+
+\small
 
 ```{r}
 library(vegan)
-ord_euclid <- metaMDS(possumc[, 3:10], distance = "euclid")
+ord_euclid_wisk <- metaMDS(possumc[, 3:10], distance = "euclid", autotransform = TRUE)
 ```
 
 ## Качество подгонки модели
@@ -399,14 +414,14 @@ ord_euclid <- metaMDS(possumc[, 3:10], distance = "euclid")
 __stress__ - оценивает, насколько были искажены исходные расстояния между объектами при снижении размерности
 
 ```{r}
-ord_euclid$stress
+ord_euclid_wisk$stress
 ```
 
-- Эмпирическое правило предложено Краскалом
-  - S > 20% плохо
-  - S = 10% нормально
-  - S < 5% хорошо
-  - S = 0 прекрасно
+- Эмпирическое правило предложено Краскалом:
+    - S > 20% плохо
+    - S = 10% нормально
+    - S < 5% хорошо
+    - S = 0 прекрасно
 
 
 ## Ординация
@@ -414,14 +429,19 @@ ord_euclid$stress
 \columnsbegin
 \column{0.48\textwidth}
 
-```{r fig.width = 4.5, fig.height = 5}
-ordiplot(ord_euclid, type = "t")
+Координаты наблюдений:
+
+```{r}
+head(ord_euclid_wisk$points, 10)
 ```
+
 
 \column{0.48\textwidth}
 
-```{r}
-head(ord_euclid$points, 10)
+График ординации:
+
+```{r fig-ugly-ord, fig.width = 4.5, fig.height = 5}
+ordiplot(ord_euclid_wisk, type = "t")
 ```
 
 \columnsend
@@ -430,7 +450,7 @@ head(ord_euclid$points, 10)
 
 При помощи `ggplot2` постройте график неметрического многомерного шкалирования.
 
-Для графика используйте координаты точек `ord_euclid$points` и исходные данные.
+Для графика используйте координаты точек `ord_euclid_wisk$points` и исходные данные.
 
 Раскрасьте график по значениям переменных `Pop` и `age`
 
@@ -439,19 +459,20 @@ head(ord_euclid$points, 10)
 
 ## Решение:
 
-```{r}
+```{r fig-ord}
 library(ggplot2)
 theme_set(theme_bw(base_size = 12) + theme(legend.key = element_blank()))
 
-ord_euclid_points <- data.frame(ord_euclid$points, possumc)
-gg <- ggplot(ord_euclid_points, aes(x = MDS1, y = MDS2)) +
+ord_euclid_wisk_points <- data.frame(ord_euclid_wisk$points, possumc)
+gg <- ggplot(ord_euclid_wisk_points, aes(x = MDS1, y = MDS2)) +
   geom_point() + facet_wrap(~sex) +
   theme(legend.key = element_blank())
+gg
 ```
 
-Примеры графиков nMDS ординации
+## Решение: раскрашенные графики
 
-```{r}
+```{r fig-ord-coloured}
 library(gridExtra)
 grid.arrange(gg + aes(colour = Pop),
              gg + aes(colour = age), ncol = 2)
@@ -465,22 +486,22 @@ grid.arrange(gg + aes(colour = Pop),
 
 ## Решение:
 
-Стресс сильно вырос, эта ординация хуже. Почему так произошло?
+\small
 
-```{r, warning=FALSE}
+```{r warning=FALSE}
 ord_raw <- metaMDS(possumc[, 3:10], dis = "euclide", autotransform = FALSE)
 ord_raw$stress
 ```
 
 Для сравнения, стресс был
 ```{r}
-ord_euclid$stress
+ord_euclid_wisk$stress
 ```
 
 
 ## Графики ординации по матрице евклидовых расстояний без стандартизации
 
-```{r, fig.width=10}
+```{r fig-ord-raw, fig.width=10}
 ord_raw_points <- data.frame(ord_raw$points, possumc)
 library(gridExtra)
 grid.arrange(gg %+% ord_raw_points + aes(colour = Pop),
@@ -488,11 +509,6 @@ gg %+% ord_raw_points + aes(colour = age),
 ncol = 2)
 ```
 
-Популяции можно различить, но возраста смешались
-
-\pause
-
-- Это произошло потому, что нет стандартизации, и теперь на расстояния между поссумами влияют в основном переменные, измеренные в больших единицах (общая длина, длина ног), а возраст не влияет
 
 ## Как изменилась сама ординация?
 
@@ -504,24 +520,24 @@ ncol = 2)
 \column{0.48\textwidth}
 
 ```{r}
-proc <- procrustes(ord_raw, ord_euclid)
+proc <- procrustes(ord_raw, 
+                   ord_euclid_wisk)
 proc
 ```
 
 \column{0.48\textwidth}
 
-```{r proc, fig.width=4.5, fig.height=5}
+```{r fig-proc, fig.width=4.5, fig.height=5}
 plot(proc)
 ```
 
 \columnsend
 
-## Похоже, что в этом случае лучшая ординация была получена при использовании евклидова расстояния со стандартизацией
+## Похоже, что в этом случае лучшая ординация была получена при использовании евклидова расстояния без висконсинской стандартизации
 
-```{r, fig.width=10, fig.height=4}
-ord_euclid_points <- data.frame(ord_euclid$points, possumc)
-grid.arrange(gg %+% ord_euclid_points + aes(colour = Pop),
-gg %+% ord_euclid_points + aes(colour = age),
+```{r fig-ord-best, fig.width=10, fig.height=4}
+grid.arrange(gg %+% ord_raw_points + aes(colour = Pop),
+gg %+% ord_raw_points + aes(colour = age),
 ncol = 2)
 ```
 
@@ -572,17 +588,16 @@ fossumc <- fossum[complete.cases(fossum), 5:14]
 - коэффициента сходства-различия
 - от алгоритма кластеризации
 
-В начале лекции мы обнаружили, что евклидово расстояние, расчитанное по стандартизованным данным, хорошо разделяет поссумов.
 
 ```{r}
-d <- dist(x = scale(fossumc), method = "euclidean")
+d <- dist(x = fossumc, method = "euclidean")
 ```
 
 Давайте построим деревья при помощи нескольких алгоритмов кластеризации и сравним их.
 
 ## Методы кластеризации
 
-```{r, echo=FALSE, fig.height=6}
+```{r gg-all, echo=FALSE, fig.height=6, purl=FALSE}
 cl_dat <- data.frame(cl = c(rep("A", 5), rep("B", 4)), 
            x = c(1, 2.7, 2, 1.5, 2, 5, 6, 5.5, 5.8),
            y = c(1, 1.2, 3, 2, 1.5, 1.2, 1, 3, 2))
@@ -642,7 +657,7 @@ grid.arrange(gg_single + ggtitle("Метод ближайшего соседа")
 
 \column{0.48\textwidth}
 
-```{r, echo=FALSE, fig.width=4.5}
+```{r gg-single, echo=FALSE, fig.width=4.5, purl=FALSE}
 gg_single
 ```
 
@@ -658,12 +673,13 @@ gg_single
 
 ## Метод ближайшего соседа в R
 
-```{r fig.height=5, fig.width=10}
+```{r fig-single, fig.height=4, fig.width=8}
 hc_single <- hclust(d, method = "single")
 library(ape)
 ph_single <- as.phylo(hc_single)
-plot(ph_single, type = "phylogram", cex = 0.7)
-axisPhylo()
+par(cex = 0.9) # уменьшаем размер шрифта
+plot(ph_single, type = "phylogram", direction = "downwards")
+axisPhylo(side = 2)
 ```
 
 ## Метод отдаленного соседа
@@ -677,7 +693,7 @@ axisPhylo()
 
 \column{0.48\textwidth}
 
-```{r, echo=FALSE, fig.width=4.5}
+```{r gg-compl, echo=FALSE, fig.width=4.5, purl=FALSE}
 gg_complete
 ```
 
@@ -691,10 +707,10 @@ gg_complete
 
 ## Метод отдаленного соседа в R
 
-```{r  fig.height=5, fig.width=10}
+```{r fig-compl, fig.height=5, fig.width=10}
 ph_compl <- as.phylo(hclust(d, method = "complete"))
-plot(ph_compl, type = "phylogram", cex = 0.7)
-axisPhylo()
+plot(ph_compl, type = "phylogram", direction = "downwards")
+axisPhylo(side = 2)
 ```
 
 ## Метод невзвешенного попарного среднего
@@ -707,7 +723,7 @@ axisPhylo()
 
 \column{0.48\textwidth}
 
-```{r, echo=FALSE, fig.width=4.5, fig.height=2.5}
+```{r gg-avg, echo=FALSE, fig.width=4.5, fig.height=2.5, purl=FALSE}
 gg_average
 ```
 
@@ -724,10 +740,10 @@ gg_average
 
 ## Метод невзвешенного попарного среднего в R
 
-```{r  fig.height=5, fig.width=10}
+```{r fig-avg, fig.height=5, fig.width=10}
 ph_avg <- as.phylo(hclust(d, method = "average"))
-plot(ph_avg, type = "phylogram", cex = 0.7)
-axisPhylo()
+plot(ph_avg, type = "phylogram", direction = "downwards")
+axisPhylo(side = 2)
 ```
 
 ## Метод Варда
@@ -740,7 +756,7 @@ axisPhylo()
 
 \column{0.48\textwidth}
 
-```{r, echo=FALSE, fig.width=4.5, fig.height=2.5}
+```{r gg-ward, echo=FALSE, fig.width=4.5, fig.height=2.5, purl=FALSE}
 gg_ward
 ```
 
@@ -753,10 +769,10 @@ gg_ward
 
 ## Метод Варда в R
 
-```{r  fig.height=5, fig.width=10}
-ph_w2<- as.phylo(hclust(d, method = "ward.D2"))
-plot(ph_w2, type = "phylogram", cex = 0.7)
-axisPhylo()
+```{r fig-ward, fig.height=5, fig.width=10}
+ph_w2 <- as.phylo(hclust(d, method = "ward.D2"))
+plot(ph_w2, type = "phylogram", direction = "downwards")
+axisPhylo(side = 2)
 ```
 
 # Cравнение и интерпретация результатов кластеризации
@@ -797,25 +813,27 @@ cor(d, as.dist(c_w2))
 ```{r}
 library(pvclust)
 ```
-```{r}
+```{r pvclust-compute, cache=TRUE}
 # итераций должно быть 10000 и больше
 # здесь мало для скорости
 set.seed(42)
-cl_boot <- pvclust(scale(t(fossumc)), method.hclust = "average", nboot = 50, method.dist = "euclidean")
+system.time({
+cl_boot <- pvclust(scale(t(fossumc)), method.hclust = "average", 
+                   nboot = 1000, method.dist = "euclidean")
+})
 ```
 
 ##
 
-```{r fig.width=10, fig.height=6}
+```{r fig-pvclust, fig.width=10, fig.height=7}
 plot(cl_boot)
-pvrect(cl_boot)
 ```
 
 
 
-## И небольшая демонстрация - дерево по генетическим данным
+## И небольшая демонстрация --- дерево по генетическим данным
 
-```{r, cache=TRUE, fig.height = 6, eval=FALSE}
+```{r eval=FALSE}
 webpage <-"http://evolution.genetics.washington.edu/book/primates.dna"
 primates.dna <- read.dna(webpage)
 d_pri <- dist.dna(primates.dna, model = "K80")
@@ -825,7 +843,7 @@ plot(ph_pri)
 axisPhylo()
 ```
 
-```{r, cache=TRUE, fig.height = 6, echo=FALSE}
+```{r fig-gen-tree, fig.height = 4, fig.width=8, out.height='2in', out.width='4.5in', echo=FALSE, purl=FALSE}
 # webpage <-"http://evolution.genetics.washington.edu/book/primates.dna"
 # primates.dna <- read.dna(webpage)
 # save(primates.dna, file = "data/09_dist_primates.dna.RData")
@@ -833,8 +851,8 @@ load(file = "data/09_dist_primates.dna.RData")
 d_pri <- dist.dna(primates.dna, model = "K80")
 hc_pri <- hclust(d_pri, method = "average")
 ph_pri <- as.phylo(hc_pri)
-plot(ph_pri)
-axisPhylo()
+par(cex = 0.8)
+plot(ph_pri); axisPhylo()
 ```
 
 
@@ -857,10 +875,11 @@ axisPhylo()
 Borcard, D., Gillet, F., Legendre, P., 2011. Numerical ecology with R. Springer.
 
 Как работает UPGMA можно посмотреть здесь:
-- http://www.southampton.ac.uk/~re1u06/teaching/upgma/
 
+- http://www.southampton.ac.uk/~re1u06/teaching/upgma/
 - pvclust: An R package for hierarchical clustering with p-values [WWW Document], n.d. URL http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/ (accessed 11.7.14).
 
 Для анализа молекулярных данных:
+
 - Paradis, E., 2011. Analysis of Phylogenetics and Evolution with R. Springer.
 
