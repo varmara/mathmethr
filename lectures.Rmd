@@ -83,6 +83,7 @@ install.packages("GGally")
 
 - Презентация [pdf](08_da.pdf)
 - [код R](08_code_da.R)
+- [BoxMTest.R](BoxMTest.R)
 - [Примеры вопросов следующего теста](test_handouts/08-da-handout-test1.pdf)
 - [Домашнее задание №3](hw/hw3_pca-da-infarctus.zip)
 
@@ -91,4 +92,4 @@ install.packages("GGally")
 - Презентация [pdf]
 - [код R]
 - Данные
-- [Примеры вопросов следующего теста]
+- [Примеры вопросов]
