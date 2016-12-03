@@ -93,6 +93,6 @@ install.packages("GGally")
 install.packages(c("ape", "pvclust"))
 ```
 
-- Презентация [pdf]
+- Презентация [pdf](09_dist.pdf)
 - [код R](09_code_dist.R)
 - [Примеры вопросов](test_handouts/09-dist-handout-test1.pdf)
