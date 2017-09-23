@@ -7,7 +7,7 @@ output:
     toc: true
     toc_float:
       collapsed: false
-    theme: flatly
+    theme: readable
     highlight: haddock
     include:
       after_body: _footer.html

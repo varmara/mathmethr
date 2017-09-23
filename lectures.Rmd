@@ -19,20 +19,20 @@ install.packages("ggplot2")
 install.packages(c("downloader", "readxl", "effsize", "pwr"))
 ```
 
-- Презентация [pdf](02_power.pdf)
-- [код R](02_code_power.R)
-- Данные: [minch.xlsx](data/minch.xlsx) | [minch.csv](data/minch.csv)
-- [Примеры вопросов следующего теста](test_handouts/02-power-handout-test1.pdf)
+<!-- - Презентация [pdf](02_power.pdf) -->
+<!-- - [код R](02_code_power.R) -->
+<!-- - Данные: [minch.xlsx](data/minch.xlsx) | [minch.csv](data/minch.csv) -->
+<!-- - [Примеры вопросов следующего теста](test_handouts/02-power-handout-test1.pdf) -->
 
 ## 3. Регрессионный анализ, часть 1
 
 
-- Презентация [pdf](03_regression1.pdf)
-- [код R](03_code_regression1.R)
-- Данные: [nelson.xlsx](data/nelson.xlsx) | [nelson.csv](data/nelson.csv)
-- [Примеры вопросов следующего теста](test_handouts/03-regr-handout-test1.pdf)
+<!-- - Презентация [pdf](03_regression1.pdf) -->
+<!-- - [код R](03_code_regression1.R) -->
+<!-- - Данные: [nelson.xlsx](data/nelson.xlsx) | [nelson.csv](data/nelson.csv) -->
+<!-- - [Примеры вопросов следующего теста](test_handouts/03-regr-handout-test1.pdf) -->
 
-- [Домашнее задание №1](hw/hw1_lin-regr-cheddar-assump.zip)
+<!-- - [Домашнее задание №1](hw/hw1_lin-regr-cheddar-assump.zip) -->
 
 ## 4. Регрессионный анализ, часть 2
 
@@ -40,10 +40,10 @@ install.packages(c("downloader", "readxl", "effsize", "pwr"))
 install.packages("car")
 ```
 
-- Презентация [pdf](04_regression2.pdf)
-- [код R](04_code_regression2.R)
-- Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv)
-- [Примеры вопросов следующего теста](test_handouts/04-mregr-handout-test1.pdf)
+<!-- - Презентация [pdf](04_regression2.pdf) -->
+<!-- - [код R](04_code_regression2.R) -->
+<!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
+<!-- - [Примеры вопросов следующего теста](test_handouts/04-mregr-handout-test1.pdf) -->
 
 ## 5. Дисперсионный анализ, часть 1 
 
@@ -51,18 +51,18 @@ install.packages("car")
 install.packages("multcomp")
 ```
 
-- Презентация [pdf](05_anova1.pdf)
-- [код R](05_code_anova1.R)
-- Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv)
-- [Примеры вопросов следующего теста](test_handouts/05-anova1-handout-test1.pdf)
-- [Домашнее задание №2](hw/hw2_anova2-moon.zip)
+<!-- - Презентация [pdf](05_anova1.pdf) -->
+<!-- - [код R](05_code_anova1.R) -->
+<!-- - Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv) -->
+<!-- - [Примеры вопросов следующего теста](test_handouts/05-anova1-handout-test1.pdf) -->
+<!-- - [Домашнее задание №2](hw/hw2_anova2-moon.zip) -->
 
 ## 6. Дисперсионный анализ, часть 2
 
-- Презентация [pdf](06_anova2.pdf)
-- [код R](06_code_anova2.R)
-- Данные: [eysenck.csv](data/eysenck.csv)
-- [Примеры вопросов следующего теста](test_handouts/06-anova2-handout-test1.pdf)
+<!-- - Презентация [pdf](06_anova2.pdf) -->
+<!-- - [код R](06_code_anova2.R) -->
+<!-- - Данные: [eysenck.csv](data/eysenck.csv) -->
+<!-- - [Примеры вопросов следующего теста](test_handouts/06-anova2-handout-test1.pdf) -->
 
 ## 7. Анализ главных компонент
 
@@ -70,9 +70,9 @@ install.packages("multcomp")
 install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "gtable", "HSAUR", "ggrepel"))
 ```
 
-- Презентация [pdf](07_pca.pdf)
-- [код R](07_code_pca.R)
-- [Примеры вопросов следующего теста](test_handouts/07-pca-handout-test1.pdf)
+<!-- - Презентация [pdf](07_pca.pdf) -->
+<!-- - [код R](07_code_pca.R) -->
+<!-- - [Примеры вопросов следующего теста](test_handouts/07-pca-handout-test1.pdf) -->
 
 
 ## 8. Дискриминантный анализ 
@@ -81,11 +81,11 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "gtable", "HSAUR", "
 install.packages("GGally")
 ```
 
-- Презентация [pdf](08_da.pdf)
-- [код R](08_code_da.R)
-- [BoxMTest.R](BoxMTest.R)
-- [Примеры вопросов следующего теста](test_handouts/08-da-handout-test1.pdf)
-- [Домашнее задание №3](hw/hw3_pca-da-infarctus.zip)
+<!-- - Презентация [pdf](08_da.pdf) -->
+<!-- - [код R](08_code_da.R) -->
+<!-- - [BoxMTest.R](BoxMTest.R) -->
+<!-- - [Примеры вопросов следующего теста](test_handouts/08-da-handout-test1.pdf) -->
+<!-- - [Домашнее задание №3](hw/hw3_pca-da-infarctus.zip) -->
 
 ## 9. Ординация и классификация с использованием мер сходства-различия
 
@@ -93,6 +93,6 @@ install.packages("GGally")
 install.packages(c("ape", "pvclust"))
 ```
 
-- Презентация [pdf](09_dist.pdf)
-- [код R](09_code_dist.R)
-- [Примеры вопросов](test_handouts/09-dist-handout-test1.pdf)
+<!-- - Презентация [pdf](09_dist.pdf) -->
+<!-- - [код R](09_code_dist.R) -->
+<!-- - [Примеры вопросов](test_handouts/09-dist-handout-test1.pdf) -->
