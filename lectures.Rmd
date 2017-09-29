@@ -20,7 +20,7 @@ install.packages(c("ggplot2", "readxl", "effsize", "pwr"))
 - Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx)
 <!-- - [Примеры вопросов следующего теста](test_handouts/02-power-handout-test1.pdf) -->
 
-## 3. Регрессионный анализ, часть 1
+## 3. Регрессионный анализ, ч.1
 
 
 <!-- - Презентация [pdf](03_regression1.pdf) -->
@@ -30,7 +30,7 @@ install.packages(c("ggplot2", "readxl", "effsize", "pwr"))
 
 <!-- - [Домашнее задание №1](hw/hw1_lin-regr-cheddar-assump.zip) -->
 
-## 4. Регрессионный анализ, часть 2
+## 4. Регрессионный анализ, ч.2
 
 ```{r eval=FALSE}
 install.packages("car")
@@ -41,7 +41,7 @@ install.packages("car")
 <!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
 <!-- - [Примеры вопросов следующего теста](test_handouts/04-mregr-handout-test1.pdf) -->
 
-## 5. Дисперсионный анализ, часть 1 
+## 5. Дисперсионный анализ, ч.1 
 
 ```{r eval=FALSE}
 install.packages("multcomp")
@@ -53,7 +53,7 @@ install.packages("multcomp")
 <!-- - [Примеры вопросов следующего теста](test_handouts/05-anova1-handout-test1.pdf) -->
 <!-- - [Домашнее задание №2](hw/hw2_anova2-moon.zip) -->
 
-## 6. Дисперсионный анализ, часть 2
+## 6. Дисперсионный анализ, ч.2
 
 <!-- - Презентация [pdf](06_anova2.pdf) -->
 <!-- - [код R](06_anova2_code.R) -->
