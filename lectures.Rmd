@@ -16,19 +16,19 @@ install.packages("ggplot2")
 ## 2. Анализ мощности
 
 ```{r eval=FALSE}
-install.packages(c("downloader", "readxl", "effsize", "pwr"))
+install.packages(c("readxl", "effsize", "pwr"))
 ```
 
-<!-- - Презентация [pdf](02_power.pdf) -->
-<!-- - [код R](02_code_power.R) -->
-<!-- - Данные: [minch.xlsx](data/minch.xlsx) | [minch.csv](data/minch.csv) -->
+- Презентация [pdf](02_power.pdf)
+- [код R](02_power_code.R)
+- Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx)
 <!-- - [Примеры вопросов следующего теста](test_handouts/02-power-handout-test1.pdf) -->
 
 ## 3. Регрессионный анализ, часть 1
 
 
 <!-- - Презентация [pdf](03_regression1.pdf) -->
-<!-- - [код R](03_code_regression1.R) -->
+<!-- - [код R](03_regression1_code.R) -->
 <!-- - Данные: [nelson.xlsx](data/nelson.xlsx) | [nelson.csv](data/nelson.csv) -->
 <!-- - [Примеры вопросов следующего теста](test_handouts/03-regr-handout-test1.pdf) -->
 
@@ -41,7 +41,7 @@ install.packages("car")
 ```
 
 <!-- - Презентация [pdf](04_regression2.pdf) -->
-<!-- - [код R](04_code_regression2.R) -->
+<!-- - [код R](04_regression2_code.R) -->
 <!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
 <!-- - [Примеры вопросов следующего теста](test_handouts/04-mregr-handout-test1.pdf) -->
 
@@ -52,7 +52,7 @@ install.packages("multcomp")
 ```
 
 <!-- - Презентация [pdf](05_anova1.pdf) -->
-<!-- - [код R](05_code_anova1.R) -->
+<!-- - [код R](05_anova1_code.R) -->
 <!-- - Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv) -->
 <!-- - [Примеры вопросов следующего теста](test_handouts/05-anova1-handout-test1.pdf) -->
 <!-- - [Домашнее задание №2](hw/hw2_anova2-moon.zip) -->
@@ -60,7 +60,7 @@ install.packages("multcomp")
 ## 6. Дисперсионный анализ, часть 2
 
 <!-- - Презентация [pdf](06_anova2.pdf) -->
-<!-- - [код R](06_code_anova2.R) -->
+<!-- - [код R](06_anova2_code.R) -->
 <!-- - Данные: [eysenck.csv](data/eysenck.csv) -->
 <!-- - [Примеры вопросов следующего теста](test_handouts/06-anova2-handout-test1.pdf) -->
 
@@ -71,7 +71,7 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "gtable", "HSAUR", "
 ```
 
 <!-- - Презентация [pdf](07_pca.pdf) -->
-<!-- - [код R](07_code_pca.R) -->
+<!-- - [код R](07_pca_code.R) -->
 <!-- - [Примеры вопросов следующего теста](test_handouts/07-pca-handout-test1.pdf) -->
 
 
@@ -82,7 +82,7 @@ install.packages("GGally")
 ```
 
 <!-- - Презентация [pdf](08_da.pdf) -->
-<!-- - [код R](08_code_da.R) -->
+<!-- - [код R](08_da_code.R) -->
 <!-- - [BoxMTest.R](BoxMTest.R) -->
 <!-- - [Примеры вопросов следующего теста](test_handouts/08-da-handout-test1.pdf) -->
 <!-- - [Домашнее задание №3](hw/hw3_pca-da-infarctus.zip) -->
@@ -94,5 +94,5 @@ install.packages(c("ape", "pvclust"))
 ```
 
 <!-- - Презентация [pdf](09_dist.pdf) -->
-<!-- - [код R](09_code_dist.R) -->
+<!-- - [код R](09_dist_code.R) -->
 <!-- - [Примеры вопросов](test_handouts/09-dist-handout-test1.pdf) -->
