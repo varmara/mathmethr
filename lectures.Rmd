@@ -35,8 +35,7 @@ install.packages("car")
 
 <!-- - Презентация [pdf](04_regression2.pdf) -->
 <!-- - [код R](04_regression2_code.R) -->
-<!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/04-mregr-handout-test1.pdf) -->
+- Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv)
 
 ## 5. Дисперсионный анализ, ч.1 
 
@@ -47,15 +46,12 @@ install.packages("multcomp")
 <!-- - Презентация [pdf](05_anova1.pdf) -->
 <!-- - [код R](05_anova1_code.R) -->
 <!-- - Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/05-anova1-handout-test1.pdf) -->
-<!-- - [Домашнее задание №2](hw/hw2_anova2-moon.zip) -->
 
 ## 6. Дисперсионный анализ, ч.2
 
 <!-- - Презентация [pdf](06_anova2.pdf) -->
 <!-- - [код R](06_anova2_code.R) -->
 <!-- - Данные: [eysenck.csv](data/eysenck.csv) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/06-anova2-handout-test1.pdf) -->
 
 ## 7. Анализ главных компонент
 
@@ -65,8 +61,6 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "gtable", "HSAUR", "
 
 <!-- - Презентация [pdf](07_pca.pdf) -->
 <!-- - [код R](07_pca_code.R) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/07-pca-handout-test1.pdf) -->
-
 
 ## 8. Дискриминантный анализ 
 
@@ -77,8 +71,6 @@ install.packages("GGally")
 <!-- - Презентация [pdf](08_da.pdf) -->
 <!-- - [код R](08_da_code.R) -->
 <!-- - [BoxMTest.R](BoxMTest.R) -->
-<!-- - [Примеры вопросов следующего теста](test_handouts/08-da-handout-test1.pdf) -->
-<!-- - [Домашнее задание №3](hw/hw3_pca-da-infarctus.zip) -->
 
 ## 9. Ординация и классификация с использованием мер сходства-различия
 
@@ -88,4 +80,3 @@ install.packages(c("ape", "pvclust"))
 
 <!-- - Презентация [pdf](09_dist.pdf) -->
 <!-- - [код R](09_dist_code.R) -->
-<!-- - [Примеры вопросов](test_handouts/09-dist-handout-test1.pdf) -->

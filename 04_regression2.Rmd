@@ -47,31 +47,6 @@ source("support_mathmethr.R")
 - `yr.isol` - Год начала изоляции
 - `abund` - Обилие птиц
 
-## Скачиваем данные с сайта
-
-Не забудьте войти в вашу директорию для матметодов при помощи `setwd()`
-
-```{r eval=FALSE}
-library(downloader)
-
-# в рабочем каталоге создаем суб-директорию для данных
-if(!dir.exists("data")) dir.create("data")
-
-# скачиваем файл в xlsx, либо в текстовом формате
-if (!file.exists("data/loyn.xlsx")) {
-  download(
-    url = "https://varmara.github.io/mathmethr/data/loyn.xlsx",
-    destfile = "data/loyn.xlsx")
-}
-
-if (!file.exists("data/loyn.csv")) {
-  download(
-    url = "https://varmara.github.io/mathmethr/data/loyn.xls",
-    destfile = "data/loyn.csv")
-}
-```
-
-
 ## Читаем данные из файла одним из способов
 
 ### Чтение из xlsx
@@ -89,7 +64,7 @@ bird <- read.table("data/loyn.csv", header = TRUE, sep = "\t")
 ## Все ли правильно открылось?
 
 ```{r}
-str(bird) # Структура данных
+str(bird)      # Структура данных
 head(bird)     # Первые несколько строк файла
 ```
 
@@ -98,7 +73,7 @@ head(bird)     # Первые несколько строк файла
 Есть ли пропущенные значения?
 
 ```{r}
-sapply(bird, function(x)sum(is.na(x)))
+colSums(is.na(bird))
 ```
 
 Каков объем выборки?
@@ -130,7 +105,7 @@ bird_lm <- lm(abund ~ l10area + l10dist + l10ldist + yr.isol, data = bird)
 summary(bird_lm)
 ```
 
-## Можно привести в виде таблицы результаты t-теста для коэффициентов
+## Можно привести  результаты t-теста для коэффициентов в виде таблицы
 
 - Обилие птиц увеличивалось с увеличением площади леса, и с уменьшением продолжительности изоляции \linebreak[2] (Табл. \autoref{tab:mreg-coef}).
 
@@ -151,6 +126,7 @@ xtb <- xtable(
 print.xtable(xtb, comment = F, caption.placement = "top")
 ```
 
+Можно было бы нарисовать график предсказаний модели, но в этом курсе мы не будем это разбирать
 
 ## Задача
 
@@ -196,8 +172,6 @@ coef(bird_lm)
 - Величина обычных коэффициентов зависит от единиц измерения
 - $b_0$ --- Отрезок (Intercept), отсекаемый регрессионной прямой на оси $y$. Значение зависимой переменной $Y$, если предикторы $X_1 = \cdots = X_p = 0$.
 - Коэффициенты при $X_p$ показывают, на сколько изменяется $Y$, когда предиктор $X_p$ меняется на единицу, при условии, что остальные предикторы не меняют своих значений.
-
-
 
 ## Для сравнения влияния разных факторов --- стандартизованные коэффициенты
 
@@ -322,7 +296,7 @@ $R^2_{adj}$ учитывает число переменных в модели, 
 Нужно, т.к. в модели $Y _i = \beta _0 + \beta x _i + \epsilon _i$ зависимая переменная $Y \sim N(0,\sigma^2)$, а значит $\epsilon _i \sim N(0,\sigma^2)$
 
 - Нужно для тестов параметров, а не для подбора методом наименьших квадратов
-- Нарушение не страшно - тесты устойчивы к небольшим отклонениям от нормального распределения
+- Нарушение не страшно --- тесты устойчивы к небольшим отклонениям от нормального распределения
 - Проверяем распределение остатков на нормально-вероятностном графике
 
 
@@ -345,7 +319,7 @@ $R^2_{adj}$ учитывает число переменных в модели, 
 
 - Нужно и важно для тестов параметров
 - Проверяем на графике остатков по отношению к предсказанным значениям
-- Есть формальные тесты (Cochran's C), но только если несколько значений y для каждого x
+- Есть формальные тесты, но они очень чувствительны (тест Бройша-Пагана, тест Кокрана)
 
 
 \column{0.48\textwidth}
@@ -518,19 +492,14 @@ $R^2_{adj}$ учитывает число переменных в модели, 
 
 ## Проверка на колинеарность
 
-### Толерантность (tolerance)
-
-$1-R^2$ регрессии данного предиктора от всех других
-
-$T \le 0.25$ --- колинеарность
-
 ### Показатель инфляции для дисперсии
 
 (коэффициент распространения дисперсии, Variance inflation factor, VIF)
 
-$VIF = 1/T$
+$VIF = 1/(1-R^2)$, здесь в знаменателе используется $R^2$ регрессии данного предиктора от всех других
 
-$VIF > 10$ (по Marquardt, 1970), но лучше $VIF > 3$, а иногда и $VIF > 2$ --- колинеарность
+
+Хорошо, если $VIF > 10$ (по Marquardt, 1970), но лучше $VIF > 3$, а иногда и $VIF > 2$. Если больше --- колинеарность
 
 # Проверка условий применимости линейной регрессии
 
@@ -545,8 +514,6 @@ $VIF > 10$ (по Marquardt, 1970), но лучше $VIF > 3$, а иногда и
 ```{r message = FALSE}
 library(car)
 vif(bird_lm) # variance inflation factors
-vif(bird_lm) > 2 # есть ли проблемы?
-1/vif(bird_lm) # tolerance
 ```
 
 \pause
@@ -557,7 +524,7 @@ vif(bird_lm) > 2 # есть ли проблемы?
 ```{r}
 library(ggplot2) # там есть функция fortify()
 bird_diag <- fortify(bird_lm)
-
+# вот, что записано в диагностическом датафрейме
 head(bird_diag, 2)
 ```
 
@@ -580,47 +547,13 @@ aes()
 geom_point()
 ```
 
-### Стандартизованные остатки 
-
-$$\frac {y _i - \hat y _i} {\sqrt{MS _e}}$$
-
-- можно сравнивать между регрессиями
-- можно сказать, какие остатки большие, какие нет
-    - $\le 2 SD$ - обычные
-    - $> 3 SD$ - редкие
-
 ## Решение
 
 График зависимости стандартизованных остатков от предсказанных значений
 
 ```{r}
-ggplot(data = bird_diag, aes(x = .fitted, y = .stdresid)) + geom_point()
-```
-
-## График станет информативнее, если кое-что добавить
-
-```{r}
-# Создаем логический вектор, где TRUE, 
-# если стандартизованный остаток больше 2
-f_outlier <- abs(bird_diag$.stdresid) > 2
-# Создаем будущие ярлыки
-labs <- ifelse(test = f_outlier,
-               yes = row(bird_diag), # Если test == TRUE
-               no = "") # Если test == FALSE
-
-gg_resid <- ggplot(data = bird_diag, 
-                   aes(x = .fitted, y = .stdresid)) + 
-  geom_point(aes(size = .cooksd)) + # расстояние Кука
-  geom_hline(yintercept = 0) +   # горизонтальная линия y = 0
-  geom_text(aes(label = labs), hjust = 2, colour = "blue", 
-            size = 2) # номера наблюдений с остатками больше 2SD
-```
-
-## Интерпретируем график стандартизованных остатков от предсказанных значений
-
-Какие выводы можно сделать по графику остатков?
-
-```{r echo=FALSE, purl=FALSE}
+gg_resid <- ggplot(data = bird_diag, aes(x = .fitted, y = .stdresid)) + 
+  geom_point()
 gg_resid
 ```
 
@@ -633,15 +566,13 @@ gg_resid
 
 ## 3. Квантильный график стандартизованных остатков
 
-Используется, чтобы оценить форму распределения.
+Используется, чтобы оценить форму распределения. По оси Х --- квантили теоретического распределения, по оси Y --- квантили остатков модели.
+
 Если точки лежат на одной прямой --- все в порядке.
 
 ```{r qqplot, warning = FALSE, message=FALSE}
-mean_val <- mean(bird_diag$.stdresid)  
-sd_val <- sd(bird_diag$.stdresid)
-ggplot(bird_diag, aes(sample = .stdresid)) + geom_point(stat = "qq") +
-geom_abline(intercept = mean_val, slope = sd_val) + # точки должны быть здесь
-  labs(x = "Квантили стандартного нормального распределения", y = "Квантили набора данных")
+library(car)
+qqPlot(bird_lm) # из пакета car
 ```
 
 ## Интерпретируем квантильный график 
@@ -654,10 +585,12 @@ geom_abline(intercept = mean_val, slope = sd_val) + # точки должны б
 
 - Отклонений от нормального распределения нет
 
+## Внимание!
+
+Только если все условия выполняются, можно приступить к интерпретации результатов.
 
 
-
-## Take home messages
+## Take-home messages
 
 - Для сравнения влияния разных предикторов можно использовать бета-коэффициенты
 - Условия применимости линейной регрессии должны выполняться, чтобы тестировать гипотезы
@@ -669,20 +602,8 @@ geom_abline(intercept = mean_val, slope = sd_val) + # точки должны б
 
 ## Дополнительные ресурсы
 
-Учебники
-
-- Quinn, Keough, 2002, pp. 92-98, 111-130
-- [Open Intro to Statistics](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/OpenIntroStatSecond.pdf): [Chapter 8. Multiple and logistic regression](https://docs.google.com/viewer?docex=1&url=http://www.openintro.org/stat/down/oiStat2_08.pdf), pp. 354-367.
-- Logan, 2010, pp. 170-173, 208-211
-- Sokal, Rohlf, 1995, pp. 451-491, 609-653
-- Zar, 2010, pp. 328-355, 419-439
-
-Упражнения для тренировки
-
-- OpenIntro Labs, Lab 7: Introduction to linear regression (Осторожно, они используют базовую графику а не `ggplot`)
-    - [Обычный вариант](http://www.openintro.org/download.php?file=os2_lab_07A&referrer=/stat/labs.php), после упражнения 4
-    - [Интерактивный вариант на Data Camp](https://www.datacamp.com/courses/data-analysis-and-statistical-inference_mine-cetinkaya-rundel-by-datacamp/lab-6-introduction-to-linear-regression?ex=1), после вопроса 4
-- OpenIntro Labs, Lab 8: Multiple linear regression
-    - [Обычный вариант](http://www.openintro.org/download.php?file=os2_lab_08A&referrer=/stat/labs.php), до упражнения 11
-    - [Интерактивный вариант на Data Camp](https://www.datacamp.com/courses/data-analysis-and-statistical-inference_mine-cetinkaya-rundel-by-datacamp/lab-7-multiple-linear-regression-9?ex=1), до вопроса 8
-    
++ Кабаков Р.И. R в действии. Анализ и визуализация данных на языке R. М.: ДМК Пресс, 2014
++ Diez, D.M., Barr, C.D. and Çetinkaya-Rundel, M., 2015. OpenIntro Statistics. OpenIntro.
++ Zuur, A., Ieno, E.N. and Smith, G.M., 2007. Analyzing ecological data. Springer Science & Business Media.
++ Quinn G.P., Keough M.J. 2002. Experimental design and data analysis for biologists
++ Logan M. 2010. Biostatistical Design and Analysis Using R. A Practical Guide
