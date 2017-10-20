@@ -38,37 +38,13 @@ opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE,
 
 ## Пример: сон у млекопитающих
 
+Известно, что у разных млекопитающих продолжительность сна сильно варьирует. Ленивцы спят , коалы спят, а  кому-то достаточно. Условия жизни у всех тоже разные. Давайте проверим, есть ли связь между продолжительностью сна и уровнем опасности среды.
+
 - `TotalSleep` - общая продолжительность сна. В нашем анализе это будет зависимая переменная
 - `Danger`  - уровень опасности среды для вида, пять градаций (1 - 5)
 
 \vskip0pt plus 1filll
 \tiny Данные: Allison, Cicchetti (1976), электронная версия [Statlib database](http://lib.stat.cmu.edu)
-
-
-## Скачиваем данные с сайта
-
-Не забудьте войти в вашу директорию для матметодов при помощи `setwd()`
-
-```{r eval=FALSE}
-library(downloader)
-
-# в рабочем каталоге создаем суб-директорию для данных
-if(!dir.exists("data")) dir.create("data")
-
-# скачиваем файл в xlsx, либо в текстовом формате
-if (!file.exists("data/sleep.xlsx")) {
-  download(
-    url = "https://varmara.github.io/mathmethr/data/sleep.xlsx",
-    destfile = "data/sleep.xlsx")
-}
-
-if (!file.exists("data/sleep.csv")) {
-  download(
-    url = "https://varmara.github.io/mathmethr/data/sleep.xls",
-    destfile = "data/sleep.csv")
-}
-```
-
 
 ## Читаем данные из файла одним из способов
 
@@ -100,7 +76,7 @@ sleep$Danger <- factor(sleep$Danger, levels = 1:5, labels = c("очень низ
 
 ## Знакомимся с данными
 
-Есть ли пропущенные значения?
+Есть ли пропущенные значения (особенно, в переменных, которые нас интересуют)?
 
 ```{r}
 sapply(sleep, function(x)sum(is.na(x)))
@@ -135,40 +111,101 @@ table(sl$Danger)
 ```
 
 
-## Задание
+## Задание 1
 
-Постройте график зависимости общей продолжительности сна (`TotalSleep`) от уровня опасности среды (`Danger`). Используйте `geom_boxplot`.
+Дополните код, чтобы построить точечный график зависимости общей продолжительности сна (`TotalSleep`) от уровня опасности среды (`Danger`).
 
-Раскрасьте график в зависимости от уровня опасности среды (используйте эстетики `fill` или `colour`)
 
-Придумайте, каким образом посчитать, в какой группе животных общая продолжительность сна больше?
-
-\vskip0pt plus 1filll
-
-### Дополнительное задание:
-
-Попробуйте сменить палитру раскраски, используя `scale_colour_brewer` (варианты можно посмотреть в справке в подразделе примеров или в интернете [Colors (ggplot2): раздел RColorBrewer palette chart](http://www.cookbook-r.com/Graphs/Colors_%28ggplot2%29/) )
-
-## Решение
-
-```{r purl=FALSE}
-library(ggplot2) 
+```{r eval=FALSE}
+library( )
 theme_set(theme_bw())
 
-gg_sl <- ggplot(data = sl, aes(x = Danger, y = TotalSleep, colour = Danger)) + 
-  labs(x = "Уровень опасности", y = "Продолжительность сна") + 
-  scale_colour_brewer("Уровень опасности", palette = "Dark2")
-gg_sl + geom_boxplot()
+ggplot(data = , aes(x = , y = )) + 
+  geom_ (position = position_jitter(width = 0.05))
+```
+
+```{r gg-points, echo=FALSE, purl=FALSE}
+library(ggplot2)
+theme_set(theme_bw())
+ggplot(data = sl, aes(x = Danger, y = TotalSleep)) + 
+  geom_point(position = position_jitter(width = 0.05))
+```
+
+## Решение 1
+
+```{r gg-points, echo=TRUE, purl=FALSE}
+```
+
+Точечный график --- не самый удобный способ представления таких данных.
+
+## Задание 2
+
+Точечный график --- не самый удобный способ представления таких данных. Лучше было бы изобразить средние значения и их 95% доверительные интервалы.
+
+Замените в графике из прошлого задания геом на этот стат:
+
+```{r eval=FALSE}
+  stat_summary(geom = 'pointrange', fun.data = mean_cl_normal) 
+```
+
+```{r gg-mean-conf-limit, echo=FALSE, purl=FALSE}
+ggplot(data = sl, aes(x = Danger, y = TotalSleep)) + 
+  stat_summary(geom = 'pointrange', fun.data = mean_cl_normal)
+```
+
+## Решение 2
+
+```{r gg-mean-conf-limit, echo=TRUE, purl=FALSE}
+```
+
+## Задание 3
+
+Раскрасьте график в зависимости от уровня опасности среды (используйте эстетику `colour`)
+
+```{r gg-mean-conf-limit-coloured, echo=FALSE, purl=FALSE}
+ggplot(data = sl, aes(x = Danger, y = TotalSleep, colour = Danger)) + 
+  stat_summary(geom = 'pointrange', fun.data = mean_cl_normal)
+```
+
+## Решение 3
+
+```{r gg-mean-conf-limit-coloured, echo=TRUE, purl=FALSE}
+```
+
+## Задание 4
+
+Создайте подписи к осям и легенде, при помощи слоя подписей labs(). Отредактируйте этот код и добавьте его к графику с предыдущего шага
+
+```{r eval=FALSE}
+  labs(x = ,  = "Продолжительность сна", colour = )
+```
+
+
+```{r gg-mean-conf-limit-coloured-labs, echo=FALSE, purl=FALSE}
+ggplot(data = sl, aes(x = Danger, y = TotalSleep, colour = Danger)) + 
+  stat_summary(geom = 'pointrange', fun.data = mean_cl_normal) +
+  labs(x = "Уровень опасности", 
+       y = "Продолжительность сна",
+       colour = "Уровень опасности")
+```
+
+## Решение 4
+
+```{r gg-mean-conf-limit-coloured-labs, echo=TRUE, purl=FALSE}
 ```
 
 ## Множественные сравнения
 
-Мы могли бы сравнить среднюю продолжительность сна в разных группах при помощи t-критерия.
+Мы могли бы сравнить среднюю продолжительность сна в разных группах при помощи t-критерия. У нас всего 5 групп. Сколько возможно между ними попарных сравнений?
 
-- 5 групп
-- 10 сравнений
+```{r gg-mean-conf-limit-coloured-labs, echo=FALSE, purl=FALSE}
+```
 
-Если для каждого сравнения вероятность ошибки первого рода будет $\alpha_{per\ comparison} = 0.05$, то для группы --- ?
+\pause
+
+Всего возможно 10 сравнений
+
+Если для каждого сравнения вероятность ошибки первого рода будет $\alpha_{per\ comparison} = 0.05$, то для всей группы из 10 сравнений --- ?
 
 \pause
 
@@ -178,7 +215,7 @@ $\alpha_{family\ wise} = 0.05 * 10$
 
 ## Поправка Бонферрони
 
-Если нужно много сравнений, можно снизить $\alpha _{per\ comparison}$
+Если все-таки приходится делать много сравнений, нужно снизить $\alpha _{per\ comparison}$ до обычного уровня
 
 $$\alpha _{per\ comparison} = \frac{\alpha _{family\ wise}}{n}$$
 
@@ -189,69 +226,156 @@ $$\alpha _{per\ comparison} = \frac{\alpha _{family\ wise}}{n}$$
 
 С поправкой Бонферрони $\alpha _{per\ comparison} = 0.05 / 10 = 0.005$
 
-Очень жесткий критерий!
+Это очень жесткая поправка! Мы рискуем не найти достоверных различий, даже там, где они есть...
+
+Но есть выход. Вместо множества попарных сравнений можно использовать один тест --- дисперсионный анализ (analysis of variation, ANOVA).
 
 \vskip0pt plus 1filll
 
 
 # Дисперсионный анализ
 
-## Модель дисперсионного анализа
+```{r purl=FALSE, echo = FALSE, warning=FALSE}
+library(dplyr)
+dat_smr <- sl %>% group_by(Danger) %>% summarise(mean = mean(TotalSleep)) 
+dat <- merge(sl, dat_smr)
+dat$Danger <- as.numeric(dat$Danger) + runif(nrow(dat), -0.15, 0.15)
+d_lev <- c("очень низкий", "низкий", "средний", "высокий", "очень высокий")
+dat_smr$Danger <- as.numeric(dat_smr$Danger)
 
-$$y _{ij} = \mu + a _i + \varepsilon _{ij}$$
-
-Из чего складываются средние значения в группах по фактору? 
-
-Группа | Общее среднее | Эффект | Случайная изменчивость
------ | ----- | ----- | -----
-очень низкий | $$\mu$$ | $$a _1$$ | $$\varepsilon _{1j}$$
-низкий | $$\mu$$ | $$a _2$$ | $$\varepsilon _{2j}$$
-... | ... | ... | ...
-очень высокий | $$\mu$$ | $$a _5$$ | $$\varepsilon _{5j}$$
-
-
-## Структура общей изменчивости
-
-Общая изменчивость (SSt) = Факторная (SSx) + Случайная (SSe)
-
-```{r purl=FALSE, echo = FALSE, warning=FALSE, fig.width = 10.5, fig.height=5}
 lims <- range(sl$TotalSleep) + c(-1, 1)
 yannot <- lims[1] + 0.5
-pos <- position_jitter(width = 0.2)
+set.seed(832)
 gmean <- mean(sl$TotalSleep, na.rm = TRUE)
 
-gg_sl <- gg_sl + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8)) + ylim(lims[1], lims[2])
+# 31 33 43 46
+id <- 43
+Y <- dat$TotalSleep[id]
+Y_hat <-dat$mean[id]
+X <- dat$Danger[id]
+
+
+
+pl <- ggplot(data = dat, aes(x = Danger, y = TotalSleep)) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8)) + ylim(lims[1], lims[2]) + scale_x_continuous(breaks = 1:5, labels = d_lev)
 
 # # Общая изменчивость (отклонения от общего среднего)
-gg_sl_total <- gg_sl + 
-  geom_jitter(position = pos) +
-  geom_hline(yintercept = gmean, linetype = "dashed") + 
+pl_tot <- pl + 
+  geom_segment(aes(xend = Danger, yend = gmean), colour = "grey70") +
+    geom_hline(yintercept = gmean, linetype = "dashed") + 
+    geom_point() +
   ggtitle("Общая изменчивость\n(отклонения от общего среднего)") +
-  annotate("text", label = "Общее\nсреднее", 
+    annotate("text", label = "Общее\nсреднее", 
            x = 0,  y = gmean, hjust = -0.1, size = 4) + 
   annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6) 
 
-library(plyr)
+pl_all <- pl + 
+  geom_segment(aes(xend = Danger, yend = gmean), colour = "grey70") +
+  geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = "dodgerblue1") + 
+  geom_hline(yintercept = gmean, linetype = "dashed") + 
+  # annotate("segment", x = X, y = Y, xend = X, yend = gmean, colour = "grey70", size = 2) + 
+  annotate("segment", x = X, y = Y, xend = X, yend = Y_hat, colour = "#009E73", size = 2) +
+  annotate("segment", x = X, y = Y_hat, xend = X, yend = gmean, colour = "#E69F00", size = 2) +
+  geom_point() +
+  annotate("text", label = "Общее\nсреднее", 
+           x = 0,  y = gmean, hjust = -0.1, size = 4)
+
+pl_no <- pl + 
+  geom_hline(yintercept = gmean, linetype = "dashed") + 
+  geom_point(data = dat_smr, y = gmean, size = 20, shape = 45, colour = "dodgerblue1") +
+    annotate("segment", x = X, y = Y, xend = X, yend = gmean, colour = "grey70", size = 2) + 
+  annotate("segment", x = X + 0.05, y = Y, xend = X + 0.05, yend = gmean, colour = "#009E73", size = 2) +
+    geom_point() +
+  annotate("text", label = "Общее\nсреднее", 
+           x = 0,  y = gmean, hjust = -0.1, size = 4)
+
+
+# library(plyr)
 # Межгрупповая изменчивость (связанная с фактором)
-gg_sl_factor <- gg_sl + 
+pl_x <- pl + 
   geom_hline(aes(yintercept = gmean), linetype = "dashed") + 
-  stat_summary(fun.y = "mean", geom = "point", size = 20, shape = 45) + 
+  geom_segment(data = dat_smr, aes(x = Danger, y = mean, xend = Danger, yend = gmean), colour = "#E69F00", size = 2) +
+  geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = "dodgerblue1") + 
+    geom_point() +
   ggtitle("Факторная изменчивость\n(межгрупповая)")+
     annotate("text", label = "SS[x] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
 
 # Внутригрупповая изменчивость (случайная)
-gg_sl_error <- gg_sl + 
-  geom_jitter(position = position_jitter(width = 0.3)) +
-  stat_summary(fun.y = "mean", geom = "point", size = 20, shape = 45, colour = "black") + 
+pl_res <- pl + 
+  geom_segment(data = dat, aes(xend = Danger, yend = mean), colour = "#009E73") +
+    geom_hline(yintercept = gmean, linetype = "dashed") + 
+    geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = "dodgerblue1") + 
+    geom_point() +
   ggtitle("Случайная изменчивость\n(внутригрупповая)")+
     annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
-
-library(gridExtra)
-grid.arrange(gg_sl_total, gg_sl_factor, gg_sl_error, ncol = 3, widths = c(0.38, 0.31, 0.31))
 ```
 
-Если выборки из одной совокупности, то
-Факторная изменчивость = Случайная изменчивость
+## Общая изменчивость
+
+Общая изменчивость SS~t~ --- это сумма квадратов отклонений наблюдаемых значений $y_i$ от общего среднего $\bar y$
+
+```{r gg-tot, echo=FALSE, fig.height=3.5, purl=FALSE}
+pl_tot
+```
+
+## Отклонения от общего среднего
+
+Отклонения от общего среднего складываются из двух составляющих:
+
+- Внутригрупповые отклонения --- отклонения наблюдаемых значений от внутригрупповых средних
+- Межгрупповые отклонения --- отклонения внутригрупповых средних от общего среднего ("эффекты" групп)
+
+```{r gg-all, echo=FALSE, fig.height=3, purl=FALSE}
+pl_all
+```
+
+## Структура общей изменчивости
+
+Общая изменчивость $SS_t$ складывается из изменчивости связанной с фактором $SS_x$ и случайной изменчивости $SS_e$
+
+$$SS_t = SS_x + SS_e$$
+
+```{r gg-ss, echo=FALSE, fig.height=3.5, fig.width=10, purl=FALSE}
+library(gridExtra)
+grid.arrange(pl_tot, pl_x, pl_res, nrow = 1)
+```
+
+## Средние квадраты отклонений
+
+Если поделить суммы квадратов отклонений ($SS$) на их число степеней свободы, то получатся средние квадраты отклонений ($MS$) --- дисперсии
+
+```{r gg-ss, echo=FALSE, fig.height=3, fig.width=10, purl=FALSE}
+```
+
+
+\resizebox{1\textwidth}{!}{
+{\small
+\begin{tabular}{c c c}
+\hline\noalign{\smallskip}
+$MS_t$ полная дисперсия  & 
+$MS_x$ факторная дисперсия & 
+$MS_e$ остаточная дисперсия  \\
+\hline\noalign{\smallskip}
+$MS_{t} =\frac{SS_{t}}{df_{t}}$ & $MS_{x} =\frac{SS_{x}}{df_{x}}$ & $MS_{e} =\frac{SS_{e}}{df_{e}}$ \\
+$SS_{t}=\sum{(\bar{y}-y_i)^2}$ & $SS_{x}=\sum{(\hat{y}-\bar{y})^2}$ & $SS_{e}=\sum{(\hat{y}-y_i)^2}$ \\
+$df_{t} = n-1$ & $df_{x} = 1$ & $df_{e} = n-2$  \\
+\hline\noalign{\smallskip}
+\end{tabular}
+}
+}
+
+
+
+##  Если выборки из одной совокупности, то  
+
+Если выборки из одной совокупности, то наблюдения из разных групп будут отличаться друг от друга не больше, чем наблюдения из одной группы,  
+т.е. факторная дисперсия будет близка к случайной дисперсии $MS_x \sim MS_e$. Их равенство можно проверить при помощи F-критерия
+
+$$ F_{df_x, df_e} = \frac{MS _{x}}{MS_{e}}$$
+
+
+```{r gg-ss, echo=FALSE, fig.height=3.5, fig.width=10, purl=FALSE}
+```
+
 
 ## Таблица дисперсионного анализа 
 
@@ -276,14 +400,14 @@ grid.arrange(gg_sl_total, gg_sl_factor, gg_sl_error, ncol = 3, widths = c(0.38, 
 
 Используем Anova из пакета car, хотя есть и другие функции. Зачем? Когда факторов будет больше одного, эта функция сможет правильно оценить значимость каждого из них независимо от других.
 
-Anova(результат_функции_lm) - дисперсионный анализ
+Anova(результат_функции_lm, type = 3) - дисперсионный анализ
 
 \small
 
 ```{r}
 library(car)
-sl_mod <- lm(TotalSleep ~ Danger, data=sl)
-sl_anova <- Anova(sl_mod)
+sl_mod <- lm(TotalSleep ~ Danger, data = sl)
+sl_anova <- Anova(sl_mod, type = 3)
 sl_anova
 ```
 
@@ -291,15 +415,15 @@ sl_anova
 
 ```{r purl=FALSE, echo=FALSE}
 result <- sl_anova
-dfs <- paste0(result$Df, collapse= ",")
-fval <- round(result$'F value'[1], 2)
-sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[1] <= 0.05, "$p < 0.05$", ""))
+dfs <- paste0(result$Df[-1], collapse= ",")
+fval <- round(result$'F value'[2], 2)
+sign <- ifelse(result$'Pr(>F)'[2] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[2] <= 0.05, "$p < 0.05$", ""))
 ```
 
 >- Общая продолжительность сна различается у видов животных, которые в разной степени подвержены опасностям в течение жизни ($F _{`r dfs`} = `r fval`$, `r sign`).
 
 
-## Результаты дисперсионного анализа
+## Описание результатов дисперсионного анализа
 
 Результаты дисперсионного анализа можно представить в виде таблицы
 
@@ -307,7 +431,8 @@ sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[
 
 ```{r purl=FALSE, echo=FALSE, results='asis'}
 library(xtable)
-smr <- fix_Anova(sl_anova,
+source("support_mathmethr.R")
+smr <- fix_Anova(sl_anova[-1, ],
                  rown = c("Уровень опасности", "Остаточная"), 
                  coln = c("SS", "df", "F", "P"))
 xtb <- xtable(
@@ -341,9 +466,24 @@ print.xtable(xtb, comment = F, caption.placement = "top")
 
 ## Задание: Проверьте условия применимости
 
-Проверьте условия применимости дисперсионного анализа, используя графики остатков
+Проверьте условия применимости дисперсионного анализа для модели `sl_mod`, Дополните код, чтобы построить графики остатков
 
-## Решение: 1. Данные для проверки условий применимости на графиках остатков
+```{r eval=FALSE}
+# Данные для анализа остатков
+sl_diag <- fortify()
+head(sl_diag)
+# График расстояния Кука
+ggplot(data = , aes(x = 1:nrow(   ), y = )) + 
+  geom_bar(stat = "identity")
+# График остатков от предсказанных значений
+ggplot(data = , aes(x = , y = .stdresid)) + 
+  geom_
+# Квантильный график остатков
+qqPlot
+```
+
+
+## Решение:
 
 ```{r purl=FALSE}
 # Данные для анализа остатков
@@ -351,49 +491,55 @@ sl_diag <- fortify(sl_mod)
 head(sl_diag)
 ```
 
-## Решение: 2. Нормальность распределения
+## Решение: 
 
 ```{r purl=FALSE}
-ggplot(sl_diag) + geom_point(stat = "qq", aes(sample = .stdresid)) + 
-  geom_abline(intercept = 0, slope = sd(sl_diag$.stdresid))
+# График расстояния Кука
+ggplot(data = sl_diag, aes(x = 1:nrow(sl_diag), y = .cooksd)) + 
+  geom_bar(stat = "identity")
 ```
 
 \pause
 
-- Распределение практически нормальное
+- Влиятельных наблюдений нет
 
-## Немного более удобный квантильный график для проверки нормальности распределения
+## Решение: 
 
-qqPlot() из пакета car
-
-```{r purl=FALSE, echo=FALSE}
-set.seed(93)
+```{r purl=FALSE}
+# График остатков от предсказанных значений
+ggplot(data = sl_diag, aes(x = .fitted, y = .stdresid)) + 
+  geom_point()
 ```
-```{r purl=FALSE, fig.height=4}
+
+\pause
+
+- В одной из групп маленький разброс
+
+## Решение: 
+
+Если предиктор --- дискретная переменная, то вместо обычного точечного графика остатков лучше построить боксплот остатков
+
+```{r purl=FALSE}
+# График остатков от значений дискретного предиктора
+ggplot(data = sl_diag, aes(x = Danger, y = .stdresid)) + geom_boxplot()
+```
+
+\pause
+
+- Остатки в пределах двух стандартных отклонений.
+- Подозрительно маленькая дисперсия продолжительности сна в группе с очень высоким уровнем опасности.
+
+## Решение: 
+
+```{r purl=FALSE}
 qqPlot(sl_mod)
 ```
 
 \pause
 
-- Нет отклонений от нормального распределения
+- Остатки распределены нормально
 
-## Решение: 3. Выбросы, гомогенность дисперсий, паттерны в остатках
-
-```{r purl=FALSE, fig.width=10}
-gg_res <- ggplot(sl_diag, aes(x = .fitted, y = .stdresid)) + 
-  geom_hline(yintercept = 0)
-gg_1 <- gg_res + geom_point(aes(size = .cooksd))
-gg_2 <- gg_res + geom_boxplot(aes(x = Danger))
-library(gridExtra)
-grid.arrange(gg_1, gg_2, ncol = 2)
-```
-
-\pause
-
-- Остатки в пределах двух стандартных отклонений, расстояния Кука маленькие - можно продолжать.
-- Подозрительно маленькая дисперсия продолжительности сна в группе с очень высоким уровнем опасности.
-
-## Решение: 4. Паттерны в остатках (графики остатков от переменных в модели и вне ее).
+## Решение: Паттерны в остатках (графики остатков от переменных в модели и вне ее).
 
 На самом деле, нужно еще построить графики остатков от переменных в модели и вне ее --- чтобы выяснить, не забыли ли мы включить другие важные предикторы.
 
@@ -401,7 +547,7 @@ grid.arrange(gg_1, gg_2, ncol = 2)
 
 \small
 
-```{r purl=FALSE, eval=FALSE}
+```{r eval=FALSE}
 sl_diag_full <- data.frame(sl_diag, sl)
 gg_other <- ggplot(sl_diag_full, aes(y = .stdresid)) + geom_hline(yintercept = 0)
 gg_other + geom_point(aes(x = log(BodyWt)))
@@ -471,24 +617,37 @@ summary(sl_pht)
 
 ```{r}
 MyData <- data.frame(Danger = levels(sl$Danger))
-MyData$Danger <- factor(
-  MyData$Danger, 
-  levels = c("очень низкий", "низкий", "средний", "высокий", "очень высокий"), 
-  labels = c("очень низкий", "низкий", "средний", "высокий", "очень высокий"))
-MyData <- data.frame(MyData, 
-                     predict(sl_mod, newdata = MyData, 
-                             interval = "confidence"))
+MyData$Danger <- factor(MyData$Danger, levels = levels(sl$Danger), 
+                        labels = levels(sl$Danger))
+Predictions <- predict(sl_mod, newdata = MyData, 
+                      interval = "confidence")
+MyData <- data.frame(MyData, Predictions)
 MyData
+```
+
+## Задание
+
+Используя данные из датафрейма MyData, дополните код и постройте график? где разными столбиками с заливкой оранжевого цвета будут показаны предсказанные средние значения, а усами будут показаны их доверительные интервалы.
+
+```{r gg-means, echo=FALSE, eval=TRUE, purl=FALSE}
+gg_means <- ggplot(data = MyData, aes(x = Danger, y = fit)) + 
+  geom_bar(stat = "identity", fill = "orange", width = 0.5) + 
+  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
+  labs(x = "Уровень опасности", y = "Продолжительность сна")
+gg_means
+```
+
+```{r eval=FALSE}
+gg_means <- ggplot(data = , aes(x = , y = )) + 
+  geom_bar(stat = "", width = 0.5) + 
+  geom_errorbar(aes(ymin = , ymax = ), width = 0.1) +
+  labs()
+gg_means
 ```
 
 ## Этот график можно использовать для представления результатов
 
-```{r tidy=FALSE}
-gg_means <- ggplot(MyData, aes(x = Danger, y = fit)) + 
-  geom_bar(stat = "identity", fill = "turquoise3", colour = "black", width = 0.5) + 
-  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
-  labs(x = "Уровень опасности", y = "Продолжительность сна, ч")
-gg_means
+```{r gg_means}
 ```
 
 ## Достоверно различающиеся по пост-хок тесту группы обозначим разными буквами
@@ -514,6 +673,6 @@ gg_means +
 
 - Quinn, Keough, 2002, pp. 173-207
 - Logan, 2010, pp. 254 - 282
-- [Open Intro to Statistics](http://www.openintro.org/stat/), pp.236-246 
+- [Open Intro to Statistics](http://www.openintro.org/stat/) 
 - Sokal, Rohlf, 1995, pp. 179-260
 - Zar, 2010, pp. 189-207
