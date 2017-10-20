@@ -43,7 +43,7 @@ install.packages("multcomp")
 
 <!-- - Презентация: [05_anova1.pdf](05_anova1.pdf) -->
 <!-- - Код: [05_anova1_code.R](05_anova1_code.R) -->
-<!-- - Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv) -->
+- Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv)
 
 ## 6. Дисперсионный анализ, ч.2
 
