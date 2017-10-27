@@ -25,25 +25,179 @@ library(knitr)
 opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
 ```
 
-## Многофакторный дисперсионный анализ
+## Двухфакторный дисперсионный анализ
 
 ### Вы сможете
 
-- Проводить многофакторный дисперсионный анализ и интерпретироватm его результаты с учетом взаимодействия факторов
+- Проводить двухфакторный дисперсионный анализ и интерпретировать его результаты с учетом взаимодействия факторов
 - Отличать фиксированные и случайные факторы и выбирать подходящую модель дисперсионного анализа
 
+# Пример: Возраст и способы запомниания
 
-# Модель многофакторного дисперсионного анализа
+## Пример: Возраст и способы запомниания
 
-## Линейные модели для факторных дисперсионных анализов
+Какие способы запоминания информации лучше работают для молодых и для пожилых? (Eysenck, 1974)
 
-- Два фактора A и B, двухфакторное взаимодействие
+Факторы:
 
-$y _{ijk} = \mu + \alpha _i + \beta _j + (\alpha \beta) _{ij} + \epsilon _{ijk}$
+- `Age` - Возраст:
+    - `Younger` - 50 молодых
+    - `Older` - 50 пожилых (55-65 лет)
+- `Process` - тип активности:
+    - `Counting` - посчитать число букв
+    - `Rhyming` - придумать рифму к слову
+    - `Adjective` - придумать прилагательное
+    - `Imagery` - представить образ
+    - `Intentional` - запомнить слово
 
-- Три фактора A, B и C, двухфакторные взаимодействия, трехфакторное взаимодействия
+Зависимая переменная - `Words` - сколько вспомнили слов
 
-$y _{ijkl} = \mu + \alpha _i + \beta _j + \gamma _k + (\alpha \beta) _{ij} + (\alpha \gamma) _{ik} + (\beta \gamma) _{jk} + (\alpha \beta \gamma) _{ijk} + \epsilon _{ijkl}$
+\vskip0pt plus 1filll
+\tiny Пример из http://www.statsci.org/data/general/eysenck.html
+
+## Открываем данные
+
+```{r}
+memory <- read.table(file = "data/eysenck.csv", header = TRUE, sep = "\t")
+# Все ли правильно открылось?
+str(memory) # Структура данных
+head(memory, 2) # Первые несколько строк файла
+```
+
+## Знакомимся с данными
+
+```{r}
+# Есть ли пропущенные значения 
+# (особенно, в переменных, которые нас интересуют)?
+colSums(is.na(memory))
+# Каков объем выборки?
+nrow(memory) # всего
+table(memory$Age, memory$Process) # в группах
+```
+
+## Задание 1
+
+Дополните код, чтобы построить график, на котором приведено среднее число слов (`Words`) для каждого возраста (`Age`) и способа запоминания (`Process`).
+
+```{r eval=FALSE}
+library()
+theme_set()
+ggplot(data = , aes()) + 
+  stat_summary(geom = '', fun.data = ,
+               position = position_dodge(width = 0.5))
+```
+
+```{r gg-mean-conf-limit, echo=FALSE, purl=FALSE}
+library(ggplot2)
+theme_set(theme_bw())
+ggplot(data = memory, aes(x = Age, y = Words, colour = Process)) + 
+  stat_summary(geom = 'pointrange', fun.data = mean_cl_normal,
+               position = position_dodge(width = 0.5))
+```
+
+## Решение 1
+
+```{r gg-mean-conf-limit, echo=TRUE, purl=FALSE}
+```
+
+## "Некрасивый" порядок уровней на графике
+
+На этом графике некрасивый порядок уровней: средние для разных способов запоминания `memory$Process` расположены, как кажется, хаотично.
+
+Порядок групп на графике определяется порядком уровней фактора
+```{r purl=FALSE}
+# "старый" порядок уровней
+levels(memory$Process)
+```
+
+```{r gg-mean-conf-limit, echo=FALSE, purl=FALSE}
+```
+
+## Изменим порядок уровней
+
+Давайте изменим порядок уровней в факторе `memory$Process` так, чтобы он соответствовал возрастанию средних значений `memory$Words`
+```{r}
+# "старый" порядок уровней
+levels(memory$Process)
+# переставляем уровни в порядке следования средних значений memory$Words
+memory$Process <- reorder(x = memory$Process, X = memory$Words, FUN = mean)
+# "новый" порядок уровней стал таким
+levels(memory$Process)
+```
+
+## График с "правильным" порядком уровней
+
+С новым порядком уровней нам легче визуально сравнивать друг с другом число запомненных слов при разных способах запоминания.
+
+```{r gg-mean-reordered, purl=FALSE}
+ggplot(data = memory, aes(x = Age, y = Words, colour = Process)) + 
+  stat_summary(geom = 'pointrange', fun.data = mean_cl_normal,
+               position = position_dodge(width = 0.5))
+```
+
+
+# Двухфакторный дисперсионный анализ
+
+
+## Двухфакторный дисперсионный анализ
+
+Значения зависимой переменной складываются из нескольких частей:
+
+- общего среднего $\mu$
+- отклонений $\alpha_i$, связанных с фактором A (в примере две возрастные группы)
+- отклонений $\beta_j$, связанных с фактором B (в примере это пять способов запоминания)
+- отклонений $(\alpha \beta) _{ij}$, связанных с группировкой по обоим факторам (в примере это 10 групп по возрасту и способу запоминания)
+- "случайных" отклонений, не связанных с учтенными факторами $\epsilon _{ijk}$.
+
+$$y _{ijk} = \mu + \alpha _i + \beta _j + (\alpha \beta) _{ij} + \epsilon _{ijk}$$
+
+Общая сумма квадратов $SS_t$ складывается из нескольких составляющих:
+
+- изменчивости связанной со всеми факторами $SS_x = SS_a + SS_b + SS_{ab}$
+- случайной изменчивости $SS_e$
+
+$$SS_t = SS_a + SS_b + SS_{ab} + SS_e$$
+
+## Таблица традиционного дисперсионного анализа 
+
+\resizebox{1\textwidth}{!}{
+\begin{tabular}{L{2.2cm} c c c c}
+\hline\noalign{\smallskip}
+Источник \linebreak[2] изменчивости  & SS & df & MS & F  \\
+\hline\noalign{\smallskip}
+
+Название фактора А & 
+$SS _A = an\sum\limits_{i}{(\bar A_i - \bar y)^2}$ & 
+$df _A = a - 1$ & 
+$MS _A = \frac{SS _A}{df _A}$ & 
+$F _{df _A df _e} = \frac{MS _A}{MS _e}$ \\
+
+Название фактора В & 
+$SS _B = bn\sum\limits_{j}{(\bar B_j - \bar y)^2}$ & 
+$df _B = b - 1$ & 
+$MS _B = \frac{SS _B}{df _B}$ & 
+$F _{df _B df _e} = \frac{MS _B}{MS _e}$ \\
+
+Взаимодействие факторов A и B & 
+$SS _{AB} = SS_t - SS_A - SS_B - SS_{AB}$ & 
+$df _{AB} = (a - 1)(b - 1)$ & 
+$MS _{AB} = \frac{SS _{AB}}{df _{AB}}$ & 
+$F _{df _{AB} df _e} = \frac{MS _{AB}}{MS _e}$ \\
+
+Случайная & $SS _e = \sum\limits_{i}\sum\limits_j\sum \limits_k {(y _{ijk} - \bar y _{ij})^2}$ & 
+$df _e = (n - 1)ab$ & 
+$MS _e = \frac{SS _e}{df _e}$ \\
+
+Общая & $SS _t = \sum\limits_{i}\sum\limits_j\sum \limits_k {(y _{ijk} - \bar y)^2}$ 
+& $df _t = N - 1$ & 
+& \\
+
+\hline\noalign{\smallskip}
+\end{tabular}
+}
+
+- $i, \ldots, a$ --- уровни фактора A, $j, \ldots, b$ --- уровни фактора B, $k, ..., n$ --- индекс наблюдения в группе, $N$ --- общее число наблюдений
+- $\bar y$ --- общее среднее значение, $\bar A_i$ --- средние в группах по фактору A, $\bar B_j$ --- в группах по фактору B
 
 # Взаимодействие факторов
 
@@ -76,15 +230,69 @@ $y _{ijkl} = \mu + \alpha _i + \beta _j + \gamma _k + (\alpha \beta) _{ij} + (\a
 
 ### Если есть значимое взаимодействие
 - главные эффекты обсуждать не имеет смысла  
-- пост хок тесты проводятся только для ваимодействия
+- пост хок тесты проводятся только для взаимодействия
 
 \vskip0pt plus 1filll
 \tiny Рисунок из Quinn, Keough, 2002, fig.9.3
 
+# Несбалансированные данные
+
+## Сбалансированность данных
+
+| A / B| B1 | B2 | B3 |
+|-----| -----| -----| -----|
+|A1 | $n_{11}$| $n_{12}$ |  $n_{13}$|
+|A2 | $n_{21}$| $n_{22}$ |  $n_{23}$|
+
+### Сбалансированные данные
+
+Одинаковое число наблюдений во всех группах $n_{11} = n_{12} = \cdots = n_{ij}$
+
+### Несбалансированные данные
+
+Неодинаковое число наблюдений в группах
+
+## Суммы квадратов в многофакторном дисперсионном анализе со взаимодействием
+
+### Если данные сбалансированы, то ...
+
+взаимодействие и эффекты факторов независимы, их суммы квадратов и соответствующие тесты можно посчитать в одном анализе и его результат не будет зависеть от того, в каком порядке мы рассматриваем факторы.
+
+### Если данные несбалансированы, то ...
+
+взаимодействие и эффекты факторов уже не являются полностью независимыми, суммы квадратов для факторов не равны общей сумме квадратов. Если делать все как обычно, результат анализа будет зависеть от порядка включения факторов в модель. (Для вычислений используется регрессионный подход к дисперсионному анализу)
+
+## Суммы квадратов III типа
+
+Если данные не сбалансированы и анализ учитывает взаимодействие факторов, то чтобы найти "правильные" суммы квадратов нужно на самом деле выполнить анализ несколько раз:
+
+- последним учитывается фактор A: Y = B + AB + __A__
+- последним учитывается фактор B: Y = A + AB + __B__
+- последним учитывается взаимодействие AB: A + B + __AB__
+
+Те суммы квадратов, которые рассчитаны __для последнего фактора в каждой модели__ будут использоваться в тестах.
+
+Это называется III тип расчета сумм квадратов (= суммы квадратов III типа). Некоторые авторы рекомендуют использовать именно III тип сумм квадратов для несбалансированных данных (Maxwell & Delaney 1990, Milliken, Johnson 1984, Searle 1993, Yandell 1997, Glantz, Slinker 2000).
+
+## Проблемы из-за несбалансированности данных
+
+- Оценки средних в разных группах с разным уровнем точности (Underwood 1997)
+- ANOVA менее устойчив к отклонениям от условий применимости (особенно от гомогенности дисперсий) при разных размерах групп (Quinn Keough 2002, section 8.3)
+- Проблемы с расчетом мощности. Если $\sigma _{\epsilon}^2 > 0$ и размеры выборок разные, то $MS _{x} \over MS _{e}$ не следует F-распределению (Searle et al. 1992).
+
+\vfill
+\pause
+
+- Старайтесь _планировать_ группы равной численности!
+- Но если не получилось - не страшно:
+    - Для фикс. эффектов неравные размеры - проблема при нарушении условий применимости только, если значения доверительной вероятности _p_ близки к выбранному критическому уровню значимости $\alpha$
+
+
+# Многофакторный дисперсионный анализ в R
 
 ## Задаем модель со взаимодействием в R
 
-Взаимодействие обозначается `:` - двоеточием
+Взаимодействие обозначается `:` --- двоеточием
 
 Если есть факторы A и B, то их взаимодействие A:B
 
@@ -98,120 +306,30 @@ Y ~ A + B + A:B
 
 Y ~ A*B
 
- 
+Внимание: при использовании III типа сумм квадратов, нужно при подборе линейной модели __обязательно указывать тип кодирования для факторов__. В данном случае --- `contrasts = list(Age = contr.sum, Process = contr.sum)`
 
-# Несбалансированные данные, типы сумм квадратов
+## Задание 2
 
+Дополните этот код, чтобы подобрать линейную модель со взаимодействием факторов, в которой используется нужный тип кодирования для факторов: `contrasts = list(Age = contr.sum, Process = contr.sum)`
 
-
-## Проблемы несбалансированных дизайнов
-
-- Оценки средних в разных группах с разным уровнем точности (Underwood 1997)
-- ANOVA менее устойчив к отклонениям от условий применимости (особенно от гомогенности дисперсий) при разных размерах групп (Quinn Keough 2002, section 8.3)
-- Проблемы с рассчетом мощности. Если $\sigma _{\epsilon}^2 > 0$ и размеры выборок разные, то $MS _{groups} \over MS _{residuals}$ не следует F-распределению (Searle et al. 1992).
-
-\vfill
-\pause
-
-- Cтарайтесь _планировать_ группы равной численности!
-- Но если не получилось - не страшно:
-    - Для фикс. эффектов неравные размеры - проблема только если значения доверительной вероятности _p_ близки к выбранному критическому уровню значимости $\alpha$
-
-## Если несбалансированные данные, выберите правильный тип сумм квадратов
-
-- SSe и SSab также как в сбалансированных
-- SSa, SSb - три способа расчета
-
-- Для сбалансированных дизайнов - результаты одинаковы
-- Для несбалансированных дизайнов рекомендуют __суммы квадратов III типа__ если есть взаимодействие факторов (Maxwell & Delaney 1990, Milliken, Johnson 1984, Searle 1993, Yandell 1997). (Правда, этот способ не самый правильный с точки зрения статистики, т.к. основные эффекты факторов тестируются так, как если бы взаимодействие было включено в модель).
-
-## Типы сумм квадратов в дисперсионном анализе
-
-\resizebox{1\textwidth}{!}{
-\begin{tabular}{L{0.25\textwidth} C{0.25\textwidth} C{0.25\textwidth} C{0.25\textwidth}}
-\hline\noalign{\smallskip}
-"Типы сумм квадратов" & I тип & II тип & III тип \\
-\hline\noalign{\smallskip}
-Название & Последовательная & Без учета взаимодействий высоких порядков & Иерархическая \\
-SS & 
-SS(A) \linebreak SS(B | A)  \linebreak SS(AB | B, A) & 
-SS(A | B) \linebreak SS(B | A) \linebreak SS(AB | B, A) & 
-SS(A | B, AB) \linebreak SS(B | A, AB) \linebreak SS(AB | B, A) \\
-Величина эффекта зависит от выборки в группе & Да & Да & Нет \\
-Результат зависит от порядка включения факторов в модель & Да & Нет & Нет \\
-Команда R & aov() & Anova() (пакет car) &  Anova() (пакет car) \\
-\hline\noalign{\smallskip}
-\end{tabular}
-}
-
-
- 
-
-# Многофакторный дисперсионный анализ в R
-
-
-## Пример: Возраст и память
-
-Почему пожилые не так хорошо запоминают? Может быть не так тщательно перерабатывают информацию? (Eysenck, 1974)
-
-Факторы:
-
-- `Age` - Возраст:
-    - `Younger` - 50 молодых
-    - `Older` - 50 пожилых (55-65 лет)
-- `Process` - тип активности:
-    - `Counting` - посчитать число букв
-    - `Rhyming` - придумать рифму к слову
-    - `Adjective` - придумать прилагательное
-    - `Imagery` - представить образ
-    - `Intentional` - запомнить слово
-
-Зависимая переменная - `Words` - сколько вспомнили слов
-
-\vskip0pt plus 1filll
-\tiny Пример из http://www.statsci.org/data/general/eysenck.html
-
-## Открываем данные
-
-```{r}
-memory <- read.delim(file = "data/eysenck.csv")
-head(memory, 10)
-```
-
-##   Посмотрим на боксплот
-
-```{r purl=FALSE}
-library(ggplot2)
-theme_set(theme_bw(base_size = 16) + theme(legend.key = element_blank()))
-ggplot(data = memory, aes(x = Age, y = Words)) +
-  geom_boxplot(aes(fill = Process))
-```
-
-Некрасивый порядок уровней `memory$Process`
-
-
-
-## Боксплот с правильным порядком уровней
-
-```{r}
-# переставляем в порядке следования средних значений memory$Words
-memory$Process <- reorder(memory$Process, memory$Words, FUN = mean)
-```
-```{r purl=FALSE}
-ggplot(data = memory, aes(x = Age, y = Words)) +
-  geom_boxplot(aes(fill = Process))
-```
-
-## Подбираем линейную модель
-
-Внимание: при использовании III типа сумм квадратов, нужно при подборе линейной модели __обязательно указывать тип контрастов для факторов__. В данном случае --- `contrasts = list(Age = contr.sum, Process = contr.sum)`
-
-```{r tidy=FALSE}
-memory_fit <- lm(formula = Words ~ Age * Process, data = memory,
+```{r tidy=FALSE, eval=FALSE, purl=TRUE}
+# Линейная модель дисперсионного анализа со взаимодействием факторов
+mem_mod <- lm(formula = , data = ,
 contrasts = list(Age = contr.sum, Process = contr.sum))
 ```
 
-## Задание
+```{r interaction-model, tidy=FALSE, eval=TRUE, echo=FALSE, purl=FALSE}
+# Линейная модель дисперсионного анализа со взаимодействием факторов
+mem_mod <- lm(formula = Words ~ Age * Process, data = memory,
+contrasts = list(Age = contr.sum, Process = contr.sum))
+```
+
+## Решение
+
+```{r interaction-model, tidy=FALSE, eval=TRUE, purl=FALSE}
+```
+
+## Задание 3
 
 Проверьте условия применимости дисперсионного анализа
 
@@ -219,65 +337,134 @@ contrasts = list(Age = contr.sum, Process = contr.sum))
 - Не видно ли паттернов в остатках?
 - Нормальное ли у остатков распределение?
 
-## Решение: 1. Проверяем условия применимости
-
-- Есть ли гомогенность дисперсий?
-- Не видно ли трендов в остатках?
-
-```{r purl=FALSE}
-memory_diag <- fortify(memory_fit)
-ggplot(memory_diag, aes(x = .fitted, y = .stdresid)) + 
-  geom_point(aes(size = .cooksd), position = position_jitter(width = .2)) + 
-  geom_hline(yintercept = 0)
+```{r eval=FALSE}
+# Данные для анализа остатков
+mem_diag <- fortify()
+# График расстояния Кука
+ggplot(data = , aes(x = 1:nrow(   ), y = )) + 
+  geom_
+# График остатков от предсказанных значений
+ggplot(data = , aes()) + 
+  geom_
+# Квантильный график остатков
+qqPlot
 ```
 
-## Решение: 2. Проверяем условия применимости
-
-- Нормальное ли у остатков распределение?
+## Решение: 
 
 ```{r purl=FALSE}
-ggplot(memory_diag) + 
-  geom_point(stat = "qq", aes(sample = .stdresid)) + 
-  geom_abline(aes(intercept = 0, slope = sd(memory_diag$.stdresid)))
+# Данные для анализа остатков
+mem_diag <- fortify(mem_mod)
+head(mem_diag)
 ```
 
+## Решение: 
+
+```{r purl=FALSE}
+# График расстояния Кука
+ggplot(data = mem_diag, aes(x = 1:nrow(mem_diag), y = .cooksd)) + 
+  geom_bar(stat = "identity")
+```
+
+\pause
+
+- Влиятельных наблюдений нет
+
+## Решение:
+
+```{r purl=FALSE, eval=FALSE}
+ggplot(data = mem_diag, aes(x = Age, y = .stdresid)) + 
+  geom_boxplot()
+ggplot(data = mem_diag, aes(x = Process, y = .stdresid)) + 
+  geom_boxplot()
+ggplot(data = mem_diag, aes(x = Process, y = .stdresid, colour = Age)) + 
+  geom_boxplot()
+```
+
+```{r purl=FALSE, echo=FALSE, fig.width=10}
+library(gridExtra)
+grid.arrange(
+ggplot(data = mem_diag, aes(x = Age, y = .stdresid)) + 
+  geom_boxplot(),
+ggplot(data = mem_diag, aes(x = Process, y = .stdresid)) + 
+  geom_boxplot(),
+ggplot(data = mem_diag, aes(x = Process, y = .stdresid, colour = Age)) + 
+  geom_boxplot(),
+ncol = 3, widths = c(0.2, 0.36, 0.44))
+```
+
+- маленький разброс остатков в группах `Counting` и `Rhyming` у обоих возрастов
+
+## Решение: 
+
+```{r purl=FALSE, fig.height=4}
+qqPlot(mem_mod)
+```
+
+\pause
+
+- Нет значительных отклонений от нормального распределения
 
 ## Результаты дисперсионного анализа
 
 ```{r}
 library(car)
-Anova(memory_fit, type = 3)
+Anova(mem_mod, type = 3)
 ```
 
 \pause
 
-- Взаимодействие достоверно, факторы отдельно можно не тестировать, тк. взаимодействие может все равно изменять их эффект до неузнаваемости.
+- Взаимодействие достоверно, факторы отдельно можно не тестировать, так как взаимодействие может все равно изменять их эффект до неузнаваемости.
 - Нужно делать пост хок тест по взаимодействию факторов.
 
 
-## Пост хок тест по взаимодействию факторов
+## Вычислительный трюк для пост хок теста по взаимодействию факторов
 
 Пост хок тест для взаимодействия факторов делается легче всего "обходным путем" 
 
 1. Создаем переменную-взаимодействие 
-2. Подбираем модель без свободного члена 
+2. Подбираем линейную модель без свободного члена 
 3. Делаем пост хок тест для этой модели
 
-```{r phoc, eval=FALSE}
-memory$AgeProc <- interaction(memory$Age, memory$Process)
-cell_means <- lm(Words ~ AgeProc - 1, data = memory)
+## Задание 4
+
+Дополните этот код, чтобы посчитать пост хок тест Тьюки по взаимодействию факторов
+
+
+```{r eval=FALSE, purl=TRUE}
+# Создаем переменную-взаимодействие
+memory$AgeProc <- interaction(memory$Age, memory$)
+# Подбираем линейную модель без свободного члена
+cell_means <- (Words ~ AgeProc - 1, data = )
+# Делаем пост хок тест для этой модели
 library(multcomp)
-memory_tukey <- glht(cell_means, linfct = mcp(AgeProc = "Tukey"))
+memory_tukey <- glht(model = , 
+                     linfct = mcp())
+summary(memory_tukey)
+```
+
+
+## Решение
+
+```{r phoc, eval=FALSE, purl=FALSE}
+# Создаем переменную-взаимодействие
+memory$AgeProc <- interaction(memory$Age, memory$Process)
+# Подбираем линейную модель без свободного члена
+cell_means <- lm(Words ~ AgeProc - 1, data = memory)
+# Делаем пост хок тест для этой модели
+library(multcomp)
+memory_tukey <- glht(model = cell_means, 
+                     linfct = mcp(AgeProc = "Tukey"))
 summary(memory_tukey)
 ```
 
 ## Смотрим на результаты пост хок теста
 
-В виде таблицы результаты нечитаемы. Лучше построить график.
+В виде таблицы результаты нечитабельны Лучше построить график.
 
-\small
+\tiny
 
-```{r phoc, echo=FALSE, R.options=list(width = 90)}
+```{r phoc, echo=FALSE, R.options=list(width = 90), purl=FALSE}
 ```
 
 
@@ -289,60 +476,52 @@ fprocess <- factor(process, levels = process)
 MyData <- expand.grid(Age = levels(memory$Age),
                       Process = fprocess)
 MyData <- data.frame(MyData,
-  predict(memory_fit, newdata = MyData,
+  predict(mem_mod, newdata = MyData,
           interval = "confidence"))
+head(MyData)
 ```
 
-## Графики для результатов: Столбчатый график
+## Задание 5
 
-```{r tidy.opts=list(width.cutoff=60)}
+Видоизмените код, чтобы построить такой график результатов 
+
+```{r tidy.opts=list(width.cutoff=60), eval=FALSE, purl=TRUE}
 pos <- position_dodge(width = 0.3)
-gg_barp <- ggplot(data = MyData, aes(x = Process, y = fit, 
-            ymin = lwr,  ymax = upr, fill = Age)) +  
-  geom_bar(stat = "identity", position = pos, width = 0.3) +  
-  geom_errorbar(width = 0.1, position = pos)
-gg_barp
-```
-
-
-## Графики для результатов: Точки
-
-```{r tidy.opts=list(width.cutoff=60)}
-gg_pointp <- ggplot(data = MyData, aes(x = Process, y = fit, 
-              ymin = lwr,  ymax = upr, colour = Age)) + 
-  geom_point(aes(shape = Age), size = 3, position = pos) +
-  # geom_line(aes(group = Age), position = pos) +
-  geom_errorbar(width = 0.1, position = pos) 
+gg_pointp <- ggplot() + 
+  geom_ (aes(), size = 3, position = pos) +
+  geom_ (aes(ymin = , ymax = ), width = 0.1, position = pos) 
 gg_pointp
 ```
 
-
-## Какой график лучше выбрать?
-
-```{r message = FALSE, fig.width = 10, fig.height = 4}
-library(gridExtra)
-grid.arrange(gg_barp + theme(legend.position = "bottom"), 
-             gg_pointp + theme(legend.position = "bottom"), 
-             ncol = 2)
+```{r point-plot, tidy.opts=list(width.cutoff=60), echo=FALSE, eval=TRUE, purl=FALSE}
+pos <- position_dodge(width = 0.3)
+gg_pointp <- ggplot(data = MyData, aes(x = Process, y = fit, colour = Age)) + 
+  geom_point(aes(shape = Age), size = 3, position = pos) +
+  geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1, position = pos) 
+gg_pointp
 ```
 
-\pause
+## Решение
 
-- Максимум данных в минимуме чернил (Tufte, 1983)
 
-## Приводим понравившийся график в приличный вид
+```{r point-plot, tidy.opts=list(width.cutoff=60), echo=TRUE, eval=TRUE, purl=FALSE}
+```
+
+
+
+## Приводим график в приличный вид
 
 ```{r tidy.opts=list(width.cutoff=60)}
 gg_final <- gg_pointp + 
-  labs(y = "Число слов") +
-   scale_colour_brewer(name = "Возраст", palette = "Dark2", 
+  scale_colour_brewer(name = "Возраст", palette = "Dark2", 
                       labels = c("Пожилые", "Молодые")) +
   scale_shape_discrete(name = "Возраст", 
-                      labels = c("Пожилые", "Молодые")) +
-  scale_x_discrete(name = "Процесс", palette = "Dark2", 
-                      labels = c("Счет", "Рифма", 
-                                 "Прилагательное", "Образ", "Запоминание"))
-  
+                       labels = c("Пожилые", "Молодые")) +
+  scale_x_discrete(name = "Процесс", 
+                   labels = c("Счет", "Рифма", "Прилагательное", 
+                              "Образ", "Запоминание")) +
+  labs(y = "Число слов")
+
 gg_final
 ```
  
@@ -395,8 +574,7 @@ gg_final
 ## Take home messages
 
 - Многофакторный дисперсионный анализ позволяет оценить взаимодействие факторов. Если оно значимо, то лучше воздержаться от интерпретации их индивидуальных эффектов
-- Если численности групп равны - получаются одинаковые результаты с использованием I, II, III типы сумм квадратов
-- В случае, если численности групп неравны (несбалансированные данные) по разному тестируется значимость факторов (I, II, III типы сумм квадратов)
+- В случае, если численности групп неравны (несбалансированные данные), лучше использовать III тип сумм квадратов
 - В зависимости от типа факторов (фиксированные или случайные) по разному формулируются гипотезы и рассчитывается F-критерий.
 
 
