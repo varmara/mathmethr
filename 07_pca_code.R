@@ -80,15 +80,18 @@ library(grid) # для стрелочек
 # параметры стрелочек
 ar <- arrow(length = unit(0.1, "cm"))
 # датафрейм с факторными нагрузками
-df_load <- data.frame(scores(ord, display = "species",
-                             choices = c(1, 2), scaling = "species"))
+df_load <- data.frame(scores(ord,
+                             display = "species",
+                             choices = c(1, 2),
+                             scaling = "species",
+                             correlation = TRUE))
 # график
 ggloadings <- ggplot(df_load) +
   geom_text_repel(aes(x = PC1, y = PC2,
                       label = rownames(df_load)), segment.alpha = 0.5) +
   geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2),
                colour = "grey40", arrow = ar) +
-  coord_equal(xlim = c(-2, 2), ylim = c(-2, 2))
+  coord_equal(xlim = c(-0.8, 0.8), ylim = c(-0.8, 0.8))
 ggloadings
 
 
