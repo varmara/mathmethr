@@ -1,14 +1,14 @@
-#' ---
-#' title: "Дискриминантный анализ"
-#' subtitle: "Математические методы в зоологии с использованием R"
-#' author: "Марина Варфоломеева"
+# ---
+# title: "Дискриминантный анализ"
+# subtitle: "Математические методы в зоологии с использованием R"
+# author: "Марина Варфоломеева"
 
-#' ## Пример: Морфометрия ирисов
-#' Сверхзадача --- научиться классифицировать ирисы по нескольким измерениям цветка
+# ## Пример: Морфометрия ирисов #####
+# Сверхзадача --- научиться классифицировать ирисы по нескольким измерениям цветка
 data(iris)
 head(iris, 10)
 
-#' ## По каким переменным легче всего различить группы?
+# ## По каким переменным легче всего различить группы?
 pairs(iris[, -5], col = iris$Species)
 
 library(GGally)
@@ -19,9 +19,9 @@ ggpairs(iris, aes(colour = Species, alpha = 0.5),
         upper = list(continuous = "density", combo = "box", discrete =
   "facetbar", na = "na"))
 
-#' # I. Дискриминантный анализ на тренировочных и тестовых данных
+# # I. Дискриминантный анализ на тренировочных и тестовых данных #####
 
-#' ## 1) Разделяем на тренировочные и тестовые данные ####
+# ## 1) Разделяем на тренировочные и тестовые данные ####
 # доля от объема выборки, которая пойдет в тренировочный датасет
 smp_size <- floor(0.80 * nrow(iris))
 # устанавливаем зерно для воспроизводимости результатов
@@ -29,7 +29,7 @@ set.seed(982)
 # индексы строк, которые пойдут в тренировочный датасет
 in_train <- sample(sample(1:nrow(iris), size = smp_size))
 
-#' ## 2) На тренировочных данных получаем стандартизованные коэффициенты дискриминантных функций ####
+# ## 2) На тренировочных данных получаем стандартизованные коэффициенты дискриминантных функций ####
 library(MASS)
 lda_tr_scaled <- lda(scale(iris[in_train, -5]), iris$Species[in_train])
 # коэффициенты дискриминантных функций
@@ -67,17 +67,17 @@ lda.class <- function(x, groups){
   return(x.lda)
 }
 
-#' ## 3) На тренировочных данных получаем функции классификации ####
+# ## 3) На тренировочных данных получаем функции классификации ####
 lda_tr <- lda.class(iris[in_train, -5], iris$Species[in_train])
 # Коэф. функций классификации
 lda_tr$class.funs
 
-#' ## 4) Оцениваем качество классификации на тренировочных данных ####
+# ## 4) Оцениваем качество классификации на тренировочных данных ####
 lda_tr_pred <- predict(lda_tr)
 table(lda_tr_pred$class, iris$Species[in_train])
 
 
-#' ## 5) График классификации тренировочных данных ####
+# ## 5) График классификации тренировочных данных ####
 class_df <- data.frame(lda_tr_pred$x,
                           gr = lda_tr_pred$class,
                           real_gr = iris$Species[in_train])
@@ -85,11 +85,11 @@ ggplot(data = class_df, aes(x = LD1, y = LD2, colour = gr)) +
   geom_text(size = 3, aes(label = real_gr)) +
   theme(legend.position = "none")
 
-#' ## 6) Оценка качества классификации на тестовых данных ####
+# ## 6) Оценка качества классификации на тестовых данных ####
 lda_test_pred <- predict(lda_tr, iris[-in_train, -5])
 table(lda_test_pred$class, iris$Species[-in_train])
 
-#' ## 7) График классификации тестовых данных ####
+# ## 7) График классификации тестовых данных ####
 class_df <- data.frame(lda_test_pred$x,
                           new = lda_test_pred$class,
                           real = iris$Species[-in_train])
@@ -98,13 +98,13 @@ class_df$Group <- factor(paste(class_df$real, class_df$new, sep = " as "))
 ggplot(data = class_df, aes(x = LD1, y = LD2)) +
   geom_point(aes(colour = Group))
 
-#' # II. Дискриминантный анализ с кроссвалидацией ####
-#' ## Кроссвалидация
+# # II. Дискриминантный анализ с кроссвалидацией ####
+# ## Кроссвалидация
 lda_cv <- lda(iris[, -5], iris$Species, CV = TRUE)
 names(lda_cv)
 table(iris$Species, lda_cv$class)
 
-#' ## График классификации
+# ## График классификации
 ggplot(data = iris, aes(x = Petal.Length,
                         y = Sepal.Width,
                         colour = Species,
@@ -112,8 +112,8 @@ ggplot(data = iris, aes(x = Petal.Length,
   geom_point(size = 3) +
   scale_shape_discrete("Classified as")
 
-#' ## Проверка условий применимости ####
-#' ## Mногомерная нормальность
+# ## Проверка условий применимости ####
+# ## Mногомерная нормальность
 x <- as.matrix(iris[, -5])
 d <- mahalanobis(x, colMeans(x), cov(x))
 qqplot(qchisq(ppoints(nrow(x)), df = ncol(x)), d,
@@ -121,22 +121,22 @@ qqplot(qchisq(ppoints(nrow(x)), df = ncol(x)), d,
   ylab="Расстояние Махаланобиса")
 abline(a = 0, b = 1)
 
-#' ## Гомогенность ковариационных матриц
+# ## Гомогенность ковариационных матриц
 source("BoxMTest.R")
 BoxMTest(as.matrix(iris[, -5]), iris$Species)
 
-#' # Квадратичный дискриминантный анализ ####
+# # Квадратичный дискриминантный анализ ####
 qda_tr <- qda(iris[in_train, -5], iris$Species[in_train])
 qda_tr_pred <- predict(qda_tr)
 table(qda_tr_pred$class, iris$Species[in_train])
 qda_test_pred <- predict(qda_tr, iris[-in_train, -5])
 table(qda_test_pred$class, iris$Species[-in_train])
 
-#' ## Задание: Поссумы ####
-#' Данные Lindenmayer et al. (1995)
-#' - При помощи дискриминантного анализа классифицируйте популяции поссумов
-#' - Хорошо ли работает классификация?
-#' - Выполняются ли условия применимости?
+# ## Задание: Поссумы ####
+# Данные Lindenmayer et al. (1995)
+# - При помощи дискриминантного анализа классифицируйте популяции поссумов
+# - Хорошо ли работает классификация?
+# - Выполняются ли условия применимости?
 library(DAAG)
 data(possum)
 possum <- possum[complete.cases(possum), ]
