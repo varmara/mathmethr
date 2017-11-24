@@ -581,7 +581,7 @@ fos <- fossum[complete.cases(fossum), 5:14]
   
 Эти методы реализованы в пакете `phangorn` 
 
-Со списком пакетов для филогенетического анализа в R можно познакомится здесь:  
+Со списком пакетов для филогенетического анализа в R можно познакомиться здесь:  
 https://cran.r-project.org/web/views/Phylogenetics.html
 
 # Методы класстеризации на основании расстояний
@@ -802,6 +802,9 @@ c_single <- as.dist(cophenetic(ph_single))
 c_compl <- as.dist(cophenetic(ph_compl))
 c_avg <- as.dist(cophenetic(ph_avg))
 c_w2 <- as.dist(cophenetic(ph_w2))
+```
+
+```{r}
 # Кофенетические корреляции
 cor(d, c_single)
 cor(d, c_compl) # лучше всех отражает структуру данных
@@ -914,14 +917,12 @@ axisPhylo()
 - Oksanen, J., 2011. Multivariate analysis of ecological communities in R: vegan tutorial. R package version 2–0.
 - Quinn, G.G.P., Keough, M.J., 2002. Experimental design and data analysis for biologists. Cambridge University Press.
 
-Borcard, D., Gillet, F., Legendre, P., 2011. Numerical ecology with R. Springer.
+- Как работает UPGMA: http://www.southampton.ac.uk/~re1u06/teaching/upgma/
 
-Как работает UPGMA можно посмотреть здесь:
-
-- http://www.southampton.ac.uk/~re1u06/teaching/upgma/
 - pvclust: An R package for hierarchical clustering with p-values [WWW Document], n.d. URL http://www.sigmath.es.osaka-u.ac.jp/shimo-lab/prog/pvclust/ (accessed 11.7.14).
 
-Для анализа молекулярных данных:
+Для анализа филогенетических данных:
 
 - Paradis, E., 2011. Analysis of Phylogenetics and Evolution with R. Springer.
-
+- Список пакетов для филогенетического анализа в R:  
+https://cran.r-project.org/web/views/Phylogenetics.html
