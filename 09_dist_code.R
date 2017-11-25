@@ -73,7 +73,7 @@ ord_scaled <- metaMDS( (pos), distance = , autotransform = )
 # Данные для графика
 points_scaled <- data.frame(ord_scaled$points, pos)
 # График nMDS-ординации
-gg_scaled <- gg_euclid %+% aes(colour = Pop)
+gg_scaled <- gg_euclid %+% points_scaled
 gg_scaled
 
 
@@ -103,7 +103,7 @@ rownames(fossum) <- paste(fossum$Pop,
 rownames(fossum) # стало
 
 ## Отбираем только то, что понадобится для кластеризации
-fos <- fossum[complete.cases(fossum), 5:14]
+fos <- fossum[complete.cases(fossum), 6:14]
 
 
 ## Кластерный анализ начинается с расчета матрицы расстояний между объектами
@@ -167,7 +167,7 @@ library(pvclust)
 
 system.time({
 cl_boot <- pvclust(scale(t(fos)),
-                   method.hclust = "complete",
+                   method.hclust = "average",
                    method.dist = "euclidean",
                    nboot = 5000,
                    parallel = TRUE,

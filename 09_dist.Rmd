@@ -506,7 +506,7 @@ ord_euclid$stress
 # Данные для графика
 points_scaled <- data.frame(ord_scaled$points, pos)
 # График nMDS-ординации
-gg_scaled <- gg_euclid %+% aes(colour = Pop)
+gg_scaled <- gg_euclid %+% points_scaled
 gg_scaled
 ```
 
@@ -562,7 +562,7 @@ rownames(fossum) # стало
 и только столбцы с морфометрическими данными
 
 ```{r}
-fos <- fossum[complete.cases(fossum), 5:14]
+fos <- fossum[complete.cases(fossum), 6:14]
 ```
 ## Какие бывают методы построения деревьев?
 
@@ -807,7 +807,7 @@ c_w2 <- as.dist(cophenetic(ph_w2))
 ```{r}
 # Кофенетические корреляции
 cor(d, c_single)
-cor(d, c_compl) # лучше всех отражает структуру данных
+cor(d, c_compl)
 cor(d, c_avg) 
 cor(d, c_w2)
 ```
@@ -836,7 +836,7 @@ library(pvclust)
 ```{r pvclust-compute, cache=TRUE}
 system.time({
 cl_boot <- pvclust(scale(t(fos)), 
-                   method.hclust = "complete", 
+                   method.hclust = "average", 
                    method.dist = "euclidean",
                    nboot = 5000,
                    parallel = TRUE,
