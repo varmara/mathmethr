@@ -4,7 +4,7 @@ title: Презентации и данные
 
 ## 1. Знакомство с R 
 
-<!-- - Конспект: [01_intro_to_r.html](01_intro_to_r.html) -->
+- Конспект: [01_intro_to_r.html](01_intro_to_r.html)
 - Код: [01_intro_to_r.R](01_intro_to_r.R)
 
 ## 2. Тестирование гипотез. Анализ мощности

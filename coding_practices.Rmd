@@ -14,5 +14,8 @@ Google [рекомендует](https://google.github.io/styleguide/Rguide.xml) 
 
 У Хэдли Викхема собраны только самые необходимые правила хорошего кода - достаточно для программирования на лекциях. Что касается названий переменных, выбирайте по вашему усмотрению. За последовательное применение `camelCase` санкций не будет:)
 
+
+**Ссылки**
+
 - [Hadley Wickham Style guide. stat405 - fall 2012, Rice University, USA](http://stat405.had.co.nz/r-style.html)
 - [Google’s R Style Guide](https://google.github.io/styleguide/Rguide.xml)
