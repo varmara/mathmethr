@@ -2,18 +2,20 @@
 title: "Анализ мощности"
 subtitle: "Математические методы в зоологии с использованием R"
 author: "Марина Варфоломеева"
+classoption: 't,xcolor=table'
+language: russian, english
 output:
   beamer_presentation:
     colortheme: seagull
     highlight: tango
     fonttheme: structurebold
+    latex_engine: xelatex
     includes:
       in_header: ./includes/header.tex
     pandoc_args:
-    - --latex-engine=xelatex
     - -V fontsize=10pt
-    - -V lang=russian
     slide_level: 2
+    fig_crop: false
     theme: CambridgeUS
     toc: no
 ---
@@ -22,8 +24,8 @@ output:
 # output options
 options(width = 70, scipen = 6)
 library(knitr)
-opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
-source("support_mathmethr.R")
+opts_chunk$set(fig.show='hold', size='footnotesize', comment='#', warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+source('support_mathmethr.R')
 ```
 
 ```{r libs, echo=FALSE}
@@ -54,14 +56,15 @@ library(gridExtra) # to rescale legend
 
 ## Тест Стьюдента (t-критерий)
 
-Гипотезы: $H_0: \bar{x}_1 = \bar{x}_2$, $H_A: \bar{x}_1 \ne \bar{x}_2$
+Гипотезы: $H_0: \mu_1 - \mu_2 = 0$, $H_A: \mu_1 - \mu_2 \ne 0$
 
-Двухвыборочный тест Стьюдента (Student, 1908) используется для проверки значимости различий между средними значениями двух нормально распределенных величин.
+Двухвыборочный тест Стьюдента (Student, 1908) используется для проверки значимости различий между средними значениями двух величин.
 
-$$t=\frac{\bar{x}_1 - \bar{x}_2}{SE}$$
+$$t= \frac{\bar{x}_1 - \bar{x}_2}{SE_{\bar{x}_1 - \bar{x}_2}}$$
 
 Условия применимости:
 
+- Наблюдения случайны и независимы друг от друга
 - Выборки случайны и независимы друг от друга
 - Величины нормально распределены
 - __Дисперсии в группах одинаковы__
@@ -71,19 +74,21 @@ $$df = (n_1 - 1) + (n_2 - 1) = n_1 + n_2 - 2$$
 
 ## t-тест Уэлча --- это модификация теста Стьюдента __для случая разных дисперсий__
 
-$$t=\frac{\bar{x}_1 - \bar{x}_2}{SE}$$
+$$t= \frac{\bar{x}_1 - \bar{x}_2}{SE_{\bar{x}_1 - \bar{x}_2}}$$
 
 Условия применимости:
 
+- Наблюдения случайны и независимы друг от друга
 - Выборки случайны и независимы друг от друга
 - Величины нормально распределены
 
 
-$$SE = \sqrt{\frac {s_1^2} {n_1} + \frac {s_2^2} {n_2}}$$
+$$SE = \sqrt{{s_1^2}/ {n_1} + {s_2^2}/{n_2}}$$
 
 Приблизительное число степеней свободы рассчитывается по уравнению Уэлча-Саттеруэйта 
 
-$$df_{ Welch–Satterthwaite} \approx \frac {\Big(\frac{s^2_1}{n_1} + \frac{s^2_2}{n_2}\Big)^2} {\frac {s_1^4} {n^2_1 \cdot df_1} + \frac {s_2^4} {n^2_2 \cdot df_1}}$$
+$$df_{ Welch-Satterthwaite} \approx \cfrac {({s^2_{1}}/{n_{1}} + {s^2_{x_2}}/{n_{2}})^2}
+{\frac{1}{n_{1} - 1}\bigg(\frac {s_{1}^2} {n_{1}}\bigg)^2 + \frac{1}{n_{2} - 1}\bigg(\frac {s_{2}^2} {n_{2}}\bigg)^2}$$
 
 ## t-распределение --- распределение разницы средних для выборок из одной совокупности
 
@@ -97,10 +102,10 @@ t-статистика подчиняется t-распределению.
 t_df <- data.frame(t = seq(-6, 6, length.out = 1000))
 
 gg_t <- ggplot(data = t_df, aes(x = t)) +
-  stat_function(fun = dt, args=list(df=18), size = 1, geom="line", colour="darkred") + 
-    labs(x = "Стандартизованная разница средних", 
-       y = "Плотность\nвероятности", 
-       title = "t-распределение, df = 18")
+  stat_function(fun = dt, args=list(df=18), size = 1, geom='line', colour='darkred') + 
+    labs(x = 't', 
+       y = 'Плотность\nвероятности', 
+       title = 't-распределение, df = 18')
 
 gg_t
 ```
@@ -116,18 +121,15 @@ gg_t +
   # alpha
   stat_function(fun = dt_limit, 
                 args = list(alph = alpha, df = df, sides = sides), 
-                geom = "area", fill = "red", alpha = 0.7) + 
+                geom = 'area', fill = 'red', alpha = 0.7) + 
   stat_function(fun = dt, args=list(df=df), 
-                geom = "line", colour = "darkred") +
-  labs(title = "t-распределение, df = 18, alpha = 0.05") + 
+                geom = 'line', colour = 'darkred') +
+  labs(title = 't-распределение, df = 18, alpha = 0.05') + 
   # редкие
-  annotate(geom = "text", x = -4, y = 0.1, label = "Редкие значения") + 
-  annotate(geom = "text", x = 4, y = 0.1, label = "Редкие значения") + 
-  annotate(geom = "text", x = 0, y = 0.1, label = "Обычные значения") + 
-  geom_vline(xintercept = p_cut, size = 1, linetype = "dotted") +
-  geom_vline(xintercept = -p_cut, size = 1, linetype = "dotted") +
-    annotate(geom = "text", x = -p_cut, y = 0.4, hjust = 1.1, 
-           label = "-t и t при alpha 0.05") 
+  geom_vline(xintercept = p_cut, size = 1, linetype = 'dotted') +
+  geom_vline(xintercept = -p_cut, size = 1, linetype = 'dotted') +
+    annotate(geom = 'text', x = -p_cut, y = 0.4, hjust = 1.1, 
+           label = '-t и t при alpha 0.05') 
 ```
 
 Обычно используется уровень значимости $\alpha$ 0.05 или 0.01. 
@@ -143,17 +145,17 @@ gg_t +
     # alpha
   stat_function(fun = dt_limit, 
                 args = list(alph = alpha, df = df, sides = sides), 
-                geom="area", fill="red", alpha = 0.7) + 
+                geom='area', fill='red', alpha = 0.7) + 
   stat_function(fun=dt, args=list(df=df), 
-                geom="line", colour="darkred") + 
-    labs(title = "t-распределение, df = 18, alpha = 0.05") + 
+                geom='line', colour='darkred') + 
+    labs(title = 't-распределение, df = 18, alpha = 0.05') + 
 # Зоны решений
   geom_segment(x=-1.5, xend = -1.5, y=0, yend = 0.2) +
-  annotate(geom = "text", x = -3, y = 0.25,
-           label = "|t| < |t_crit| \n Не можем отвергнуть H0") +
+  annotate(geom = 'text', x = -3, y = 0.25,
+           label = '|t| < |t_crit| \n Не можем отвергнуть H0') +
   geom_segment(x=2.7, xend = 2.7, y=0, yend = 0.2) +
-  annotate(geom = "text", x = 2.7, y = 0.25, 
-           label = "|t| >= |t_crit| \n Отвергаем H0")
+  annotate(geom = 'text', x = 2.7, y = 0.25, 
+           label = '|t| >= |t_crit| \n Отвергаем H0')
 ```
 
 1. Для конкретных данных считаем значение t-критерия
@@ -169,13 +171,28 @@ data(sleep)
 # View(sleep)
 ```
 
-## Двухвыборочный t-критерий
 
-Сравним увеличение продолжительности сна при помощи двухвыборочного t-критерия.
+## Двухвыборочный t-критерий в R рассчитывает функция `t.test()`
+
+О параметрах функции t.test() можно прочесть в справке `?t.test`
+
+Формат вызова функции, если в данных две группы
+
+```
+t.test(formula = зависимая_переменная ~ группирующая_переменная, data = данные, ...)
+```
+
+Если групп больше двух --- другой формат
+
+```
+t.test(x = одна_группа, y = другая_группа, ...)
+```
+
+## Различается ли изменение продолжительности сна при применении этих двух снотворных?
 
 \fontsize{10pt}{10pt}
 ```{r}
-tt <- t.test(extra ~ group, sleep)
+tt <- t.test(formula = extra ~ group, data = sleep)
 tt
 ```
 
@@ -198,7 +215,7 @@ str(tt)
 
 ```{r purl=FALSE}
 tt$parameter # степени свободы
-tt$p.value # доверительная вероятность
+tt$p.value # уровень значимости
 tt$statistic # значение t-критерия
 ```
 
@@ -228,17 +245,17 @@ gg_alpha <- gg_t +
   # alpha
   stat_function(fun = dt_limit, 
                 args = list(alph = alpha, df = df, sides = sides), 
-                geom = "area", fill = "red", alpha = 0.7) + 
+                geom = 'area', fill = 'red', alpha = 0.7) + 
   # H_0 curve
   stat_function(fun = dt, args=list(df = df), 
-                geom = "line", colour = "darkred") + 
+                geom = 'line', colour = 'darkred') + 
   # labs
-  labs(title = "t-распределение, df = 18, alpha = 0.05") +
+  labs(title = 't-распределение, df = 18, alpha = 0.05') +
   # limits
-  geom_vline(xintercept = p_cut, size = 1, linetype = "dotted") +
-  geom_vline(xintercept = -p_cut, size = 1, linetype = "dotted") +
-    annotate(geom = "text", x = -p_cut, y = 0.4, hjust = 1.1,
-           label = "-t и t при alpha 0.05")
+  geom_vline(xintercept = p_cut, size = 1, linetype = 'dotted') +
+  geom_vline(xintercept = -p_cut, size = 1, linetype = 'dotted') +
+    annotate(geom = 'text', x = -p_cut, y = 0.4, hjust = 1.1,
+           label = '-t и t при alpha 0.05')
 gg_alpha
 ```
 
@@ -261,7 +278,7 @@ nc <- 0.5
 gg_alpha +
     stat_function(fun = dt, 
                 args = list(df = df, ncp = nc), 
-                geom = "line", colour = "steelblue", size = 1)
+                geom = 'line', colour = 'steelblue', size = 1)
 ```
 
 Можно построить еще одно распределение статистики --- распределение, при условии того, что верна $H_A$
@@ -283,12 +300,12 @@ gg_beta <- gg_alpha +
     # beta
   stat_function(fun = dt_limit, 
                 args = list(alph = alpha, df = df, sides = sides,
-                            ncp = nc, what = "beta"), 
-                geom = "area", fill="steelblue", alpha = 0.7) +
+                            ncp = nc, what = 'beta'), 
+                geom = 'area', fill='steelblue', alpha = 0.7) +
 # H_A curve
   stat_function(fun = dt, 
                 args = list(df = df, ncp = nc), 
-                geom = "line", colour = "steelblue", size = 1)
+                geom = 'line', colour = 'steelblue', size = 1)
 gg_beta
 ```
 
@@ -310,12 +327,12 @@ gg_power <- gg_beta +
 # power
     stat_function(fun = dt_limit, 
                 args = list(alph = alpha, df = df, sides = sides,
-                            ncp = nc, what = "power"), 
-                geom = "area", fill="seagreen2", alpha = 0.7) +
+                            ncp = nc, what = 'power'), 
+                geom = 'area', fill='seagreen2', alpha = 0.7) +
 # H_A curve
   stat_function(fun = dt, 
                 args = list(df = df, ncp = nc), 
-                geom = "line", colour = "steelblue", size = 1)
+                geom = 'line', colour = 'steelblue', size = 1)
 
 gg_power
 ```
@@ -401,7 +418,7 @@ $SD_{pooled} = {\sqrt{\frac {(n _1 - 1)s_1^2 + (n _2 - 1)s_2^2 }  {n _1 + n _2 -
 
 ```{r }
 library(pwr)
-cohen.ES(test = "t", size = "large")
+cohen.ES(test = 't', size = 'large')
 ```
 
 ## Рассчет объема выборки для обнаружения эффекта известной величины
@@ -415,7 +432,7 @@ cohen.ES(test = "t", size = "large")
 
 ```{r}
 pwr.t.test(n = NULL, d = 0.8, power = 0.8, sig.level = 0.01,
-           type = "two.sample", alternative = "two.sided")
+           type = 'two.sample', alternative = 'two.sided')
 ```
 
 ## Задание
@@ -428,12 +445,14 @@ pwr.t.test(n = NULL, d = 0.8, power = 0.8, sig.level = 0.01,
 
 \fontsize{10pt}{10pt}
 
-```{r purl = FALSE}
-cohen.ES(test = "t", size = "small")
+```{r purl=FALSE}
+cohen.ES(test = 't', size = 'small') # величина слабого эффекта по Коэну
+# Какой нужен объем выборки?
 pwr.t.test(n = NULL, d = 0.2, power = 0.8, sig.level = 0.05,
-           type = "two.sample", alternative = "two.sided")
+           type = 'two.sample', alternative = 'two.sided')
 ```
 
+Для того, чтобы при помощи t-теста обнаружить слабый эффект (d = 0.2) с вероятностью 0.8 и при уровне значимости 0.05, нужно собрать выборку не меньше 394 наблюдений __в каждой__ группе.
 
 # A priory анализ мощности по данным пилотного исследования
 
@@ -444,14 +463,14 @@ pwr.t.test(n = NULL, d = 0.2, power = 0.8, sig.level = 0.05,
 Переменные
 
 - fjft --- ширина первого членика первой лапки в микронах (сумма измерений для обеих лапок)
-- species --- вид блох (1=Ch. concinna, 2= Ch. heptapotamica)
+- species --- вид жуков (1=Ch. concinna, 2= Ch. heptapotamica)
 
 Есть ли морфологические различия между видами?
 
 
 ```{r}
 library(readxl)
-flea <- read_excel(path = "data/fleabeetles-subset.xlsx", sheet = "dat")
+flea <- read_excel(path = 'data/fleabeetles-subset.xlsx', sheet = 'dat')
 ```
 
 \vfill
@@ -467,8 +486,9 @@ head(flea) # Первые несколько строк файла
 ## Делаем фактором переменную, где записан вид
 
 ```{r}
-flea$species <- factor(flea$species, levels = c(1, 2), 
-                       labels = c("cocin", "hept"))
+flea$species <- factor(flea$species, 
+                       levels = c(1, 2), 
+                       labels = c('cocin', 'hept'))
 ```
 
 ## Знакомимся с данными
@@ -485,26 +505,25 @@ colSums(is.na(flea))
 table(flea$species)
 ```
 
-## Представим, что эти данные --- это данные пилотного исследования.
+## Представим, что это данные пилотного исследования.
 
 Мы хотим выяснить, сколько нужно жуков, чтобы показать, что ширина первого членика первой лапки различается у этих двух видов
 
 График средних и стандартных отклонений
 
-```{r fig.width = 7, out.width='7cm', fig.height=3, out.height='3cm'}
+```{r fig.width = 5*0.75, out.width='5cm', fig.height=4*0.75, out.height='4cm'}
 library(ggplot2)
 theme_set(theme_bw())
 ggplot(data = flea, aes(x = species, y = fjft)) +
-  stat_summary(geom = "pointrange", fun.data = mean_sdl) +
-  labs(y = "Ширина первого членика первой лапки (мкм)", 
-       x = "Вид")
+  stat_summary(geom = 'pointrange', fun.data = mean_sdl) +
+  labs(y = 'Ширина первого членика \nпервой лапки (мкм)', x = 'Вид')
 ```
 
 ## Величина эффекта по исходным данным
 
 ```{r}
 library(effsize)
-eff_flea <- cohen.d(flea$fjft, flea$species)
+eff_flea <- cohen.d(d = flea$fjft, f = flea$species)
 eff_flea
 ```
 
@@ -525,9 +544,9 @@ effect_size_flea <- abs(eff_flea$estimate)
 
 ```{r purl = FALSE}
 pwr_flea <- pwr.t.test(n = NULL, d = effect_size_flea, 
-                        power = 0.8, sig.level = 0.05, 
-                        type = "two.sample", 
-                        alternative = "two.sided")
+                       power = 0.8, sig.level = 0.05, 
+                       type = 'two.sample', 
+                       alternative = 'two.sided')
 pwr_flea
 ```
 
@@ -550,8 +569,8 @@ eff_sleep <- cohen.d(sleep$extra, sleep$group)
 effect_sleep <- abs(eff_sleep$estimate)
 pwr_sleep <- pwr.t.test(n = NULL, d = effect_sleep, 
                         power = 0.8, sig.level = 0.05, 
-                        type = "two.sample", 
-                        alternative = "two.sided")
+                        type = 'two.sample', 
+                        alternative = 'two.sided')
 pwr_sleep
 ```
 
@@ -569,23 +588,23 @@ pwr_sleep
 
 # Need pwr, reshape2, ggplot2 packages
 gen_pwr_vs_n <- function(d = c(0.2, 0.5, 0.8), a = c(0.05, 0.01), n = 150){
-  if(!require(pwr)){install.packages("pwr");library("pwr")}
+  if(!require(pwr)){install.packages('pwr');library('pwr')}
   # t-TEST
   #---------------------------------
   n <- 1:n
   t.test.power.effect<-
-    as.data.frame(do.call("cbind", lapply(1:length(d),function(i){
+    as.data.frame(do.call('cbind', lapply(1:length(d),function(i){
     sapply(1:length(a),function(k){
       sapply(1:length(n), function(j){
         #       paste(d[i], n[j], a[k])
         power.t.test(n = n[j],d = d[i],sig.level = a[k],power = NULL,
-                     type = "two.sample")$power
+                     type = 'two.sample')$power
       })
     })
   })))
   t.test.power.effect[is.na(t.test.power.effect)]<-0 # some powers couldn't be calculated, set these to zero
   # melt the data
-  if(!require(reshape2)){install.packages("reshape2");library("reshape2")}
+  if(!require(reshape2)){install.packages('reshape2');library('reshape2')}
   measured <- length(d)*length(a)
   t.test.power.effect <- melt(t.test.power.effect, measure.vars = 1:measured)
   # fill the levels of n, a, and d
@@ -598,22 +617,22 @@ gen_pwr_vs_n <- function(d = c(0.2, 0.5, 0.8), a = c(0.05, 0.01), n = 150){
 
 th <- theme_classic(base_size = 18) +
   theme(legend.key = element_blank(),
-        axis.line.x = element_line(colour = "black"),
-        axis.line.y = element_line(colour = "black"))
+        axis.line.x = element_line(colour = 'black'),
+        axis.line.y = element_line(colour = 'black'))
 
 dat <-gen_pwr_vs_n(n = 150)
 # factors
-dat$sig.level <- factor(dat$sig.level, levels = c(0.01, 0.05), labels = c("p = 0.01", "p = 0.05"))
-dat$effect <- factor(dat$effect, levels = c(0.2, 0.3, 0.5, 0.8), labels = c("d = 0.2", "d = 0.3", "d = 0.5", "d = 0.8"))
+dat$sig.level <- factor(dat$sig.level, levels = c(0.01, 0.05), labels = c('p = 0.01', 'p = 0.05'))
+dat$effect <- factor(dat$effect, levels = c(0.2, 0.3, 0.5, 0.8), labels = c('d = 0.2', 'd = 0.3', 'd = 0.5', 'd = 0.8'))
 
 # Power increases as the sample size increases
 # plot power vs n at d = 0.5, p = 0.01
 pwr.size <-
-  ggplot(data = dat[(dat$effect == "d = 0.5" & dat$sig.level == "p = 0.05"), ], aes(x = size, y = value, color = sig.level)) +
+  ggplot(data = dat[(dat$effect == 'd = 0.5' & dat$sig.level == 'p = 0.05'), ], aes(x = size, y = value, color = sig.level)) +
   geom_line(size = 1.5) +
-  scale_colour_discrete(name = "Уровень\nзначимости") +
-  labs(x = "Объем выборки", y = "Мощность") +
-  ggtitle("t-тест, d = 0.5") +
+  scale_colour_discrete(name = 'Уровень\nзначимости') +
+  labs(x = 'Объем выборки', y = 'Мощность') +
+  ggtitle('t-тест, d = 0.5') +
   th
 pwr.size
 ```
@@ -623,13 +642,13 @@ pwr.size
 ```{r cache = TRUE, dependson='pwr_vs_n', echo = FALSE, warning = FALSE, fig.width = 10, fig.height = 5, purl = FALSE}
 # Power increases as the signifficance level increases
 #   plot power vs n at d = 0.5, add linetype = sig.level (p = 0.01, p = 0.05)
-pwr_size_apha <- ggplot(data = dat[dat$effect == "d = 0.5", ],
+pwr_size_apha <- ggplot(data = dat[dat$effect == 'd = 0.5', ],
                         aes(x = size, y = value, color = sig.level)) +
   geom_line(size = 1.5) +
-  scale_colour_discrete(name = "Уровень\nзначимости",
-                        limits = c("p = 0.05", "p = 0.01")) +
-  labs(x = "Объем выборки", y = "Мощность") +
-  ggtitle("t-тест, d = 0.5") +
+  scale_colour_discrete(name = 'Уровень\nзначимости',
+                        limits = c('p = 0.05', 'p = 0.01')) +
+  labs(x = 'Объем выборки', y = 'Мощность') +
+  ggtitle('t-тест, d = 0.5') +
   th
 pwr_size_apha
 ```
@@ -643,10 +662,10 @@ pwr_size_apha
 # add facets for d = 0.2, d = 0.5, d = 0.8
 pwr_size_alpha_d <- ggplot(data = dat, aes(x = size, y = value, color = sig.level)) +
     geom_line(size = 1.5) + facet_wrap(~effect) +
-  scale_colour_discrete(name = "Уровень\nзначимости",
-                        limits = c("p = 0.05", "p = 0.01")) +
-  labs(x = "Объем выборки", y = "Мощность") +
-  ggtitle("t-тест") +
+  scale_colour_discrete(name = 'Уровень\nзначимости',
+                        limits = c('p = 0.05', 'p = 0.01')) +
+  labs(x = 'Объем выборки', y = 'Мощность') +
+  ggtitle('t-тест') +
   th
 pwr_size_alpha_d
 ```
