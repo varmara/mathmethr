@@ -1,172 +1,212 @@
+# ---
 # title: "Регрессионный анализ, часть 1"
 # subtitle: "Математические методы в зоологии с использованием R"
 # author: "Марина Варфоломеева"
 
-# ## Пример: потеря влаги личинками мучных хрущаков #####
-# Как зависит потеря влаги личинками [малого мучного хрущака](http://ru.wikipedia.org/wiki/Хрущак_малый_мучной) _Tribolium confusum_ от влажности воздуха?
-# - 9 экспериментов, продолжительность 6 дней
-# - разная относительная влажность воздуха, %
-# - измерена потеря влаги, мг
-# Nelson, 1964; данные из Sokal, Rohlf, 1997, табл. 14.1 по Logan, 2010. глава 8, пример 8c; Данные в файле nelson.xlsx
+# ## Пример: стерильность пыльцы гибридов
+#
+# Гибриды отдаленных видов часто бывают стерильны.
+# Но насколько они должны быть разными для этого?
+# Как зависит плодовитость гибридов
+# [смолевок](http://ru.wikipedia.org/wiki/Смолёвка)
+# _Silene vulgaris_ от генетической удаленности?
+
+# - `proportionSterile` --- доля стерильных пыльцевых зерен
+# - `geneticDistance` --- генетическая удаленность видов
+# Moyle et al. 2004; данные из Whitlock, Schluter, 2015, глава 17, упр.10; Данные в файлах HybridPollenSterility.xlsx и HybridPollenSterility.csv
 
 
-# ## Читаем данные из файла ######################
+# ## Читаем данные из файла #######################################
+
+# Чтение из xlsx:
 library(readxl)
-nelson <- read_excel(path = "data/nelson.xlsx", sheet = 1)
+hybrid <- read_excel(path = 'data/HybridPollenSterility.xlsx', sheet = 1)
+head(hybrid)     # Первые несколько строк файла
 
-# ## Знакомимся с данными ########################
+# Или чтение из csv:
+hybrid <- read.table(file = 'data/HybridPollenSterility.csv', header = TRUE, sep = ',')
+head(hybrid)     # Первые несколько строк файла
 
-# ## Все ли правильно открылось?
-str(nelson)      # Структура данных
-head(nelson)     # Первые несколько строк файла
+# ## Знакомимся с данными ###################################
+
+str(hybrid)      # Структура данных
+
+# ## Сделаем более короткие имена
+# Сейчас переменные называются так:
+colnames(hybrid)
+# Сделаем более удобные короткие названия:
+colnames(hybrid) <- c('Distance', 'Sterile')
+# Теперь переменные стали называться так:
+colnames(hybrid)
+
 
 # Есть ли пропущенные значения?
-colSums(is.na(nelson))
+colSums(is.na(hybrid))
 
 # Каков объем выборки?
-# Поскольку пропущенных значений нет, можем просто посчитать число строк
-nrow(nelson)
+nrow(hybrid)
 
 
-# # Графики средствами пакета ggplot2 ############
+# # Графики средствами пакета ggplot2 ###############################
+# ## Грамматика графиков
 
-# ### Давайте поэтапно построим график
-# - `library(ggplot2)` --- активирует пакет ggplot2 со всеми его функциями
-# - `ggplot()` --- создает пустой "базовый" слой --- основу графика
+# 1. Откуда брать данные?
+# 2. Какие переменные изображать на графике?
+# 3. В виде чего изображать?
+# 4. Какие подписи нужны?
+# 5. Какую тему оформления нужно использовать?
+
+
+
+
+# Давайте поэтапно построим график
 library(ggplot2)
+
+
+# - `ggplot()` --- создает пустой "базовый" слой --- основу графика
 ggplot()
 
-# ## Откуда брать данные?
-ggplot(data = nelson)
+# 1. Откуда брать данные?
+ggplot(data = hybrid)
 
-# ## Какие переменные изображать на графике?
-ggplot(data = nelson, aes(x = humidity, y = weightloss))
+# 2. Какие переменные изображать на графике?
+# Эстетики --- это свойства будущих элементов графика, которые будут изображать данные
 
-# ## В виде чего изображать?
-ggplot(data = nelson, aes(x = humidity, y = weightloss)) +
+ggplot(data = hybrid, aes(x = Distance, y = Sterile))
+
+# 3. В виде чего изображать?
+# Геомы --- графические элементы
+
+ggplot(data = hybrid, aes(x = Distance, y = Sterile)) +
   geom_point()
 
-# ## В виде чего изображать?
-ggplot(data = nelson, aes(x = humidity, y = weightloss)) +
-  geom_line()
-
-# ## Можно использовать несколько геомов одновременно
-ggplot(data = nelson, aes(x = humidity, y = weightloss)) +
+# 4. Какие подписи нужны?
+ggplot(data = hybrid, aes(x = Distance, y = Sterile)) +
   geom_point() +
-  geom_line()
+  labs(x = 'Генетическое расстояние', y = 'Доля стерильных \nпыльцевых зерен')
 
-# ## Подписи осей, заголовок и т.д.
-ggplot(data = nelson, aes(x = humidity, y = weightloss)) +
+# Графики ggplot можно сохранять в переменные
+gg_hybrid <- ggplot(data = hybrid, aes(x = Distance, y = Sterile)) +
   geom_point() +
-  labs(x = "Относительная влажность, %", y = "Потеря веса, мг",
-       title = "Потеря веса мучных хрущаков \nпри разной влажности воздуха")
+  labs(x = 'Генетическое расстояние', y = 'Доля стерильных \nпыльцевых зерен')
+gg_hybrid
 
-# ## Графики ggplot можно сохранять в переменные
-gg_nelson <- ggplot(data = nelson, aes(x = humidity, y = weightloss)) +
-  geom_point() +
-  labs(x = "Относительная влажность, %", y = "Потеря веса, мг")
-gg_nelson
-
-# ## Темы оформления графиков можно менять и настраивать
-gg_nelson + theme_classic()
+# 5. Какую тему оформления нужно использовать?
+# `theme()` --- меняет отдельные элементы (см. справку)
+# `theme_bw()`, `theme_classic()` и т.д. --- стили оформления целиком
+gg_hybrid + theme_classic()
 
 # ## Можно установить любимую тему для всех последующих графиков
 theme_set(theme_bw())
-gg_nelson
+gg_hybrid
 
 # ## Графики можно сохранять в файлы
-ggsave(filename = "bugs_weightloss.png", plot = gg_nelson)
-ggsave(filename = "bugs_weightloss.pdf", plot = gg_nelson)
+ggsave(filename = 'hybrids_Sterile.png', plot = gg_hybrid)
+ggsave(filename = 'hybrids_Sterile.pdf', plot = gg_hybrid)
 
 
+# # Корреляция ####################################################
 
 
-# # Корреляция ##################################
+# ## Есть ли связь между переменными?
+gg_hybrid
 
-# ### Коэффициент корреляции Пирсона
-p_cor <- cor.test(nelson$humidity, nelson$weightloss,
-         alternative = "two.sided", method = "pearson")
+# ## Можно посчитать корреляцию между долей стерильной пыльцы и генетическим расстоянием
+p_cor <- cor.test(hybrid$Distance, hybrid$Sterile)
 p_cor
 
 
-# ## Линейная регрессия ##########################
-# # Линейная регрессия в R
+
+
+# # Линейная регрессия ##############################################
+
 
 # ## Подбираем параметры линейной модели
-nelson_lm <- lm(weightloss ~ humidity, nelson)
-summary(nelson_lm)
-
+hybrid_lm <- lm(Sterile ~ Distance, hybrid)
+summary(hybrid_lm)
 
 # ## Записываем уравнение линейной регрессии
-# Коэффициенты модели:
-coef(nelson_lm)
 
-# # Тестирование значимости модели и ее коэффициентов
+
+
+
+# # Тестирование значимости модели и ее коэффициентов ###########################
+
+# Два эквивалентных варианта (не надо использовать оба)
 
 # ## Тестируем значимость коэффициентов t-критерием
-summary(nelson_lm)
+summary(hybrid_lm)
 
 
 # ## Тестируем значимость модели целиком при помощи F-критерия
 library(car)
-nelson_aov <- Anova(nelson_lm, type = 3)
-summary(nelson_aov)
+Anova(hybrid_lm)
 
 
-# # График линейной регрессии ####################
 
-gg_nelson + geom_smooth(method = "lm") +
-  labs (title = "95% доверительная зона регрессии")
+# # График линейной регрессии ##################################
 
-gg_nelson + geom_smooth(method = "lm", level = 0.99) +
-  labs (title = "99% доверительная зона регрессии")
+# ## Строим доверительную зону регрессии
+gg_hybrid + geom_smooth(method = 'lm') +
+  labs(title = '95% доверительная зона регрессии')
 
+# # Оценка качества подгонки модели #############################
 
-# # Оценка качества подгонки модели ##############
-#
-# ## Коэффициент детерминации
-summary(nelson_lm)
-
-# ## Использование линейной регрессии для предсказаний ########
-
-# Для конкретного значения предиктора мы можем сделать два типа предсказаний
-# - предсказываем среднее значение отклика --- это оценка точности положения линии регрессии
-# - предсказываем значение отклика у 95% наблюдений --- это оценка точности предсказаний
-
-# ## Предсказываем Y при заданном X ##############
-
-# Какова средняя потеря веса при заданной влажности?
-newdata <- data.frame(humidity = c(50, 100)) # значения, для которых предсказываем
-(pr1 <- predict(nelson_lm, newdata, interval = "confidence", se = TRUE))
+# ## Коэффициент детерминации $R^2$ можно найти в сводке модели
+summary(hybrid_lm)
 
 
-# ## Предсказываем изменение Y для 95% наблюдений при заданном X ######
+# # Использование линейной регрессии для предсказаний ####################
+# (для самостоятельного разбора)
 
-# В каких пределах находится потеря веса у 95% жуков при заданной влажности?
 
-newdata <- data.frame(humidity = c(50, 100)) # новые данные для предсказания значений
-(pr2 <- predict(nelson_lm, newdata, interval = "prediction", se = TRUE))
+# ## Предсказываем Y при заданном X
+
+# Какова доля стерильной пыльцы межвидового
+# гибрида, если генетическое расстояние между
+# родителями 0.07 или 0.055?
+newdata <- data.frame(Distance = c(0.07, 0.055)) # значения, для которых предсказываем
+(pr1 <- predict(hybrid_lm, newdata, interval = 'confidence', se = TRUE))
+
+
+# ## Предсказываем изменение Y для 95% наблюдений при заданном X
+
+# В каких пределах находится доля стерильной
+# пыльцы, если генетическое расстояние между
+# родителями 0.07 или 0.055?
+newdata <- data.frame(Distance = c(50, 100)) # новые данные для предсказания значений
+(pr2 <- predict(hybrid_lm, newdata, interval = 'prediction', se = TRUE))
 
 
 # ## Данные для доверительной области значений
+# Предсказанные значения для исходных данных
+# объединим с исходными данными в новом датафрейме
+# - для графиков
+(pr_all <- predict(hybrid_lm, interval = 'prediction'))
+hybrid_with_pred <- data.frame(hybrid, pr_all)
 
-# Предсказанные значения для исходных данных объединим с исходными данными в новом датафрейме - для графиков
-pr_all <- predict(nelson_lm, interval = "prediction")
-# head(pr_all)
-nelson_with_pred <- data.frame(nelson, pr_all)
-# head(nelson_with_pred)
 
 # ## Строим доверительную область значений и доверительный интервал одновременно
-gg_nelson +
-  geom_smooth(method = "lm",
-              aes(fill = "Доверительный \nинтервал"),
+gg_hybrid +
+  geom_smooth(method = 'lm',
+              aes(fill = 'Доверительный \nинтервал'),
               alpha = 0.4) +
-  geom_ribbon(data = nelson_with_pred,
-              aes(y = fit,
-                  ymin = lwr,
-                  ymax = upr,
-                  fill = "Доверительная \nобласть значений"),
+  geom_ribbon(data = hybrid_with_pred,   # внимание, в этом слое используются данные предсказаний.
+              aes(y = fit, ymin = lwr, ymax = upr,
+                  fill = 'Доверительная \nобласть значений'),
               alpha = 0.2) +
-  scale_fill_manual('Интервалы',
-                    values = c('green', 'blue'))
+  scale_fill_manual('Интервалы', values = c('green', 'blue'))
 
+
+
+
+#  ####################
+# gg_hybrid +
+#   geom_smooth(method = 'lm', aes(fill = 'Доверительный \nинтервал'), alpha = 0.4) +
+#   geom_ribbon(data = hybrid_with_pred, aes(ymin = lwr, ymax = upr, fill = 'Доверительная \nобласть значений'), alpha = 0.2) +
+#   scale_fill_manual('Интервалы', values = c('green', 'blue')) +
+#   geom_hline(yintercept = 1, linetype = 'dashed', colour = 'red3') +
+#   geom_hline(yintercept = 0, linetype = 'dashed', colour = 'red3') +
+#   annotate('polygon', x = c(-Inf, -Inf, Inf, Inf), y = c(1, Inf, Inf, 1), alpha = 0.2, fill = 'red') +
+#   annotate('polygon', x = c(-Inf, -Inf, Inf, Inf), y = c(0, -Inf, -Inf, 0), alpha = 0.2, fill = 'red') +
+#   annotate('text', label = 'Так не бывает! Нужна другая модель.', x = 0.06, y = 1.25)

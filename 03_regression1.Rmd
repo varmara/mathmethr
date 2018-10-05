@@ -2,27 +2,29 @@
 title: "Регрессионный анализ, часть 1"
 subtitle: "Математические методы в зоологии с использованием R"
 author: "Марина Варфоломеева"
+classoption: 't,xcolor=table'
+language: russian, english
 output:
   beamer_presentation:
     colortheme: seagull
     highlight: tango
     fonttheme: structurebold
+    latex_engine: xelatex
     includes:
       in_header: ./includes/header.tex
     pandoc_args:
-    - --latex-engine=xelatex
     - -V fontsize=10pt
-    - -V lang=russian
     slide_level: 2
+    fig_crop: false
     theme: CambridgeUS
-    toc: yes
+    toc: no
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 options(width = 70, scipen = 6)
 library(knitr)
-opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
-source("support_mathmethr.R")
+opts_chunk$set(fig.show='hold', size='footnotesize', comment='#', warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+source('support_mathmethr.R')
 ```
 
 ### Вы сможете
@@ -33,65 +35,98 @@ source("support_mathmethr.R")
 - протестировать значимость модели и ее коэффициентов при помощи t- или F-теста
 - оценить долю изменчивости, которую объясняет модель, при помощи $R^2$
 
-## Пример: потеря влаги личинками мучных хрущаков
+## Пример: стерильность пыльцы гибридов
 
-\columnsbegin
-
-\column{0.48\textwidth}
-
-Как зависит потеря влаги личинками [малого мучного хрущака](http://ru.wikipedia.org/wiki/Хрущак_малый_мучной) _Tribolium confusum_ от влажности воздуха? 
-
-- 9 экспериментов, продолжительность 6 дней
-- разная относительная влажность воздуха, %
-- измерена потеря влаги, мг
-
-\column{0.48\textwidth}
-
-\centering
-
-\includegraphics[width=0.3\linewidth]{images/Tribolium_confusum.png}
+Гибриды отдаленных видов часто бывают стерильны.  
+Но насколько они должны быть разными для этого?  
+Как зависит плодовитость гибридов [смолевок](http://ru.wikipedia.org/wiki/Смолёвка) _Silene vulgaris_ от генетической удаленности? 
 
 \vfill
-\tiny Малый мучной хрущак \textit{Tribolium confusum}, photo by Sarefo, CC BY-SA
+
+\columnsbegin
+\column{0.6\textwidth}
+
+- `proportionSterile` ---  
+доля стерильных пыльцевых зерен
+- `geneticDistance` ---  
+генетическая удаленность видов
+
+\column{0.38\textwidth}
+
+\includegraphics[width=0.9\linewidth]{images/BladderCampion.jpg}
+
+\vfill
+\tiny Смолeвка обыкновенная \textit{Silene vulgaris}, by Rhododendrites [CC BY-SA 4.0  (https://creativecommons.org/licenses/by-sa/4.0)], from Wikimedia Commons
 
 \columnsend
 
 \vfill
-\tiny Nelson, 1964; данные из Sokal, Rohlf, 1997, табл. 14.1 по Logan, 2010. глава 8, пример 8c; Данные в файлах nelson.xlsx и nelson.csv
+\tiny Moyle et al. 2004; данные из Whitlock, Schluter, 2015, глава 17, упр.10; Данные в файлах HybridPollenSterility.xlsx и HybridPollenSterility.csv
 
 
 ## Читаем данные из файла
 
-### Чтение из xlsx
+Чтение из xlsx:
+
 ```{r}
 library(readxl)
-nelson <- read_excel(path = "data/nelson.xlsx", sheet = 1)
+hybrid <- read_excel(path = 'data/HybridPollenSterility.xlsx', sheet = 1)
+```
+
+\vfill
+
+Чтение из csv:
+
+```{r}
+hybrid <- read.table(file = 'data/HybridPollenSterility.csv', header = TRUE, sep = ',')
 ```
 
 ## Все ли правильно открылось?
 
 ```{r}
-str(nelson)      # Структура данных
-head(nelson)     # Первые несколько строк файла
+str(hybrid)      # Структура данных
+head(hybrid)     # Первые несколько строк файла
 ```
+
+## Сделаем более короткие имена
+
+Сейчас переменные называются так:
+
+```{r}
+colnames(hybrid)
+```
+
+Сделаем более удобные короткие названия:
+
+```{r}
+colnames(hybrid) <- c('Distance', 'Sterile')
+```
+
+Теперь переменные стали называться так:
+
+```{r}
+colnames(hybrid)
+```
+
+
 
 ## Знакомимся с данными
 
 Есть ли пропущенные значения?
 
 ```{r}
-colSums(is.na(nelson))
+colSums(is.na(hybrid))
 ```
 
 Каков объем выборки?
 
-Поскольку пропущенных значений нет, можем просто посчитать число строк
+Поскольку пропущенных значений нет, можем просто посчитать число строк:
 
 ```{r}
-nrow(nelson)
+nrow(hybrid)
 ```
 
-Теперь все готово, чтобы мы могли ответить на вопрос, как зависит потеря веса от влажности?
+Теперь все готово, чтобы мы могли ответить на вопрос исследования.
 
 # Графики средствами пакета ggplot2
 
@@ -103,7 +138,8 @@ nrow(nelson)
 4. Какие подписи нужны?
 5. Какую тему оформления нужно использовать?
 
-### Давайте поэтапно построим график
+
+Давайте поэтапно построим график
 
 ## С чего начинаются графики?
 
@@ -120,7 +156,7 @@ ggplot()
 Обычно в основе графика пишут, откуда брать данные
 
 ```{r gg_base_2}
-ggplot(data = nelson)
+ggplot(data = hybrid)
 ```
 
 ## Какие переменные изображать на графике?
@@ -130,7 +166,7 @@ ggplot(data = nelson)
 `aes()` --- функция, которая сопоставляет значения эстетик и переменные из источника данных (название происходит от англ. _aesthetics_)
 
 ```{r gg_aes}
-ggplot(data = nelson, aes(x = humidity, y = weightloss))
+ggplot(data = hybrid, aes(x = Distance, y = Sterile))
 ```
 
 ## В виде чего изображать?
@@ -140,25 +176,8 @@ ggplot(data = nelson, aes(x = humidity, y = weightloss))
 `geom_point()` --- точки
 
 ```{r gg-point}
-ggplot(data = nelson, aes(x = humidity, y = weightloss)) + 
+ggplot(data = hybrid, aes(x = Distance, y = Sterile)) + 
   geom_point()
-```
-
-## В виде чего изображать?
-
-`geom_line()` --- линии
-
-```{r, gg-line}
-ggplot(data = nelson, aes(x = humidity, y = weightloss)) + 
-  geom_line()
-```
-
-## Можно использовать несколько геомов одновременно
-
-```{r, gg-point-line}
-ggplot(data = nelson, aes(x = humidity, y = weightloss)) + 
-  geom_point() + 
-  geom_line()
 ```
 
 ## Подписи осей, заголовок и т.д.
@@ -167,19 +186,18 @@ ggplot(data = nelson, aes(x = humidity, y = weightloss)) +
 
 
 ```{r gg-labs}
-ggplot(data = nelson, aes(x = humidity, y = weightloss)) + 
+ggplot(data = hybrid, aes(x = Distance, y = Sterile)) + 
   geom_point() + 
-  labs(x = "Относительная влажность, %", y = "Потеря веса, мг",
-       title = "Потеря веса мучных хрущаков \nпри разной влажности воздуха")
+  labs(x = 'Генетическое расстояние', y = 'Доля стерильных \nпыльцевых зерен')
 ```
 
 ## Графики ggplot можно сохранять в переменные
 
 ```{r gg-var}
-gg_nelson <- ggplot(data = nelson, aes(x = humidity, y = weightloss)) + 
+gg_hybrid <- ggplot(data = hybrid, aes(x = Distance, y = Sterile)) + 
   geom_point() + 
-  labs(x = "Относительная влажность, %", y = "Потеря веса, мг")
-gg_nelson
+  labs(x = 'Генетическое расстояние', y = 'Доля стерильных \nпыльцевых зерен')
+gg_hybrid
 ```
 
 ## Темы оформления графиков можно менять и настраивать
@@ -188,14 +206,14 @@ gg_nelson
 `theme_bw()`, `theme_classic()` и т.д. --- стили оформления целиком
 
 ```{r gg-themes}
-gg_nelson + theme_classic()
+gg_hybrid + theme_classic()
 ```
 
 ## Можно установить любимую тему для всех последующих графиков
 
 ```{r gg-theme-set}
 theme_set(theme_bw())
-gg_nelson
+gg_hybrid
 ```
 
 ## Графики можно сохранять в файлы
@@ -203,8 +221,8 @@ gg_nelson
 Функция `ggsave()` позволяет сохранять графики в виде файлов во множестве разных форматов ("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg" или "wmf"). Параметры изображений настраиваются (см. справку)
 
 ```{r gg-save, eval=FALSE}
-ggsave(filename = "bugs_weightloss.png", plot = gg_nelson)
-ggsave(filename = "bugs_weightloss.pdf", plot = gg_nelson)
+ggsave(filename = 'hybrids_Sterile.png', plot = gg_hybrid)
+ggsave(filename = 'hybrids_Sterile.pdf', plot = gg_hybrid)
 ```
 
 # Корреляция
@@ -216,16 +234,16 @@ ggsave(filename = "bugs_weightloss.pdf", plot = gg_nelson)
 Но насколько сильна эта связь?
 
 ```{r}
-gg_nelson
+gg_hybrid
 ```
 
 
 ## Коэффициент корреляции --- способ оценки силы связи между двумя переменными
 
-### Коэффициент корреляции Пирсона
+__Коэффициент корреляции Пирсона__
 
 - Оценивает только линейную составляющую связи
-- Параметрические тесты значимости (t-критерий) применимы если переменные распределены нормально
+- Параметрические тесты значимости (t-тест) применимы если переменные распределены нормально
   
 
 
@@ -260,10 +278,10 @@ library(mvtnorm)
 
 MyPlot <- function(xy, xlim = c(-4, 4), ylim = c(-4, 4), eps = 1e-15) {
    title = round(cor(xy[,1], xy[,2]), 1)
-   if (sd(xy[,2]) < eps) title = "" # corr. coeff. is undefined
-   plot(xy, main = title, xlab = "", ylab = "",
-        col = "darkblue", pch = 16, cex = 0.2,
-        xaxt = "n", yaxt = "n", bty = "n",
+   if (sd(xy[,2]) < eps) title = '' # corr. coeff. is undefined
+   plot(xy, main = title, xlab = '', ylab = '',
+        col = 'darkblue', pch = 16, cex = 0.2,
+        xaxt = 'n', yaxt = 'n', bty = 'n',
         xlim = xlim, ylim = ylim)
 }
 
@@ -329,86 +347,135 @@ output()
 \tiny
 \href{https://commons.wikimedia.org/wiki/File\%3ACorrelation\\_examples2.svg}{By DenisBoigelot, original uploader was Imagecreator} [CC0], via Wikimedia Commons
 
-## Можно расчитать значение коэффициента корреляции между потерей веса и влажностью
+## Можно посчитать корреляцию между долей стерильной пыльцы и генетическим расстоянием
 
 \fontsize{10pt}{10pt}
 
 ```{r}
-p_cor <- cor.test(nelson$humidity, nelson$weightloss, 
-         alternative = "two.sided", method = "pearson")
+p_cor <- cor.test(hybrid$Distance, hybrid$Sterile, 
+         alternative = 'two.sided', method = 'pearson')
 p_cor
 ```
 
 
 Можно описать результаты несколькими способами:
 
-- Величина потери веса мучных хрущаков отрицательно коррелирует с относительной влажностью воздуха ($r = `r round(p_cor$estimate, 2)`$, $p `r format.pval(p_cor$p.value, eps = 0.01)`$)
-- Мучные хрущаки теряют вес при уменьшении относительной влажности воздуха ($r = `r round(p_cor$estimate, 2)`$, $p `r format.pval(p_cor$p.value, eps = 0.01)`$)
+- Доля стерильной пыльцы у межвидовых гибридов смолевок положительно коррелирует с генетическим расстоянием ($r = `r round(p_cor$estimate, 2)`$, $p `r format.pval(p_cor$p.value, eps = 0.01)`$)
+- Стерильной пыльцы у межвидовых гибридов смолевок становится больше с увеличением генетического расстояния между родителями ($r = `r round(p_cor$estimate, 2)`$, $p `r format.pval(p_cor$p.value, eps = 0.01)`$)
 
 # Линейная регрессия
 
 
 ## Линейная регрессия
 
-- позволяет описать функциональную зависимость между переменны
-- позволяет предсказать значение одной переменной, зная значение другой
+- позволяет описать зависимость между количественными величинами
+- позволяет предсказать значение одной величины, зная значения других
 
-Зависимая переменная называется отклик
-
-Те переменные, от которых она зависит --- предикторы
-
-$$\hat y _i = b _0 + b _1 x _i$$
+$$y _i = \beta _0 + \beta _1 x _{1i} + \varepsilon_i$$
 
 ```{r echo=FALSE, purl=FALSE}
-gg_nelson + geom_smooth(method = "lm")
+gg_hybrid + geom_smooth(method = 'lm')
 ```
 
-
-## Линейная регрессия
+## Линейная регрессия бывает простая и множественная
 
 - простая
 
-$$Y _i = \beta _0 + \beta _1 x _i + \varepsilon _i$$
+$$y _i = \beta _0 + \beta _1 x _i + \varepsilon _i$$
 
 - множественная
 
-$$Y _i = \beta _0 + \beta _1 x _{1 i} + \beta _2 x _{2 i} + ... + \varepsilon _i$$
+$$y _i = \beta _0 + \beta _1 x _{1 i} + \beta _2 x _{2 i} + ... + \varepsilon _i$$
 
-## Интерпретация коэффициентов регрессии
 
-$$\hat y _i = b _0 + b _1 x _i$$
+## Линейная регрессия в генеральной совокупности и в выборке
 
-\includegraphics[width=\linewidth]{images/interpretation-of-regression-coefficients.png}
+В уравнении линейной регрессии, описывающей зависимость в  генеральной совокупности, обозначения записываются греческими буквами:
 
-\tiny Рисунок из кн. Logan, 2010, стр. 170, рис. 8.2
-\normalsize
+$$y _i = \beta _0 + \beta _1 x _{1i} + \varepsilon_i$$
 
-\vfill
+Обозначения в уравнении модели, построенной по выборке --- латинскими:
 
-- $b_0$ --- Отрезок (Intercept), отсекаемый регрессионной прямой на оси $y$. Значение зависимой переменной $y$, если предиктор $x = 0$.
-- $b_1$ --- Коэффициент угла наклона регрессионной прямой. Показывает на сколько единиц изменяется отклик ($y$), при увеличении значения предиктора ($x$) на единицу.
+$$y _i = b _0 + b _1 x _i + e_i$$
+
+## Что есть что в уравнении линейной регрессии
+
+\columnsbegin
+
+\column{0.4\textwidth}
+
+```{r echo=FALSE, fig.height=2*1.5, fig.width=2*1.5, out.width='2in', out.height='2in'}
+dfr <- data.frame(x = c(-1,  -0.5, 0.8, 2.5, 3, 4), 
+                  y = c(-0.5, 1.5, 1,   5,   2, 3.5))
+mod <- lm(y ~ x, data = dfr)
+cf <- coef(mod)
+
+gg_coefs <- ggplot(data = dfr, aes(x = x, y = y)) +
+  geom_point(colour = 'steelblue') +
+  coord_equal(xlim = c(-2, 5), ylim = c(-1, 6), expand = FALSE) +
+  scale_x_continuous(breaks = -1:5) + scale_y_continuous(breaks = -1:6) + 
+  geom_hline(yintercept = 0) + geom_vline(xintercept = 0) +
+  geom_smooth(method = 'lm', se = FALSE) +
+  # остаток
+  annotate('segment', x = 2.5, y = 5, xend = 2.5, yend = predict(mod, data.frame(x = 2.5)), linetype = 'dashed', size = 0.8) + 
+  annotate('text', label = 'e[i] == y[i] - hat(y)[i]', x = 2.7, y = 4.5, parse = T, size = 4, hjust = 0) +
+  # предсказанное
+  annotate('text', label = 'y[i]', x = 2, y = 5, parse = T, size = 4) +
+  annotate('point', x = 2.5, y = 5, size = 3, colour = 'red3') +
+  # наблюдаемое
+  annotate('text', label = 'hat(y)[i]', x = 2, y = 3, parse = T, size = 4) +
+  # x_i
+  annotate('segment', x = 2.5, y = 0, xend = 2.5, yend = predict(mod, data.frame(x = 2.5)), linetype = 'dotted') +
+  annotate('text', label = 'x[i]', x = 2.5, y = -0.4, parse = T, size = 4) +
+  # отрезок
+  annotate('segment', x = 0, y = cf[1], xend = 0, yend = 0, size = 2, colour = 'red3')  +
+  annotate('text', label = 'b[0]', x = -0.4, y = 0.3, parse = T, size = 4) +
+  # угол наклона
+  annotate('segment', x = 1, y = 0, xend = 1, yend = predict(mod, data.frame(x = 1)), linetype = 'dotted') +
+  annotate('segment', x = 2, y = 0, xend = 2, yend = predict(mod, data.frame(x = 2)), linetype = 'dotted') +
+  annotate('segment', x = 1, y = predict(mod, data.frame(x = 1)), xend = 0, yend = predict(mod, data.frame(x = 1)), linetype = 'dotted') +
+  annotate('segment', x = 2, y = predict(mod, data.frame(x = 2)), xend = 0, yend = predict(mod, data.frame(x = 2)), linetype = 'dotted') +
+  annotate('segment', x = 0, y = predict(mod, data.frame(x = 1)), xend = 0, yend = predict(mod, data.frame(x = 2)), size = 2, colour = 'orange2') +
+  annotate('text', label = 'b[1]', x = -0.4, y = 2, parse = T, size = 4) +
+  annotate('segment', x = 1, y = 0, xend = 2, yend = 0, size = 1) +
+  annotate('text', label = '1', x = 1.5, y = -0.4, size = 4) 
+  
+gg_coefs
+```
+
+\column{0.6\textwidth}
+
+$$y _i = b _0 + b _1 x _i + e_i$$
+
+- $y_i$ --- наблюдаемое значение зависимой переменной
+- $\hat y_i$ --- предсказанное значение зависимой переменной
+- $e_i$ --- остатки (отклонения наблюдаемых от предсказанных значений)
+
+\columnsend
+
+- $b_0$ --- отрезок (Intercept), отсекаемый регрессионной прямой на оси $y$
+- $b_1$ --- коэффициент угла наклона регрессионной прямой
+
 
 # Подбор коэффициентов линейной регрессии
 
 ## Как провести линию регрессии?
 
-$$\hat y _i = \beta _0 + \beta _1 x _i + \varepsilon_i$$
+$$\hat y _i = b _0 + b _1 x _i$$
 
 ```{r echo=FALSE}
-gg_nelson + 
-  geom_abline(slope = coef(nelson_lm)[2], 
-              intercept = coef(nelson_lm)[1], 
-              colour = "steelblue3", size = 1) +
-  geom_abline(slope = -0.058, intercept = 8.8, 
-              colour = "orange3", size = 1) +
-  geom_abline(slope = -0.05, intercept = 8.9,
-              colour = "green3", size = 1)
+hybrid_lm <-lm(Sterile ~ Distance, data = hybrid)
+gg_hybrid + 
+  geom_abline(slope = coef(hybrid_lm)[2], 
+              intercept = coef(hybrid_lm)[1], 
+              colour = 'steelblue3', size = 1) +
+  geom_abline(slope = 5.875, intercept = 0.1, 
+              colour = 'orange3', size = 1) +
+  geom_abline(slope = 4.9, intercept = 0.24,
+              colour = 'green4', size = 1)
 ```
 
-Нужно оценить параметры линейной модели:
-
-- $\beta _0$
-- $\beta _1$
+Нужно получить оценки $b_0$ и $b_1$ значений параметров линейной модели $\beta _0$ и $\beta _1$.
 
 Но как это сделать?
 
@@ -416,83 +483,69 @@ gg_nelson +
 
 $$\hat y _i = b _0 + b _1 x _i$$
 
-\columnsbegin
-
-\column{0.4\textwidth}
-
-Нужно получить оценки параметров линейной модели:
-
-- $b _0$
-- $b _1$
-
-Оценки параметров линейной регрессии подбирают так, чтобы минимизировать остатки $\sum{(y _i - \hat y _i)^2}$, т.е. $\sum{\varepsilon^2_i}$
+Оценки параметров линейной регрессии $b_0$ и $b_1$ подбирают так, чтобы минимизировать сумму квадратов остатков  $\sum{\varepsilon^2_i}$, т.е. $\sum{(y _i - \hat y _i)^2}$.
 
 
-\column{0.6\textwidth}
+```{r echo=FALSE}
+gg_hybrid + 
+  geom_abline(slope = coef(hybrid_lm)[2], 
+              intercept = coef(hybrid_lm)[1], 
+              colour = 'steelblue3', size = 1) +
+  geom_segment(aes(xend =Distance , yend = predict(hybrid_lm)), linetype = 'dashed')
+```
 
-\includegraphics[width=0.9\linewidth]{images/OLS-regression-line.png}
 
-Линия регрессии по методу наименьших квадратов
-
-\vfill
-\tiny из кн. Quinn, Keough, 2002, стр. 85, рис. 5.6 a
-
-\columnsend
 
 ## Оценки параметров линейной регрессии
 
-\begin{tabular}{l l l}
- \hline\noalign{\smallskip}
-Параметры & Оценки параметров & Стандартные ошибки оценок \\
- \hline\noalign{\smallskip}
-$\beta _1$    & $b _1 = \frac {\sum _{i=1}^{n} {[(x _i - \bar x)(y _i - \bar y)]}}{\sum _{i=1}^{n} {(x _i - \bar x)^2}}$      & $SE _{b _1} = \sqrt{\frac{MS _e}{\sum _{i=1}^{n} {(x _i - \bar x)^2}}}$ \\
-$\beta _0$    & $b _0 = \bar y - b _1 \bar x$  & $SE _{b _0} = \sqrt{MS _e [\frac{1}{n} + \frac{\bar x}{\sum _{i=1}^{n} {(x _i - \bar x)^2}}]}$ \\
- \hline\noalign{\smallskip}
+\resizebox{1\textwidth}{!}{%
+\scriptsize
+\begin{tabular}{p{2cm}|c|c}
+Параметр  & Оценка & Стандартная ошибка  \\
+$\beta_0$ & $b_0 = \bar y - b_1 \bar{x}$  & $SE _{b _0} = \sqrt{MS _e [\cfrac{1}{n} + \cfrac{\bar x}{\sum {(x _i - \bar x)^2}}]}$ \\
+$\beta_1$ & $b _1 = \cfrac {\sum {[(x _i - \bar {x})(y _i - \bar {y})]}}{\sum {(x _i - \bar x)^2}}$ & $SE _{b _1} = \sqrt{\cfrac{MS _e}{\sum {(x _i - \bar {x})^2}}}$ \\
+$\varepsilon _i$ & $e_i = y_i - \hat {y}_i$ & $\approx \sqrt{MS_e}$ \\
 \end{tabular}
+}
 
 \tiny Таблица из кн. Quinn, Keough, 2002, стр. 86, табл. 5.2
 \normalsize
 
 Стандартные ошибки коэффициентов
+
   - используются для построения доверительных интервалов
   - нужны для статистических тестов
 
-### Доверительный интервал коэффициента
+## Неопределенность оценки положения регрессии
 
-  - зона, в которой с $(1 - \alpha) \cdot 100\%$ вероятностью содержится среднее значение коэффициента
-  - $b _1 \pm t _{\alpha, df = n - 2} \cdot SE _{b _1}$
-  - $\alpha = 0.05$ => $(1 - 0.05) \cdot 100\% = 95\%$ интервал
+__Доверительный интервал коэффициента__ --- это зона, в которой с заданной вероятностью содержится среднее значение оценки коэффициента. Если $\alpha = 0.05$, то получается 95\% доверительный интервал.
 
-## Доверительная зона регрессии
 
-```{r, nelson-conf, echo=FALSE, purl=FALSE}
-gg_nelson + geom_smooth(method = "lm")
+$$b _1 \pm t _{\alpha, df = n - 2} \cdot SE _{b _1}$$
+
+__Доверительная зона регрессии__ --- это зона, в которой с заданной вероятностью лежит регрессионная прямая при повторных выборках из генеральной совокупности. 
+
+```{r, hybrid-conf, echo=FALSE, purl=FALSE}
+gg_hybrid + geom_smooth(method = 'lm')
 ```
-
-### Доверительная зона регрессии
-
-- $(1 - \alpha) \cdot 100\%$ доверительная зона регрессии
-- зона, в которой с $(1 - \alpha) \cdot 100\%$ вероятностью лежит регрессионная прямая
-- Возникает из-за неопределенности оценок коэффициентов регрессии
 
 ## Неопределенность оценок предсказанных значений
 
-### Доверительный интервал к предсказанному значению
-  - зона в которую попадают $(1 - \alpha) \cdot 100\%$ значений $\hat y _i$ при данном $x _i$
-  - $\hat y _i \pm t _{\alpha, n - 2} \cdot SE _{\hat y _i}$
-  - $SE _{\hat y} = \sqrt{MS _{e} [1 + \frac{1}{n} + \frac{(x _{prediction} - \bar x)^2} {\sum _{i=1}^{n} {(x _{i} - \bar x)^2}}]}$
+__Доверительный интервал к предсказанному значению__ --- это зона, в которую попадает заданная доля значений $\hat y _i$ при данном $x _i$
 
-### Доверительная область значений регрессии
-  - зона, в которую попадает $(1 - \alpha) \cdot 100\%$ всех предсказанных значений
 
-```{r, nelson-pr-all, echo=FALSE, results='hide', purl=FALSE}
-(pr_all <- predict(nelson_lm, interval = "prediction"))
-nelson_with_pred <- data.frame(nelson, pr_all)
+$\hat y _i \pm t _{\alpha, n - 2} \cdot SE _{\hat y _i}$, $SE _{\hat y} = \sqrt{MS _{e} [1 + \frac{1}{n} + \frac{(x _{prediction} - \bar x)^2} {\sum _{i=1}^{n} {(x _{i} - \bar x)^2}}]}$
+
+__Доверительная область значений регрессии__ --- это зона, в которую попадает $(1 - \alpha) \cdot 100\%$ всех предсказанных значений
+
+```{r, hybrid-pr-all, echo=FALSE, results='hide', purl=FALSE}
+(pr_all <- predict(hybrid_lm, interval = 'prediction'))
+hybrid_with_pred <- data.frame(hybrid, pr_all)
 ```
 
-```{r, nelson-pred, echo=FALSE, fig.height=1.75, purl=FALSE}
-gg_nelson + geom_smooth(method = "lm", se = FALSE) +
-  geom_ribbon(data = nelson_with_pred, 
+```{r, hybrid-pred, echo=FALSE, fig.height=1.75, purl=FALSE}
+gg_hybrid + geom_smooth(method = 'lm', se = FALSE) +
+  geom_ribbon(data = hybrid_with_pred, 
               aes(y = fit, ymin = lwr, ymax = upr), 
               fill = 'green', alpha = 0.2)
 ```
@@ -511,73 +564,69 @@ gg_nelson + geom_smooth(method = "lm", se = FALSE) +
 
 `lm(формула, данные)` - функция для подбора регрессионных моделей
 
-Формат формулы: `зависимая_переменная ~ модель`
+Формат формулы: `зависимая_переменная ~ независимые_переменные`
 
-- $\hat y _i = b _0 + b _1 x _i$ (простая линейная регрессия с $b _0$ (intercept))
-    - Y ~ X
-    - Y ~ 1 + X 
-    - Y ~ X + 1
+$\hat y _i = b _0 + b _1 x _i$ (простая линейная регрессия с $b _0$ (intercept))
 
-- $\hat y _i = b _1 x _i$ (простая линейная регрессия без $b _0$)
-    - Y ~ X - 1
-    - Y ~ -1 + X
+- Y ~ X
+- Y ~ 1 + X 
+- Y ~ X + 1
 
-- $\hat y _i = b _0$ (уменьшенная модель, линейная регрессия Y от $b _0$)
-    - Y ~ 1
-    - Y ~ 1 - X
+$\hat y _i = b _1 x _i$ (простая линейная регрессия без $b _0$)
+
+- Y ~ X - 1
+- Y ~ -1 + X
+
+$\hat y _i = b _0$ (уменьшенная модель, линейная регрессия Y от $b _0$)
+
+- Y ~ 1
+- Y ~ 1 - X
 
 ## Примеры формул линейной регрессии
 
-- $\hat y _i = b _0 + b _1 x _{1 i} + b _2 x _{2 i} + b _3 x _{3 i}$
+$\hat y _i = b _0 + b _1 x _{1 i} + b _2 x _{2 i} + b _3 x _{3 i}$
 
 (множественная линейная регрессия с $b _0$)
 
-    Y ~ X1 + X2 + X3
-    
-    Y ~ 1 + X1 + X2 + X3
+- Y ~ X1 + X2 + X3
+- Y ~ 1 + X1 + X2 + X3
 
-- $\hat y _i = b _0 + b _1 x _{1 i} + b _3 x _{3 i}$
+$\hat y _i = b _0 + b _1 x _{1 i} + b _3 x _{3 i}$
 
 (уменьшенная модель множественной линейной регрессии, без $x _2$)
 
-    Y ~ X1 + X3
-    
-    Y ~ 1 + X1 + X3
+- Y ~ X1 + X3
+- Y ~ 1 + X1 + X3
 
 ## Подбираем параметры линейной модели
 
 \fontsize{10pt}{10pt}
 
-```{r, nelson-reg}
-nelson_lm <- lm(weightloss ~ humidity, nelson)
-summary(nelson_lm)
+```{r, hybrid-reg}
+hybrid_lm <- lm(Sterile ~ Distance, hybrid)
+summary(hybrid_lm)
 ```
 
 
 Коэффициенты линейной регрессии:
 
-- $b _0 =  `r format(coef(nelson_lm)[1], digits = 2)` \pm `r format(coef(summary(nelson_lm))[1, 2], digits = 1)`$
-- $b _1 =  `r format(coef(nelson_lm)[2], digits = 2)` \pm `r format(coef(summary(nelson_lm))[2, 2], digits = 1)`$
+- $b _0 =  `r format(coef(hybrid_lm)[1], digits = 2)` \pm `r format(coef(summary(hybrid_lm))[1, 2], digits = 1)`$
+- $b _1 =  `r format(coef(hybrid_lm)[2], digits = 2)` \pm `r format(coef(summary(hybrid_lm))[2, 2], digits = 1)`$
 
 ## Записываем уравнение линейной регрессии
 
 Коэффициенты модели:
 
+$$\hat y _i = b _0 + b _1 x _i$$
+
 ```{r}
-coef(nelson_lm)
+coef(hybrid_lm)
 ```
 
 Уравнение регрессии:  
 
-```{r results='asis', echo=FALSE, purl=FALSE}
-lm_equation(nelson_lm, strict=FALSE, digits = 1)
-```
+$$\widehat{Sterile} _i  = 0.2 + 5.4 Distance _i$$
 
-Более формальная запись:  
-
-```{r results='asis', echo=FALSE, purl=FALSE}
-lm_equation(nelson_lm, digits = 1)
-```
 
 # Тестирование значимости модели и ее коэффициентов
 
@@ -585,39 +634,40 @@ lm_equation(nelson_lm, digits = 1)
 
 Существует несколько способов проверки значимости модели
 
-- Значима ли модель целиком?
-    + F критерий: действительно ли объясненная моделью изменчивость больше, чем остаточная изменчивость
+Значима ли модель целиком?
 
-- Значима ли связь между предиктором и откликом?
-    + t-критерий: отличается ли от нуля коэффициент при этом предикторе
-    + F-критерий: действительно ли объясненная предиктором изменчивость больше, чем случайная?
++ F критерий: действительно ли объясненная моделью изменчивость больше, чем остаточная изменчивость
+
+Значима ли связь между предиктором и откликом?
+
++ t-критерий: отличается ли от нуля коэффициент при этом предикторе
++ F-критерий: действительно ли объясненная предиктором изменчивость больше, чем случайная?
 
 ## Тестируем значимость коэффициентов t-критерием
-
-### t-критерий
 
 $$t = \frac{b _1 - \theta}{SE _{b _1}}$$
 
 $H _0 : b _1 = \theta$, для $\theta = 0$
+$H _A : b _1 \ne \theta$
 
-Число степеней свободы $df = n - 2$
+$t$-статистика подчиняется $t$-распределению с числом степеней свободы $df = n - p$, где $p$ --- число параметров.
 
-## Тестируем значимость коэффициентов с помощью t-критерия
+Для простой линейной регрессии $df = n - 2$.
+
+## Тестируем значимость коэффициентов t-критерием
 
 \fontsize{10pt}{10pt}
 
 ```{r}
-summary(nelson_lm)
+summary(hybrid_lm)
 ```
 
 
 Результаты можно описать в тексте так:
 
-- Увеличение относительной влажности привело к достоверному замедлению потери веса жуками ($b _1 = -0.053$, $t = - 16.35$, $p < 0.01$)
+- Доля стерильной пыльцы у межвидовых гибридов значимо возрастает с увеличением генетического расстоянияя ($b _1 = `r  round(coef(hybrid_lm[1])[1], 2)`$, $t = `r round(summary(hybrid_lm)$coefficients[2, 3], 2)`$, $p < 0.01$)
 
 ## Тестируем значимость модели целиком при помощи F-критерия
-
-### F-критерий
 
 $$F = {MS _{regression} \over MS _{error}}$$
 
@@ -625,108 +675,182 @@ $H _0: \beta _1 = 0$
 
 Число степеней свободы $df _{regression}$, $df _{error}$
 
+
+```{r echo=FALSE, purl=FALSE}
+lims <- range(hybrid$Sterile) + c(-1, 1)
+yannot <- lims[1] + 0.5
+xannot <- max(hybrid$Distance)
+gmean <- mean(hybrid$Sterile, na.rm = TRUE)
+Y <- 0.84
+Y_hat <- predict(hybrid_lm, newdata = hybrid[hybrid$Sterile == 0.84, ])
+X <- hybrid$Distance[hybrid$Sterile == 0.84]
+
+# Общая изменчивость
+pl_tot <- ggplot(hybrid, aes(x = Distance, y = Sterile)) + 
+  geom_hline(yintercept = gmean, size = 1) + 
+  geom_segment(aes(x = Distance, y = Sterile, 
+                   xend = Distance, yend = gmean), colour = "grey70") + 
+  geom_point() +
+  annotate("text", label = "Общее\nсреднее", 
+           x = max(hybrid$Distance), y = gmean, size = 4, hjust = 1, vjust = 1.3) + 
+  labs(x = 'Генетическое\nрасстояние', y = 'Доля стерильных \nпыльцевых зерен') +
+  ggtitle("Общая изменчивость")
+  # annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 6)
+
+# Объясненная изменчивость
+pl_exp <- ggplot(hybrid, aes(x = Distance, y = Sterile)) + 
+  geom_smooth(method = "lm", se = F, size = 1.3) + 
+  geom_hline(yintercept = gmean, size = 1) + 
+  geom_segment(aes(x = Distance, y = gmean, 
+                   xend = Distance, yend = fitted(hybrid_lm)), colour = "#E69F00") + 
+  geom_point() +
+  annotate("text", label = "Общее\nсреднее", 
+           x = max(hybrid$Distance), y = gmean, size = 4, hjust = 1, vjust = 1.3) + 
+  labs(x = 'Генетическое\nрасстояние', y = 'Доля стерильных \nпыльцевых зерен') +
+  ggtitle("Объясненная") +
+      # annotate("text", label = "SS[r] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 6)  +
+  theme(axis.title.y = element_blank())
+
+# Остаточная изменчивость
+pl_res <- ggplot(hybrid, aes(x = Distance, y = Sterile)) + 
+  geom_smooth(method ="lm", se = F, size = 1.3) + 
+  geom_segment(aes(x = Distance, y = Sterile, 
+                   xend = Distance, yend = fitted(hybrid_lm)), colour = "#009E73") + 
+  geom_point() +
+  labs(x = 'Генетическое\nрасстояние', y = 'Доля стерильных \nпыльцевых зерен') +
+  ggtitle("Случайная") +
+  # annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = xannot,  y = yannot, hjust = 0.95, vjust = 0.2, size = 6)
+  theme(axis.title.y = element_blank())
+```
+
+
+
 ## Общая изменчивость
 
 Общая изменчивость --- $SS _{total}$, сумма квадратов отклонений от общего среднего значения
 
-\centering
-\includegraphics[width=.5\textwidth]{images/total-variation.png}
 
-\raggedright
-\vfill
-\tiny Рис. из кн. Logan, 2010, стр. 172, рис. 8.3
+```{r echo=FALSE, purl=FALSE, fig.width=1.8*1.5, out.width="1.8in" }
+pl_tot
+```
+
 
 
 ## Общая изменчивость делится на объясненную и остаточную
 
-$SS _{total} = SS _{regression} + SS _{error}$
+\centering
+$SS_t = SS_r + SS_e$ \qquad $MS_t \ne MS_r + MS_e$
 
 \columnsbegin
-\column{0.48\linewidth}
+\column{0.31\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=1.6*1.5, out.width="1.6in"}
+pl_tot + ggtitle('Общая')
+```
 \centering
-\includegraphics[width=.9\textwidth]{images/explained-variation.png}
 
-Объясненная изменчивость
+$SS_{t}= \sum{(\bar{y}-y_i)^2}$  
+$df_{t} = n - 1$  
 
-\column{0.48\linewidth}
+$MS_{t} = \frac {SS_{t}}{df_{t}}$
+
+\column{0.31\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=1.4*1.5, out.width="1.4in"}
+pl_exp
+```
 \centering
-\includegraphics[width=.9\textwidth]{images/residual-variation.png}
 
-Остаточная изменчивость
+$SS_{r}=\sum{(\hat{y}-\bar{y})^2}$  
+$df_{r} = p - 1$  
+
+$MS_{r} = \frac {SS_{r}}{df_{r}}$
+
+\column{0.31\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=1.4*1.5, out.width="1.4in"}
+pl_res
+```
+\centering
+
+$SS_{e}= \sum{(\hat{y}-y_i)^2}$  
+$df_{e} = n - p$
+
+$MS_{e} = \frac{SS_{e}}{df_{e}}$
 
 \columnsend
 
-\vfill
-\tiny Рис. из кн. Logan, 2010, стр. 172, рис. 8.3
+\note{
+Они не зависят от числа наблюдений в выборке, в отличие от $SSr$ и $SS_e$
+С их помощью можно проверить гипотезу о наличии связи между предиктором и откликом
+}
 
 ## Если зависимости нет, $b _1 = 0$
 
 Тогда $\hat y _i = \bar y _i$ и $MS _{regression} \approx MS _{error}$
 
 \columnsbegin
-\column{0.48\linewidth}
+\column{0.31\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=1.6*1.5, out.width="1.6in"}
+pl_tot + ggtitle('Общая')
+```
 \centering
-\includegraphics[width=.9\textwidth]{images/explained-variation.png}
 
-Объясненная изменчивость
+$SS_{t}= \sum{(\bar{y}-y_i)^2}$  
+$df_{t} = n - 1$  
 
-\column{0.48\linewidth}
+$MS_{t} = \frac {SS_{t}}{df_{t}}$
+
+\column{0.31\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=1.4*1.5, out.width="1.4in"}
+pl_exp
+```
 \centering
-\includegraphics[width=.9\textwidth]{images/residual-variation.png}
 
-Остаточная изменчивость
+$SS_{r}=\sum{(\hat{y}-\bar{y})^2}$  
+$df_{r} = p - 1$  
+
+$MS_{r} = \frac {SS_{r}}{df_{r}}$
+
+\column{0.31\textwidth}
+
+```{r echo=FALSE, purl=FALSE, fig.width=1.4*1.5, out.width="1.4in"}
+pl_res
+```
+\centering
+
+$SS_{e}= \sum{(\hat{y}-y_i)^2}$  
+$df_{e} = n - p$
+
+$MS_{e} = \frac{SS_{e}}{df_{e}}$
 
 \columnsend
 
-\vfill
-\tiny Рис. из кн. Logan, 2010, стр. 172, рис. 8.3
-
-<!-- ## Что оценивают средние квадраты отклонений? -->
-
-<!-- \resizebox{1\textwidth}{!}{ -->
-<!-- \begin{tabular}{ L{2.3cm} C{1.5cm} C{2cm} C{2.5cm} C{4cm}} -->
-<!-- \hline\noalign{\smallskip} -->
-<!-- Источник \linebreak[4] изменчивости &  Число степеней свободы df & Суммы квадратов отклонений SS & Средний квадрат отклонений MS & Ожидаемый средний квадрат \\ -->
-<!-- \hline\noalign{\smallskip} -->
-<!-- Регрессия & $1$ & $\sum{(\bar y - \hat y _i)^2}$ & $\frac{\sum _{i=1}^{n}{(\bar y - \hat y _i)^2}}{1}$ & $\sigma _{\varepsilon} ^2 + {\beta _1} ^2 \sum _{i=1}^{n} {(x _i - \bar x)^2}$ \\ -->
-<!-- Остаточная & $n - 2$ & $\sum{(y _i - \hat y _i)^2}$ & $\frac{\sum _{i=1}^{n}{(y _i - \hat y _i)^2}}{n - 2}$ & $\sigma _{\varepsilon} ^2$ \\ -->
-<!-- Общая & $n - 1$ & $\sum {(\bar y - y _i)^2}$ &  & \\ -->
-<!-- \hline\noalign{\smallskip} -->
-<!-- \end{tabular} -->
-<!-- } -->
-
-
-<!-- Если $b _1 = 0$, тогда $\hat y _i = \bar y _i$ и $MS _{r} \approx MS _{e}$ -->
-
-<!-- Тестируем: -->
-
-<!-- $$F = {MS _{regression} \over MS _{error}}$$ -->
 
 ## F-критерий и распределение F-статистики
 
 Если $b _1 = 0$, тогда $\hat y _i = \bar y _i$ и $MS _{r} \approx MS _{e}$
 
-\columnsbegin
-\column{0.38\linewidth}
-F - соотношение объясненной и не объясненной изменчивости
+F - соотношение объясненной и не объясненной изменчивости:
 $$F = {MS _{regression} \over MS _{error}}$$
-Зависит от
 
-- $\alpha$
-- $df _{r}$
-- $df _{e}$
+Подчиняется F-распределению с параметрами $df _{r}$ и $df _{e}$.
 
+Для простой линейной регрессии $df_{r} = 1$ и $df_{e} = n - 2$.
 
-\column{0.58\linewidth}
-\centering
-\includegraphics[width=.9\textwidth]{images/f-distribution.png}
+```{r, echo=FALSE, purl=FALSE}
+ar <- arrow(type = "closed", length = unit(0.15,"cm"))
+arb <- arrow(type = "closed", length = unit(0.15,"cm"), ends = "both")
 
-Распределение F-статистики при справедливой $H _0$
+dfr <- data.frame(f = seq(-0.1, 2, 0.001))
+ggplot(dfr, aes(x = f)) + 
+  stat_function(fun = df, args = list(df1 = 1, df2 = 21), size = 1.3) + 
+labs(title = expression(bold(paste("F-распределение,", ~df[1]==1, ", ", ~ df[2]==25))),
+     x = "F", y = "Плотность вероятности")
+```
 
-\vfill
-\tiny Рис. из кн. Logan, 2010, стр. 172, рис. 8.3
-
-\columnsend
 
 
 ## Таблица результатов дисперсионного анализа
@@ -749,41 +873,45 @@ $$F = {MS _{regression} \over MS _{error}}$$
 
 ```{r}
 library(car)
-nelson_aov <- Anova(nelson_lm, type = 3)
-summary(nelson_aov)
+Anova(hybrid_lm)
 ```
 
 Результаты дисперсионного анализа можно описать в тексте (или представить в виде таблицы):
 
-- Количество влаги, потерянной жуками в период эксперимента, достоверно зависело от уровня относительной влажности \linebreak[2] ($F _{1, 7} = 267$, $p < 0.01$).
+```{r echo=FALSE, purl=FALSE}
+smr_f <- summary(hybrid_lm)$fstatistic[3]
+f_val <- round(smr_f[1], 2)
+df1 <- smr_f[2]
+df2 <- smr_f[3]
+```
+
+- Доля стерильной пыльцы межвидовых гибридов смолевок значимо зависит от генетического расстояния \linebreak[2] ($F _{`r df1`, `r df2`} = `r f_val`$, $p < 0.001$).
 
 # График линейной регрессии
 
 ## Строим доверительную зону регрессии
 
 ```{r eval=FALSE}
-gg_nelson + geom_smooth(method = "lm") + 
-  labs (title = "95% доверительная зона регрессии")
+gg_hybrid + geom_smooth(method = 'lm') + 
+  labs (title = '95% доверительная зона регрессии')
 
-gg_nelson + geom_smooth(method = "lm", level = 0.99) + 
-  labs (title = "99% доверительная зона регрессии")
+gg_hybrid + geom_smooth(method = 'lm', level = 0.99) + 
+  labs (title = '99% доверительная зона регрессии')
 ```
 
 ```{r echo=FALSE, purl=FALSE}
 library(gridExtra)
 grid.arrange(
-gg_nelson + geom_smooth(method = "lm") + 
-  labs (title = "95% доверительная зона регрессии"),
-gg_nelson + geom_smooth(method = "lm", level = 0.99) + 
-  labs (title = "99% доверительная зона регрессии"),
+gg_hybrid + geom_smooth(method = 'lm') + 
+  labs (title = '95% доверительная зона регрессии'),
+gg_hybrid + geom_smooth(method = 'lm', level = 0.99) + 
+  labs (title = '99% доверительная зона регрессии'),
 ncol = 2)
 ```
 
 # Оценка качества подгонки модели
 
-## Коэффициент детерминации
-
-### Коэффициент детерминации $R^2$
+## Коэффициент детерминации $R^2$
 
 доля общей изменчивости, объясненная линейной связью x и y
 
@@ -800,12 +928,12 @@ __Не используйте обычный $R^2$ для множественн
 
 \fontsize{10pt}{10pt}
 ```{r}
-summary(nelson_lm)
+summary(hybrid_lm)
 ```
 
-## Сравнение качества подгонки моделей
+## Сравнение качества подгонки моделей при помощи $R^2_{adj}$
 
-### $R^2_{adj}$ --- cкорректированный $R^2$
+$R^2_{adj}$ --- cкорректированный $R^2$
 
 $$R^2_{adj} = 1 - \frac{SS_{e} / df_{e}}{SS_{t} / df_{t}}$$
 
@@ -826,76 +954,81 @@ $R^2_{adj}$ учитывает число переменных в модели, 
 
 ## Предсказываем Y при заданном X 
 
-Какова средняя потеря веса при заданной влажности?
+Какова доля стерильной пыльцы межвидового гибрида, если генетическое расстояние между родителями 0.07 или 0.055?
 
 \fontsize{10pt}{10pt}
 
 ```{r fig.height = 7}
-newdata <- data.frame(humidity = c(50, 100)) # значения, для которых предсказываем
-(pr1 <- predict(nelson_lm, newdata, interval = "confidence", se = TRUE))
+newdata <- data.frame(Distance = c(0.07, 0.055)) # значения, для которых предсказываем
+(pr1 <- predict(hybrid_lm, newdata, interval = 'confidence', se = TRUE))
 ```
 
 
-- При 50 и 100\% относительной влажности ожидаемая средняя потеря веса жуков будет `r round(pr1$fit[1,1], 1)` $\pm$ `r round(pr1$fit[1,1] - pr1$fit[1,2], 1)` и `r round(pr1$fit[2,1], 1)` $\pm$ `r round(pr1$fit[2,1] - pr1$fit[2,2], 1)`, соответственно.
+- Если генетическое расстояние между родителями 0.07 или 0.055, то стерильно будет `r round(pr1$fit[1,1], 1)` $\pm$ `r round(pr1$fit[1,1] - pr1$fit[1,2], 1)` и `r round(pr1$fit[2,1], 1)` $\pm$ `r round(pr1$fit[2,1] - pr1$fit[2,2], 1)` всей пыльцы, соответственно.
 
 ## Предсказываем изменение Y для 95\% наблюдений при заданном X
 
-В каких пределах находится потеря веса у 95\% жуков при заданной влажности?
+В каких пределах находится доля стерильной пыльцы, если генетическое расстояние между родителями 0.07 или 0.055?
 
 \fontsize{10pt}{10pt}
 
 ```{r}
-newdata <- data.frame(humidity = c(50, 100)) # новые данные для предсказания значений
-(pr2 <- predict(nelson_lm, newdata, interval = "prediction", se = TRUE))
+newdata <- data.frame(Distance = c(50, 100)) # новые данные для предсказания значений
+(pr2 <- predict(hybrid_lm, newdata, interval = 'prediction', se = TRUE))
 ```
 
-- У 95\% жуков при 50 и 100\% относительной влажности будет потеря веса будет в пределах `r round(pr2$fit[1,1], 1)` $\pm$ `r round(pr2$fit[1,1] - pr2$fit[1,2], 1)` и `r round(pr2$fit[2,1], 1)` $\pm$ `r round(pr2$fit[2,1] - pr2$fit[2,2], 1)`, соответственно.
+- У 95\% межвидовых гибридов, у которых генетическое расстояние между родителями 0.07 или 0.055, доля стерильной пыльцы будет в пределах `r round(pr2$fit[1,1], 1)` $\pm$ `r round(pr2$fit[1,1] - pr2$fit[1,2], 1)` и `r round(pr2$fit[2,1], 1)` $\pm$ `r round(pr2$fit[2,1] - pr2$fit[2,2], 1)`, соответственно.
 
 ## Данные для доверительной области значений
 
 Предсказанные значения для исходных данных объединим с исходными данными в новом датафрейме - для графиков
 
-```{r, nelson-pr-all}
+```{r, hybrid-pr-all}
 ```
 
 
 ## Строим доверительную область значений и доверительный интервал одновременно
 
-```{r, nelson-plot-all}
-gg_nelson + 
-  geom_smooth(method = "lm", 
-              aes(fill = "Доверительный \nинтервал"), 
+```{r, hybrid-plot-all}
+gg_hybrid + 
+  geom_smooth(method = 'lm', 
+              aes(fill = 'Доверительный \nинтервал'), 
               alpha = 0.4) +
-  geom_ribbon(data = nelson_with_pred, 
+  geom_ribbon(data = hybrid_with_pred, 
               aes(y = fit, ymin = lwr, ymax = upr, 
-                  fill = "Доверительная \nобласть значений"), 
+                  fill = 'Доверительная \nобласть значений'), 
               alpha = 0.2) +
   scale_fill_manual('Интервалы', values = c('green', 'blue'))
 ```
 
-## Осторожно!
+## Осторожно! У такой линейной регрессии есть проблемы!
 
-### Вне интервала значений $X$ ничего предсказать нельзя!
-```{r echo=FALSE, fig.height=3, out.height='3in', purl=FALSE}
-gg_nelson + 
-  geom_smooth(method = "lm", 
-              aes(fill = "Доверительный \nинтервал"), 
-              alpha = 0.4) +
-  geom_ribbon(data = nelson_with_pred, 
-              aes(y = fit, ymin = lwr, ymax = upr, 
-                  fill = "Доверительная \nобласть значений"), 
-              alpha = 0.2) +
-  scale_fill_manual('Интервалы', values = c('green', 'blue')) + xlim(-10, 110)
+Для некоторых значений генетического расстояния построенная нами модель предсказывает больше 100\% стерильной пыльцы.
+
+Так не бывает!
+
+__Вместо простой линейной регрессии нужно использовать более сложную линейную модель__ (это за рамками курса)
+
+```{r echo=FALSE, fig.height=3, out.height='3in', purl=TRUE}
+gg_hybrid + 
+  geom_smooth(method = 'lm', aes(fill = 'Доверительный \nинтервал'), alpha = 0.4) +
+  geom_ribbon(data = hybrid_with_pred, aes(ymin = lwr, ymax = upr, fill = 'Доверительная \nобласть значений'), alpha = 0.2) +
+  scale_fill_manual('Интервалы', values = c('green', 'blue')) +
+  geom_hline(yintercept = 1, linetype = 'dashed', colour = 'red3') +
+  geom_hline(yintercept = 0, linetype = 'dashed', colour = 'red3') +
+  annotate('polygon', x = c(-Inf, -Inf, Inf, Inf), y = c(1, Inf, Inf, 1), alpha = 0.2, fill = 'red') +
+  annotate('polygon', x = c(-Inf, -Inf, Inf, Inf), y = c(0, -Inf, -Inf, 0), alpha = 0.2, fill = 'red') +
+  annotate('text', label = 'Так не бывает! Нужна другая модель.', x = 0.06, y = 1.25)
 ```
-
 
 
 ## Take home messages
 
 - Модель простой линейной регрессии $y _i = \beta _0 + \beta _1 x _i + \varepsilon _i$
-- В оценке коэффициентов регрессии и предсказанных значений существует неопределенность. Доверительные интервалы можно расчитать, зная стандартные ошибки.
-- Значимость всей регрессии и ее параметров можно проверить при помощи t- или F-теста. $H _0: \beta _1 = 0$
+- В оценке коэффициентов регрессии ($b_0$ и $b_1$) и предсказанных значений ($\hat y_i$) существует неопределенность. Доверительные интервалы можно расчитать, зная стандартные ошибки.
+- Значимость всей регрессии и ее параметров можно проверить при помощи t- или F-теста. Для простой линейной регрессии $H _0: \beta _1 = 0$.
 - Качество подгонки модели можно оценить при помощи коэффициента детерминации $R^2$
+- Не всякие данные можно описать при помощи простой линейной регрессии.
 
 ## Дополнительные ресурсы
 
