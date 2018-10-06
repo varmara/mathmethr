@@ -23,7 +23,7 @@ install.packages(c("Hmisc", "Rcpp", "ggplot2", "readxl", "effsize", "pwr"))
 install.packages("car")
 ```
 
-<!-- - Презентация: [03_regression1.pdf](03_regression1.pdf) -->
+- Презентация: [03_regression1.pdf](03_regression1.pdf)
 - Код: [03_regression1_code.R](03_regression1_code.R)
 - Данные: 
     - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx)
