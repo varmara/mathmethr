@@ -32,8 +32,8 @@ install.packages("car")
 ## 4. Регрессионный анализ, ч.2
 
 <!-- - Презентация: [04_regression2.pdf](04_regression2.pdf) -->
-<!-- - Код: [04_regression2_code.R](04_regression2_code.R) -->
-<!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
+- Код: [04_regression2_code.R](04_regression2_code.R)
+- Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv)
 
 ## 5. Дисперсионный анализ, ч.1 
 
