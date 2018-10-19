@@ -37,7 +37,7 @@ sleep$Danger <- factor(sleep$Danger, levels = 1:5, labels = c("очень низ
 
 # Есть ли пропущенные значения (особенно, в
 # переменных, которые нас интересуют)?
-sapply(sleep, function(x)sum(is.na(x)))
+colSums(is.na(sleep))
 
 # Каков объем выборки?
 # В одной из переменных, которые нам интересны,
@@ -46,8 +46,7 @@ sapply(sleep, function(x)sum(is.na(x)))
 #
 # Удалим из датафрейма `sleep` строки, где
 # `TotalSleep` принимает значение `NA`.
-flt <- ! is.na(sleep$TotalSleep)
-sl <- sleep[flt, ]
+sl <- sleep[!is.na(sleep$TotalSleep), ]
 
 # Дальше будем работать с датафреймом `sl`. В нем
 # нет пропущенных значений в интересующих нас
@@ -116,7 +115,7 @@ library(car)
 
 sl_mod <- lm(TotalSleep ~ Danger, data = sl)
 
-sl_anova <- Anova(sl_mod, type = 3)
+sl_anova <- Anova(sl_mod)
 
 sl_anova
 

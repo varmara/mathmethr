@@ -2,20 +2,22 @@
 title: "Дисперсионный анализ, часть 1"
 subtitle: "Математические методы в зоологии с использованием R"
 author: "Марина Варфоломеева"
+classoption: 't,xcolor=table'
+language: russian, english
 output:
   beamer_presentation:
     colortheme: seagull
     highlight: tango
     fonttheme: structurebold
+    latex_engine: xelatex
     includes:
       in_header: ./includes/header.tex
     pandoc_args:
-    - --latex-engine=xelatex
     - -V fontsize=10pt
-    - -V lang=russian
     slide_level: 2
+    fig_crop: false
     theme: CambridgeUS
-    toc: yes
+    toc: no
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
@@ -79,7 +81,7 @@ sleep$Danger <- factor(sleep$Danger, levels = 1:5, labels = c("очень низ
 Есть ли пропущенные значения (особенно, в переменных, которые нас интересуют)?
 
 ```{r}
-sapply(sleep, function(x)sum(is.na(x)))
+colSums(is.na(sleep))
 ```
 
 К счастью, про уровень опасности (`Danger`) информация есть для всех объектов.
@@ -93,8 +95,7 @@ sapply(sleep, function(x)sum(is.na(x)))
 Удалим из датафрейма `sleep` строки, где `TotalSleep` принимает значение `NA`.
 
 ```{r}
-flt <- ! is.na(sleep$TotalSleep)
-sl <- sleep[flt, ]
+sl <- sleep[! is.na(sleep$TotalSleep), ]
 ```
 
 \small
@@ -194,7 +195,7 @@ ggplot(data = sl, aes(x = Danger, y = TotalSleep, colour = Danger)) +
 ```{r gg-mean-conf-limit-coloured-labs, echo=TRUE, purl=FALSE}
 ```
 
-## Множественные сравнения
+## Множественные сравнения: \newline число возможных сравнений
 
 Мы могли бы сравнить среднюю продолжительность сна в разных группах при помощи t-критерия. У нас всего 5 групп. Сколько возможно между ними попарных сравнений?
 
@@ -203,19 +204,29 @@ ggplot(data = sl, aes(x = Danger, y = TotalSleep, colour = Danger)) +
 
 \pause
 
-Всего возможно 10 сравнений
+Всего возможно 10 сравнений.
 
-Если для каждого сравнения вероятность ошибки первого рода будет $\alpha_{per\ comparison} = 0.05$, то для всей группы из 10 сравнений --- ?
+## Множественные сравнения: \newline вероятность совершить ошибку I рода
+
+Всего возможно 10 сравнений. Если для каждого вероятность ошибки I рода будет $\alpha_{per\ comparison} = 0.05$, то для всей группы из 10 сравнений --- ?
+
+```{r gg-mean-conf-limit-coloured-labs, echo=FALSE, purl=FALSE}
+```
 
 \pause
 
-$\alpha_{family\ wise} = 0.05 * 10$
+Для независимых тестов вероятность совершить хотя бы одну ошибку I рода в группе сравнений будет $\alpha_{family\ wise} = 1 - (1 - 0.05)^{10} = `r 1 - (1 - 0.05)^{10}`$ (т.е. 40\%).
 
-В половине случаев мы рискуем найти различия там где их нет!!!
+Для зависимых тестов (например, для попарных сравнений) эта вероятность чуть ниже (Winer et al. 1991), но все равно хорошо бы внести поправку в $\alpha_{per\ comparison}$.
+
+\note{
+зависимость между тестами снижает степень раздутия альфы (Winer et al. 1991), поэтому даже если тесты зависимы, можно действовать как для независимых тестов.
+Winer, B. J., Brown, D. R., & Michels, K. M. (1991). Statistical principles in experimental design, 3rd ed. New York, NY: McGraw-Hill.
+}
 
 ## Поправка Бонферрони
 
-Если все-таки приходится делать много сравнений, нужно снизить $\alpha _{per\ comparison}$ до обычного уровня
+Если все-таки приходится делать много сравнений, нужно снизить $\alpha _{per\ comparison}$ до обычного уровня.
 
 $$\alpha _{per\ comparison} = \frac{\alpha _{family\ wise}}{n}$$
 
@@ -341,8 +352,6 @@ grid.arrange(pl_tot, pl_x, pl_res, nrow = 1)
 
 ## Средние квадраты отклонений
 
-Если поделить суммы квадратов отклонений ($SS$) на их число степеней свободы, то получатся средние квадраты отклонений ($MS$) --- дисперсии
-
 ```{r gg-ss, echo=FALSE, fig.height=3, fig.width=10, purl=FALSE}
 ```
 
@@ -357,7 +366,7 @@ $MS_e$ остаточная дисперсия  \\
 \hline\noalign{\smallskip}
 $MS_{t} =\frac{SS_{t}}{df_{t}}$ & $MS_{x} =\frac{SS_{x}}{df_{x}}$ & $MS_{e} =\frac{SS_{e}}{df_{e}}$ \\
 $SS_{t}=\sum{(\bar{y}-y_i)^2}$ & $SS_{x}=\sum{(\hat{y}-\bar{y})^2}$ & $SS_{e}=\sum{(\hat{y}-y_i)^2}$ \\
-$df_{t} = N - 1$ & $df_{x} = a - 1$ & $df_{e} = N - a$  \\
+$df_{t} = n - 1$ & $df_{x} = a - 1$ & $df_{e} = n - a$  \\
 \hline\noalign{\smallskip}
 \end{tabular}
 }
@@ -381,11 +390,11 @@ $$ F_{df_x, df_e} = \frac{MS _{x}}{MS_{e}}$$
 $$ F_{df_x, df_e} = \frac{MS _{x}}{MS_{e}}$$
 Гипотезы: 
 
-$H _0$: все выборки взяты из одной совокупности --- $\bar X_1 = \bar X_2  = \dots = \bar X_a$. Тогда $MS _x = MS _e$
+$H _0$: все выборки взяты из одной совокупности --- $\mu_1 = \mu_2  = \dots = \mu_a$. Тогда $MS _x = MS _e$
 
-$H _A$: какая-то из выборок из другой совокупности, т.е. какое-то среднее значение $\bar X_i$ отличается от других. Тогда $MS _x \ne MS _e$
+$H _A$: какая-то из выборок из другой совокупности, т.е. какое-то среднее значение $\mu_k$ отличается от других. Тогда $MS _x > MS _e$
 
-F-статистика подчиняется F-распределению. Форма F-распределения зависит от двух параметров: $df_{x} = a - 1$ и $df_{e} = N - a$
+F-статистика подчиняется F-распределению. Форма F-распределения зависит от двух параметров: $df_{x} = a - 1$ и $df_{e} = n - a$
 
 ```{r f-distribution, echo=FALSE, purl=FALSE, fig.width=7, fig.height=2}
 dfr <- data.frame(f = seq(-0.3, 9, 0.01))
@@ -408,8 +417,8 @@ ggplot(dfr, aes(x = f)) +
 Источник \linebreak[2] изменчивости  & SS & df & MS & F  \\
 \hline\noalign{\smallskip}
 Название фактора & $SS _x = \sum{(\bar y - \hat y _i)^2}$ & $df _x = a - 1$ & $MS _x = \frac{SS _x}{df _x}$ & $F _{df _x df _e} = \frac{MS _x}{MS _e}$ \\
-Случайная & $SS _e = \sum{(y _i - \hat y _i)^2}$ & $df _e = N - a$ & $MS _e = \frac{SS _e}{df _e}$ \\
-Общая & $SS _t = \sum {(\bar y - y _i)^2}$ & $df _t = N - 1$ & & \\
+Случайная & $SS _e = \sum{(y _i - \hat y _i)^2}$ & $df _e = n - a$ & $MS _e = \frac{SS _e}{df _e}$ \\
+Общая & $SS _t = \sum {(\bar y - y _i)^2}$ & $df _t = n - 1$ & & \\
 \hline\noalign{\smallskip}
 \end{tabular}
 }
@@ -422,14 +431,14 @@ ggplot(dfr, aes(x = f)) +
 
 Используем Anova из пакета car, хотя есть и другие функции. Зачем? Когда факторов будет больше одного, эта функция сможет правильно оценить значимость каждого из них независимо от других.
 
-Anova(результат_функции_lm, type = 3) - дисперсионный анализ
+Anova(результат_функции_lm) - дисперсионный анализ
 
 \small
 
 ```{r}
 library(car)
 sl_mod <- lm(TotalSleep ~ Danger, data = sl)
-sl_anova <- Anova(sl_mod, type = 3)
+sl_anova <- Anova(sl_mod)
 sl_anova
 ```
 
@@ -454,12 +463,12 @@ sign <- ifelse(result$'Pr(>F)'[2] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[
 ```{r purl=FALSE, echo=FALSE, results='asis'}
 library(xtable)
 source("support_mathmethr.R")
-smr <- fix_Anova(sl_anova[-1, ],
+smr <- fix_Anova(sl_anova,
                  rown = c("Уровень опасности", "Остаточная"), 
                  coln = c("SS", "df", "F", "P"))
 xtb <- xtable(
   smr,
-  caption = "Результаты дисперсионного анализа продолжительности сна млекопитающих в зависимости от уровня опасностей, которым они подвергаются в течении жизни. SS --- суммы квадратов отклонений, df --- число степеней свободы, F --- значение F-критерия, P --- доверительная вероятность.",
+  caption = "Результаты дисперсионного анализа продолжительности сна млекопитающих в зависимости от уровня опасностей, которым они подвергаются в течении жизни. SS --- суммы квадратов отклонений, df --- число степеней свободы, F --- значение F-критерия, P --- уровень значимости",
   label = "tab:one-anova-sl")
 print.xtable(xtb, comment = F, caption.placement = "top")
 ```
@@ -555,7 +564,7 @@ ggplot(data = sl_diag, aes(x = Danger, y = .stdresid)) + geom_boxplot()
 
 ## Решение: 
 
-```{r purl=FALSE}
+```{r purl=FALSE, fig.height=4, out.height='2in'}
 qqPlot(sl_mod)
 ```
 
@@ -567,13 +576,14 @@ qqPlot(sl_mod)
 
 На самом деле, нужно еще построить графики остатков от переменных в модели и вне ее --- чтобы выяснить, не забыли ли мы включить другие важные предикторы.
 
-Построй те самостоятельно графики, используя код. Какие из переменных хорошо было бы добавить в модель?
+Постройте самостоятельно графики, используя код. Какие из переменных хорошо было бы добавить в модель?
 
 \small
 
 ```{r eval=FALSE}
 sl_diag_full <- data.frame(sl_diag, sl)
-gg_other <- ggplot(sl_diag_full, aes(y = .stdresid)) + geom_hline(yintercept = 0)
+gg_other <- ggplot(sl_diag_full, aes(y = .stdresid)) + 
+  geom_hline(yintercept = 0)
 gg_other + geom_point(aes(x = log(BodyWt)))
 gg_other + geom_point(aes(x = log(BrainWt)))
 gg_other + geom_point(aes(x = NonDreaming))
@@ -584,7 +594,23 @@ gg_other + geom_point(aes(x = Predation))
 gg_other + geom_point(aes(x = Exposure))
 ```
 
-\pause
+## Решение: Паттерны в остатках (графики остатков от переменных в модели и вне ее).
+
+```{r echo=FALSE, fig.height=4, out.height='2in', fig.width=9, out.width='4.5in'}
+sl_diag_full <- data.frame(sl_diag, sl)
+gg_other <- ggplot(sl_diag_full, aes(y = .stdresid)) + 
+  geom_hline(yintercept = 0)
+library(gridExtra)
+grid.arrange(
+gg_other + geom_point(aes(x = log(BodyWt))),
+gg_other + geom_point(aes(x = log(BrainWt))),
+gg_other + geom_point(aes(x = NonDreaming)),
+gg_other + geom_point(aes(x = Dreaming)),
+gg_other + geom_point(aes(x = log(LifeSpan))),
+gg_other + geom_point(aes(x = Gestation)),
+gg_other + geom_point(aes(x = Predation)),
+gg_other + geom_point(aes(x = Exposure)), nrow = 2)
+```
 
 \normalsize
 
