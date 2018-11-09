@@ -48,8 +48,8 @@ install.packages("multcomp")
 ## 6. Дисперсионный анализ, ч.2
 
 <!-- - Презентация: [06_anova2.pdf](06_anova2.pdf) -->
-<!-- - Код: [06_anova2_code.R](06_anova2_code.R) -->
-<!-- - Данные: [eysenck.csv](data/eysenck.csv) -->
+- Код: [06_anova2_code.R](06_anova2_code.R)
+- Данные: [eysenck.csv](data/eysenck.csv)
 
 ## 7. Анализ главных компонент
 
@@ -58,7 +58,7 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", 
 ```
 
 <!-- - Презентация: [07_pca.pdf](07_pca.pdf) -->
-<!-- - Код: [07_pca_code.R](07_pca_code.R) -->
+- Код: [07_pca_code.R](07_pca_code.R)
 
 ## 8. Дискриминантный анализ 
 

@@ -2,20 +2,22 @@
 title: "Анализ главных компонент"
 subtitle: "Математические методы в зоологии с использованием R"
 author: "Марина Варфоломеева"
+classoption: 't,xcolor=table'
+language: russian, english
 output:
   beamer_presentation:
     colortheme: seagull
     highlight: tango
     fonttheme: structurebold
+    latex_engine: xelatex
     includes:
       in_header: ./includes/header.tex
     pandoc_args:
-    - --latex-engine=xelatex
     - -V fontsize=10pt
-    - -V lang=russian
     slide_level: 2
+    fig_crop: false
     theme: CambridgeUS
-    toc: yes
+    toc: no
 ---
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
@@ -521,7 +523,7 @@ ggscores
 
 ```{r out.height='1.8in'}
 library(cowplot)
-plot_grid(ggloadings, ggscores, labels = c("A", "B"))
+plot_grid(ggloadings, ggscores, labels = c("A", "B"), align = 'hv', axis = 'r')
 ```
 
 \pause
