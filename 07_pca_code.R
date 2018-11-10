@@ -120,7 +120,7 @@ ggscores
 
 # Два графика рядом
 library(cowplot)
-plot_grid(ggloadings, ggscores, labels = c("A", "B"), axis = 'r')
+plot_grid(ggloadings, ggscores, labels = c("A", "B"), align = 'vh', axis = 'r')
 
 
 #### Пример: Морфометрия египетских черепов ###############

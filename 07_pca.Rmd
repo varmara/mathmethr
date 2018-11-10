@@ -23,7 +23,7 @@ output:
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 options(width = 70, scipen = 6)
 library(knitr)
-opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+opts_chunk$set(fig.show='hold', size='footnotesize', comment='#', warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
 ```
 
 
@@ -56,7 +56,7 @@ x2 <- c(2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9)
 df <- data.frame(x1, x2)
 library(ggplot2)
 theme_set(theme_classic())
-p_raw <- ggplot(df) + geom_point(aes(x = x1, y = x2), colour = "black") + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(df)), hjust = -0.3) 
+p_raw <- ggplot(df) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(df)), hjust = -0.3) 
 df
 ```
 
@@ -84,7 +84,7 @@ p_raw + xlim(0, 3.2)
 # normalize
 dfnorm <- data.frame(x1=x1-mean(x1), x2=x2-mean(x2))
 dfnorm <- dfnorm[order(x1), ]
-p_normalized <- ggplot(dfnorm) + geom_point(aes(x = x1, y = x2), colour = "black") + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(dfnorm)), hjust = -0.3)
+p_normalized <- ggplot(dfnorm) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(dfnorm)), hjust = -0.3)
 ```
 
 \columnsbegin
@@ -191,8 +191,8 @@ dfnorm$pc1 <- eigen_vectors[2,1]/eigen_vectors[1,1] * dfnorm$x1
 dfnorm$pc2 <- eigen_vectors[2,2]/eigen_vectors[1,2] * dfnorm$x1
 # plot of future axes
 p_futureax <- p_normalized +
-  geom_line(data = dfnorm, aes(x = x1, y = pc1), linetype = "dashed") +
-  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = "dashed")
+  geom_line(data = dfnorm, aes(x = x1, y = pc1), linetype = 'dashed') +
+  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = 'dashed')
 p_futureax + xlim(-1.5, 1.5)
 ```
 
@@ -207,8 +207,8 @@ p_futureax + xlim(-1.5, 1.5)
 
 ```{r echo=FALSE, purl=FALSE, fig.height=4, fig.width=4}
 p_normalized +
-  geom_line(data = dfnorm, aes(x = x1, y = pc1), linetype = "dashed") +
-  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = "dashed")
+  geom_line(data = dfnorm, aes(x = x1, y = pc1), linetype = 'dashed') +
+  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = 'dashed')
 ```
 
 \column{0.49\textwidth}
@@ -220,7 +220,7 @@ p_normalized +
 library(vegan)
 df_pca <- rda(df, scale = TRUE)
 
-df_scores <- data.frame(scores(df_pca, display = "sites", choices = c(1, 2), scaling = "sites"), Id = 1:10)
+df_scores <- data.frame(scores(df_pca, display = 'sites', choices = c(1, 2), scaling = 'sites'), Id = 1:10)
 library(ggrepel)
 pcaplot <- ggplot(df_scores, aes(x = PC1, y = PC2)) + geom_point() + geom_text_repel(aes(label = Id)) + coord_equal(xlim = c(-1.4, 1.4), ylim = c(-1.4, 1.4)) + geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
 pcaplot
@@ -307,9 +307,9 @@ table(pos$sex, pos$site, pos$Pop)
 ```{r pairs-pos, eval=FALSE, tidy.opts=list(blank=FALSE, width.cutoff=60)}
 # сколько всего сайтов
 n_sites <- length(unique(pos$site))
-# цвета из Брюеровской палитры "Set1"
+# цвета из Брюеровской палитры 'Set1'
 library(RColorBrewer)
-cols <- brewer.pal(n = n_sites, name = "Set1")
+cols <- brewer.pal(n = n_sites, name = 'Set1')
 # график морфометрических переменных
 pairs(pos[, 6:14], col = cols[pos$site], 
       pch =  as.numeric(pos$sex))
@@ -383,7 +383,7 @@ eigenvals(ord) # собственные числа
 Строим график собственных чисел
 
 ```{r, fig.height=3}
-screeplot(ord, bstick = TRUE, type = "lines")
+screeplot(ord, bstick = TRUE, type = 'lines')
 abline(h = 1, lty = 2)
 ```
 
@@ -410,8 +410,8 @@ eigenvals(ord) / sum(eigenvals(ord)) * 100
 \small
 
 ```{r}
-scores(ord, display = "species", choices = c(1, 2, 3),
-       scaling = "species", correlation = TRUE)
+scores(ord, display = 'species', choices = c(1, 2, 3),
+       scaling = 'species', correlation = TRUE)
 ```
 
 ## 3. Что означают получившиеся компоненты?
@@ -440,8 +440,8 @@ belly    |\textbf{-0.3983862}| -0.06276943 -0.023506174
 - Стрелки направлены в сторону увеличения значения исходного признака
 
 ```{r fig.height=3.5, fig.width=4, out.width='2.5in', out.height='2in', fig.align='center'}
-biplot(ord, scaling = "species", correlation = TRUE, 
-       main = "PCA -  species scaling", display = "species")
+biplot(ord, scaling = 'species', correlation = TRUE, 
+       main = 'PCA -  species scaling', display = 'species')
 ```
 
 
@@ -453,16 +453,16 @@ theme_set(theme_bw())
 library(ggrepel) # для подписей (geom_text_repel)
 library(grid) # для стрелочек
 # параметры стрелочек
-ar <- arrow(length = unit(0.1, "cm"))
+ar <- arrow(length = unit(0.1, 'cm'))
 # датафрейм с факторными нагрузками
-df_load <- data.frame(scores(ord, display = "species",
-         choices = c(1, 2), scaling = "species", correlation = TRUE))
+df_load <- data.frame(scores(ord, display = 'species',
+         choices = c(1, 2), scaling = 'species', correlation = TRUE))
 # график
 ggloadings <- ggplot(df_load) + 
   geom_text_repel(aes(x = PC1, y = PC2, 
     label = rownames(df_load)), segment.alpha = 0.5) + 
   geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), 
-    colour = "grey40", arrow = ar) + 
+    colour = 'grey40', arrow = ar) + 
   coord_equal(xlim = c(-0.8, 0.8), ylim = c(-0.8, 0.8))
 ggloadings
 ```
@@ -494,14 +494,14 @@ ggloadings
 
 ```{r}
 # Координаты можно добыть так (но сейчас нам нужен только график)
-scores(ord, display = "sites",  choices = c(1, 2, 3), scaling = "sites")
+scores(ord, display = 'sites',  choices = c(1, 2, 3), scaling = 'sites')
 ```
 
 ## График факторных координат (= график ординации)
 
 ```{r fig.height=5, fig.width=5, out.width='2.6in', out.height='2.6in', fig.align='center'}
-biplot(ord, scaling = "sites", display = "sites", 
-       type = "t", main = "PCA - sites scaling")
+biplot(ord, scaling = 'sites', display = 'sites', 
+       type = 't', main = 'PCA - sites scaling')
 ```
 
 ## График факторных координат в ggplot2
@@ -509,7 +509,7 @@ biplot(ord, scaling = "sites", display = "sites",
 ```{r ggscor-pos, out.width='2in', out.height='2in', fig.align='center'}
 # данные для графика: факторные координаты и исходные переменные
 df_scores <- data.frame(pos, 
-                        scores(ord, display = "sites", scaling = "sites", 
+                        scores(ord, display = 'sites', scaling = 'sites', 
                                choices = c(1, 2, 3)))
 # график ординации
 ggscores <- ggplot(df_scores, aes(x = PC1, y = PC2, 
@@ -523,7 +523,7 @@ ggscores
 
 ```{r out.height='1.8in'}
 library(cowplot)
-plot_grid(ggloadings, ggscores, labels = c("A", "B"), align = 'hv', axis = 'r')
+plot_grid(ggloadings, ggscores, labels = c('A', 'B'), align = 'hv', axis = 'r')
 ```
 
 \pause
@@ -583,7 +583,7 @@ plot_grid(ggloadings, ggscores, labels = c("A", "B"), align = 'hv', axis = 'r')
 
 ```{r}
 library(HSAUR)
-data("skulls")
+data('skulls')
 str(skulls)
 sum(is.na(skulls))
 table(skulls$epoch)
@@ -594,7 +594,7 @@ table(skulls$epoch)
 ```{r fig.height=4}
 # цвета
 library(RColorBrewer)
-cols <- brewer.pal(n = length(levels(skulls$epoch)), name = "Set1")
+cols <- brewer.pal(n = length(levels(skulls$epoch)), name = 'Set1')
 # график
 pairs(skulls[, -1], col = cols[skulls$epoch])
 ```
@@ -623,7 +623,7 @@ ord1 <- rda(skulls[, -1], scale = TRUE)
 ## Cколько компонент нужно оставить?
 
 ```{r purl=FALSE, fig.height=3}
-screeplot(ord1, bstick = TRUE, type = "lines")
+screeplot(ord1, bstick = TRUE, type = 'lines')
 abline(h = 1, lty = 2)
 ```
 
@@ -649,25 +649,25 @@ explained
 - Вдоль 2й компоненты уменьшается высота носа (nh) и максимальная ширина (mb)
 
 ```{r purl=FALSE}
-scores(ord1, display = "species", choices = c(1, 2), 
-       scaling = "species", correlation = TRUE)
+scores(ord1, display = 'species', choices = c(1, 2), 
+       scaling = 'species', correlation = TRUE)
 ```
 
 ## Что означают получившиеся компоненты?
 
 ```{r loadings, purl=FALSE, eval=FALSE}
 # данные для графика факторных нагрузок
-df_load <- data.frame(scores(ord1, display = "species", 
+df_load <- data.frame(scores(ord1, display = 'species', 
                              choices = c(1, 2, 3), 
-                             scaling = "species", correlation = TRUE))
+                             scaling = 'species', correlation = TRUE))
 # стрелочки
-ar <- arrow(length = unit(0.1, "cm"))
+ar <- arrow(length = unit(0.1, 'cm'))
 # график факторных нагрузок
 ggloadings1 <- ggplot(df_load) + 
   geom_text_repel(aes(x = PC1, y = PC2, 
                       label = rownames(df_load))) + 
   geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), 
-               colour = "grey40", arrow = ar) + 
+               colour = 'grey40', arrow = ar) + 
   coord_equal(xlim = c(-0.8, 0.8), ylim = c(-0.8, 0.8))
 ggloadings1
 ```
@@ -694,8 +694,8 @@ ggloadings1
 ```{r skull-ord, purl=FALSE, fig.width=4, fig.height=4,  out.height='1.8in'}
 # Данные для графика ординации
 df_scores1 <- data.frame(skulls, 
-                         scores(ord1, display = "sites", choices = c(1, 2, 3), 
-                                scaling = "sites"))
+                         scores(ord1, display = 'sites', choices = c(1, 2, 3), 
+                                scaling = 'sites'))
 # График ординации
 ggscores1 <- ggplot(df_scores1, aes(x = PC1, y = PC2)) + 
   geom_point(aes(colour = epoch)) +
@@ -707,14 +707,14 @@ ggscores1
 
 ```{r out.height='2in'}
 # library(cowplot)
-plot_grid(ggloadings1, ggscores1, labels = c("A", "B"))
+plot_grid(ggloadings1, ggscores1, labels = c('A', 'B'), align = 'vh', axis = 'r')
 
 ```
 <!-- # ```{r} -->
 <!-- # # # два графика рядом -->
 <!-- # # g1 <- ggplotGrob(ggloadings1) -->
 <!-- # # g2 <- ggplotGrob(ggscores1) -->
-<!-- # # g <- gtable:::cbind_gtable(x = g1, y = g2, size = "first") -->
+<!-- # # g <- gtable:::cbind_gtable(x = g1, y = g2, size = 'first') -->
 <!-- # # grid.newpage() -->
 <!-- # # grid.draw(g) -->
 <!-- # ``` -->
