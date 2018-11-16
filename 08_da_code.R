@@ -11,14 +11,6 @@ head(iris, 10)
 # ## По каким переменным легче всего различить группы?
 pairs(iris[, -5], col = iris$Species)
 
-library(GGally)
-library(ggplot2)
-theme_set(theme_bw() + theme(legend.key = element_blank()))
-update_geom_defaults("point", list(shape = 19, size = 2))
-ggpairs(iris, aes(colour = Species, alpha = 0.5),
-        upper = list(continuous = "density", combo = "box", discrete =
-  "facetbar", na = "na"))
-
 # # I. Дискриминантный анализ на тренировочных и тестовых данных #####
 
 # ## 1) Разделяем на тренировочные и тестовые данные ####
@@ -125,12 +117,6 @@ abline(a = 0, b = 1)
 source("BoxMTest.R")
 BoxMTest(as.matrix(iris[, -5]), iris$Species)
 
-# # Квадратичный дискриминантный анализ ####
-qda_tr <- qda(iris[in_train, -5], iris$Species[in_train])
-qda_tr_pred <- predict(qda_tr)
-table(qda_tr_pred$class, iris$Species[in_train])
-qda_test_pred <- predict(qda_tr, iris[-in_train, -5])
-table(qda_test_pred$class, iris$Species[-in_train])
 
 # ## Задание: Поссумы ####
 # Данные Lindenmayer et al. (1995)
