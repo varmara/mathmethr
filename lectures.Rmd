@@ -62,14 +62,11 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", 
 
 ## 8. Дискриминантный анализ 
 
-```{r eval=FALSE}
-install.packages("GGally")
-```
 
 <!-- - Презентация: [08_da.pdf](08_da.pdf) -->
-<!-- - Код: -->
-<!--     + [код R](08_da_code.R) -->
-<!--     + [BoxMTest.R](BoxMTest.R) -->
+- Код:
+    + [код R](08_da_code.R)
+    + [BoxMTest.R](BoxMTest.R)
 
 ## 9. Ординация и классификация с использованием мер сходства-различия
 
@@ -78,4 +75,4 @@ install.packages(c("ape", "pvclust"))
 ```
 
 <!-- - Презентация: [09_dist.pdf](09_dist.pdf) -->
-<!-- - Код: [09_dist_code.R](09_dist_code.R) -->
+- Код: [09_dist_code.R](09_dist_code.R)

@@ -4,7 +4,7 @@
 
 <head>
 
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
@@ -16,47 +16,74 @@
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
 <script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #0000ff; } /* Keyword */
-code > span.ch { color: #008080; } /* Char */
-code > span.st { color: #008080; } /* String */
-code > span.co { color: #008000; } /* Comment */
-code > span.ot { color: #ff4000; } /* Other */
-code > span.al { color: #ff0000; } /* Alert */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #008000; font-weight: bold; } /* Warning */
-code > span.cn { } /* Constant */
-code > span.sc { color: #008080; } /* SpecialChar */
-code > span.vs { color: #008080; } /* VerbatimString */
-code > span.ss { color: #008080; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { } /* Variable */
-code > span.cf { color: #0000ff; } /* ControlFlow */
-code > span.op { } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #ff4000; } /* Preprocessor */
-code > span.do { color: #008000; } /* Documentation */
-code > span.an { color: #008000; } /* Annotation */
-code > span.cv { color: #008000; } /* CommentVar */
-code > span.at { } /* Attribute */
-code > span.in { color: #008000; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; } /* Alert */
+code span.an { color: #008000; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #0000ff; } /* ControlFlow */
+code span.ch { color: #008080; } /* Char */
+code span.cn { } /* Constant */
+code span.co { color: #008000; } /* Comment */
+code span.cv { color: #008000; } /* CommentVar */
+code span.do { color: #008000; } /* Documentation */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.im { } /* Import */
+code span.in { color: #008000; } /* Information */
+code span.kw { color: #0000ff; } /* Keyword */
+code span.op { } /* Operator */
+code span.ot { color: #ff4000; } /* Other */
+code span.pp { color: #ff4000; } /* Preprocessor */
+code span.sc { color: #008080; } /* SpecialChar */
+code span.ss { color: #008080; } /* SpecialString */
+code span.st { color: #008080; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #008080; } /* VerbatimString */
+code span.wa { color: #008000; font-weight: bold; } /* Warning */
 </style>
 <style type="text/css">
   pre:not([class]) {
@@ -115,6 +142,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -124,34 +154,34 @@ button.code-folding-btn:focus {
 <style type="text/css">
 /* padding for bootstrap navbar */
 body {
-  padding-top: 60px;
+  padding-top: 66px;
   padding-bottom: 40px;
 }
 /* offset scroll position for anchor links (for fixed navbar)  */
 .section h1 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 
 .section h2 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .section h3 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .section h4 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .section h5 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 .section h6 {
-  padding-top: 65px;
-  margin-top: -65px;
+  padding-top: 71px;
+  margin-top: -71px;
 }
 </style>
 
@@ -177,7 +207,6 @@ $(document).ready(function () {
 <div class="container-fluid main-container">
 
 <!-- tabsets -->
-<script src="site_libs/navigation-1.1/tabsets.js"></script>
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
@@ -203,7 +232,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0
@@ -262,8 +291,9 @@ div.tocify {
 }
 
 .tocify-subheader .tocify-item {
-  font-size: 0.9em;
-  padding-left: 5px;
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -275,7 +305,6 @@ div.tocify {
 }
 .tocify-subheader .tocify-item {
   font-size: 0.95em;
-  padding-left: 10px;
 }
 
 </style>
@@ -306,7 +335,8 @@ div.tocify {
       <ul class="nav navbar-nav">
         <li><a href="index.html">О курсе</a></li>
         <li><a href="lectures.html">Презентации и данные</a></li>
-        <li><a href="evaluation_criteria.html">Критерии оценки домашних заданий</a></li>
+<!--        <li><a href="evaluation_criteria.html">Критерии оценки домашних заданий</a></li>
+-->
         <li class="dropdown">
           <a href="appendix" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Полезности<span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
@@ -346,8 +376,8 @@ div.tocify {
 <div id="--" class="section level2">
 <h2>Пример: Морфометрия ирисов</h2>
 <p>Сверхзадача — научиться классифицировать ирисы по нескольким измерениям цветка</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(iris)
-<span class="kw">head</span>(iris, <span class="dv">10</span>)</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">data</span>(iris)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">head</span>(iris, <span class="dv">10</span>)</a></code></pre></div>
 <pre><code>#    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 # 1           5.1         3.5          1.4         0.2  setosa
 # 2           4.9         3.0          1.4         0.2  setosa
@@ -363,29 +393,25 @@ div.tocify {
 <div id="------" class="section level2">
 <h2>По каким переменным легче всего различить группы?</h2>
 <p>Чтобы это узнать, построим графики всех пар переменных при помощи функции <code>pairs()</code> из базового пакета</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs</span>(iris[, -<span class="dv">5</span>], <span class="dt">col =</span> iris$Species)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">pairs</span>(iris[, <span class="dv">-5</span>], <span class="dt">col =</span> iris<span class="op">$</span>Species)</a></code></pre></div>
 <p>Второй вариант — получить похожий график при помощи ggplot2, и с большим числом настроек</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GGally)
-<span class="kw">library</span>(ggplot2)
-<span class="kw">theme_set</span>(<span class="kw">theme_bw</span>() +<span class="st"> </span><span class="kw">theme</span>(<span class="dt">legend.key =</span> <span class="kw">element_blank</span>()))
-<span class="kw">update_geom_defaults</span>(<span class="st">&quot;point&quot;</span>, <span class="kw">list</span>(<span class="dt">shape =</span> <span class="dv">19</span>, <span class="dt">size =</span> <span class="dv">2</span>))
-<span class="kw">ggpairs</span>(iris, <span class="kw">aes</span>(<span class="dt">colour =</span> Species, <span class="dt">alpha =</span> <span class="fl">0.5</span>),
-        <span class="dt">upper =</span> <span class="kw">list</span>(<span class="dt">continuous =</span> <span class="st">&quot;density&quot;</span>, <span class="dt">combo =</span> <span class="st">&quot;box&quot;</span>, <span class="dt">discrete =</span>
-  <span class="st">&quot;facetbar&quot;</span>, <span class="dt">na =</span> <span class="st">&quot;na&quot;</span>))</code></pre></div>
-</div>
-<div id="section" class="section level2">
-<h2></h2>
-<p><img src="08_da_files/figure-html/pairs-plot-1.pdf" width="739.2" height="3.5in" /></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">library</span>(GGally)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw">theme_set</span>(<span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">legend.key =</span> <span class="kw">element_blank</span>()))</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="kw">update_geom_defaults</span>(<span class="st">&quot;point&quot;</span>, <span class="kw">list</span>(<span class="dt">shape =</span> <span class="dv">19</span>, <span class="dt">size =</span> <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw">ggpairs</span>(iris, <span class="kw">aes</span>(<span class="dt">colour =</span> Species, <span class="dt">alpha =</span> <span class="fl">0.5</span>),</a>
+<a class="sourceLine" id="cb4-6" data-line-number="6">        <span class="dt">upper =</span> <span class="kw">list</span>(<span class="dt">continuous =</span> <span class="st">&quot;density&quot;</span>, <span class="dt">combo =</span> <span class="st">&quot;box&quot;</span>, <span class="dt">discrete =</span></a>
+<a class="sourceLine" id="cb4-7" data-line-number="7">  <span class="st">&quot;facetbar&quot;</span>, <span class="dt">na =</span> <span class="st">&quot;na&quot;</span>))</a></code></pre></div>
+<hr />
+<embed src="08_da_files/figure-html/pairs-plot-1.pdf" width="739.2" height="3.5in" type="application/pdf" />
 <p>Группы не различимы, если использовать любую из переменных отдельно, или даже какую-то пару переменных. Что делать?</p>
-</div>
-<div id="section-1" class="section level2">
-<h2></h2>
-<p><img src="08_da_files/figure-html/ggpairs-plot-1.pdf" width="4.9in" height="3.5in" /></p>
+<hr />
+<embed src="08_da_files/figure-html/ggpairs-plot-1.pdf" width="4.9in" height="3.5in" type="application/pdf" />
 </div>
 <div id="--2" class="section level2">
 <h2>Дискриминантный анализ</h2>
-<p> - метод классификации объектов с учителем (<strong>supervised learning</strong>), т.е. применяется, когда принадлежность объектов к группе заранее известна. </p>
-<p></p>
+<p>Метод классификации объектов с учителем (<strong>supervised learning</strong>), т.е. применяется, когда принадлежность объектов к группе заранее известна.</p>
+
 <p>Задачи дискриминантного анализа:</p>
 <ul>
 <li>выяснить, какие признаки лучше всего позволяют классифицировать объекты</li>
@@ -410,22 +436,22 @@ div.tocify {
 </div>
 <div id="-" class="section level2">
 <h2>Дискриминантные оси</h2>
-<p></p>
+
 <ul>
 <li>задаются дискриминантными функциями</li>
 <li>вдоль них минимальное перекрывание групп</li>
 <li>дискриминантных осей всего на одну меньше чем групп (или столько же, сколько признаков, если признаков меньше, чем групп)</li>
 </ul>
-<p></p>
+
 <p></p>
 </div>
 <div id="-" class="section level2">
 <h2>Дискриминантные функции</h2>
-<p></p>
+
 <ul>
 <li>описывают положение дискриминантных осей</li>
 </ul>
-<p></p>
+
 <p><span class="math display">\[LD _j = d _{1j} X _{1} + d _{2i} X _{2} + ... + d _p X _{p}\]</span></p>
 <ul>
 <li>LD — линейная дискриминантная функция</li>
@@ -435,7 +461,7 @@ div.tocify {
 <li>p — число признаков</li>
 <li>k — число классов</li>
 </ul>
-<p></p>
+
 <div id="---" class="section level3">
 <h3>Стандартизованные коэффициенты дискриминантной функции</h3>
 <ul>
@@ -446,12 +472,12 @@ div.tocify {
 </div>
 <div id="-" class="section level2">
 <h2>Классификация объектов</h2>
-<p></p>
-<p></p>
+
+
 <ul>
-<li>Описывают вероятность принадлежности объекта к группе согласно построенной классификации</li>
+<li>Описывают <strong>правдоподобие</strong> того, что объект с заданными свойствами относится к данной группе при данных значениях признаков согласно построенной классификации.</li>
 </ul>
-<p></p>
+
 <p><span class="math display">\[C _{j} = c _{j0} + c _{j1} X _{1} + ... + c _{jp} X _{p}\]</span></p>
 <ul>
 <li>С — функция классификации</li>
@@ -460,16 +486,19 @@ div.tocify {
 <li>j = 1, …, k — число групп</li>
 <li>p — число признаков</li>
 </ul>
-<p></p>
+
 <p>Для каждого (в том числе, нового) объекта можно вычислить значение всех функций классификации. Какое значение больше — к такой группе и надо отнести объект.</p>
 <p></p>
 <p>Пример расположения областей принятия решений в линейном дискриминантном анализе с тремя группами</p>
-<p></p>
-<p></p>
+
+
 </div>
 <div id="--" class="section level2">
 <h2>Оценка качества классификации</h2>
-<p> - число верно или неверно классифицированных объектов (<strong>confusion matrix</strong>) </p>
+
+<ul>
+<li>число верно или неверно классифицированных объектов (<strong>confusion matrix</strong>) </li>
+</ul>
 <table>
 <thead>
 <tr class="header">
@@ -514,19 +543,19 @@ div.tocify {
 <h1>I. Дискриминантный анализ на тренировочных и тестовых данных</h1>
 <div id="-----" class="section level2">
 <h2>1) Разделяем на тренировочные и тестовые данные</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># доля от объема выборки, которая пойдет в тренировочный датасет</span>
-smp_size &lt;-<span class="st"> </span><span class="kw">floor</span>(<span class="fl">0.80</span> *<span class="st"> </span><span class="kw">nrow</span>(iris))
-<span class="co"># устанавливаем зерно для воспроизводимости результатов</span>
-<span class="kw">set.seed</span>(<span class="dv">982</span>)
-<span class="co"># индексы строк, которые пойдут в тренировочный датасет </span>
-in_train &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(iris), <span class="dt">size =</span> smp_size))</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># доля от объема выборки, которая пойдет в тренировочный датасет</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">smp_size &lt;-<span class="st"> </span><span class="kw">floor</span>(<span class="fl">0.80</span> <span class="op">*</span><span class="st"> </span><span class="kw">nrow</span>(iris))</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co"># устанавливаем зерно для воспроизводимости результатов</span></a>
+<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="kw">set.seed</span>(<span class="dv">982</span>)</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"><span class="co"># индексы строк, которые пойдут в тренировочный датасет </span></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">in_train &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(iris), <span class="dt">size =</span> smp_size))</a></code></pre></div>
 </div>
 <div id="-------" class="section level2">
 <h2>2) На тренировочных данных получаем стандартизованные коэффициенты дискриминантных функций</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
-lda_tr_scaled &lt;-<span class="st"> </span><span class="kw">lda</span>(<span class="kw">scale</span>(iris[in_train, -<span class="dv">5</span>]), iris$Species[in_train])
-<span class="co"># коэффициенты дискриминантных функций</span>
-lda_tr_scaled$scaling</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">library</span>(MASS)</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">lda_tr_scaled &lt;-<span class="st"> </span><span class="kw">lda</span>(<span class="kw">scale</span>(iris[in_train, <span class="dv">-5</span>]), iris<span class="op">$</span>Species[in_train])</a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co"># коэффициенты дискриминантных функций</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4">lda_tr_scaled<span class="op">$</span>scaling</a></code></pre></div>
 <pre><code>#                     LD1         LD2
 # Sepal.Length  0.6519385 -0.02737872
 # Sepal.Width   0.7433480  0.82887139
@@ -535,9 +564,9 @@ lda_tr_scaled$scaling</code></pre></div>
 </div>
 <div id="-----" class="section level2">
 <h2>3) На тренировочных данных получаем функции классификации</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lda_tr &lt;-<span class="st"> </span><span class="kw">lda.class</span>(iris[in_train, -<span class="dv">5</span>], iris$Species[in_train])
-<span class="co"># Коэф. функций классификации</span>
-lda_tr$class.funs</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">lda_tr &lt;-<span class="st"> </span><span class="kw">lda.class</span>(iris[in_train, <span class="dv">-5</span>], iris<span class="op">$</span>Species[in_train])</a>
+<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co"># Коэф. функций классификации</span></a>
+<a class="sourceLine" id="cb8-3" data-line-number="3">lda_tr<span class="op">$</span>class.funs</a></code></pre></div>
 <pre><code>#                 setosa versicolor virginica
 # constant     -85.93751 -69.983829 -99.85668
 # Sepal.Length  21.68238  13.979471  10.80913
@@ -547,8 +576,8 @@ lda_tr$class.funs</code></pre></div>
 </div>
 <div id="-----" class="section level2">
 <h2>4) Оцениваем качество классификации на тренировочных данных</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lda_tr_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(lda_tr)
-<span class="kw">table</span>(lda_tr_pred$class, iris$Species[in_train])</code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">lda_tr_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(lda_tr)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="kw">table</span>(lda_tr_pred<span class="op">$</span>class, iris<span class="op">$</span>Species[in_train])</a></code></pre></div>
 <pre><code>#             
 #              setosa versicolor virginica
 #   setosa         38          0         0
@@ -561,19 +590,19 @@ lda_tr$class.funs</code></pre></div>
 <div id="---" class="section level2">
 <h2>5) График классификации тренировочных данных</h2>
 <p>Один из вариантов представления — текстом обозначить правильные группы, а цветом — результат работы классификации</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">class_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(lda_tr_pred$x, 
-                          <span class="dt">gr =</span> lda_tr_pred$class, 
-                          <span class="dt">real_gr =</span> iris$Species[in_train])
-<span class="kw">ggplot</span>(<span class="dt">data =</span> class_df, <span class="kw">aes</span>(<span class="dt">x =</span> LD1, <span class="dt">y =</span> LD2, <span class="dt">colour =</span> gr)) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_text</span>(<span class="dt">size =</span> <span class="dv">3</span>, <span class="kw">aes</span>(<span class="dt">label =</span> real_gr)) +
-<span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</code></pre></div>
-<p><img src="08_da_files/figure-html/unnamed-chunk-7-1.pdf" width="739.2" /></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">class_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(lda_tr_pred<span class="op">$</span>x, </a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">                          <span class="dt">gr =</span> lda_tr_pred<span class="op">$</span>class, </a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">                          <span class="dt">real_gr =</span> iris<span class="op">$</span>Species[in_train])</a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="kw">ggplot</span>(<span class="dt">data =</span> class_df, <span class="kw">aes</span>(<span class="dt">x =</span> LD1, <span class="dt">y =</span> LD2, <span class="dt">colour =</span> gr)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_text</span>(<span class="dt">size =</span> <span class="dv">3</span>, <span class="kw">aes</span>(<span class="dt">label =</span> real_gr)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>)</a></code></pre></div>
+<embed src="08_da_files/figure-html/unnamed-chunk-7-1.pdf" width="739.2" type="application/pdf" />
 </div>
 <div id="-----" class="section level2">
 <h2>6) Оценка качества классификации на тестовых данных</h2>
 <p>Самое важное, если мы хотим использовать классификацию для прогноза</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lda_test_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(lda_tr, iris[-in_train, -<span class="dv">5</span>])
-<span class="kw">table</span>(lda_test_pred$class, iris$Species[-in_train])</code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">lda_test_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(lda_tr, iris[<span class="op">-</span>in_train, <span class="dv">-5</span>])</a>
+<a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw">table</span>(lda_test_pred<span class="op">$</span>class, iris<span class="op">$</span>Species[<span class="op">-</span>in_train])</a></code></pre></div>
 <pre><code>#             
 #              setosa versicolor virginica
 #   setosa         12          0         0
@@ -586,24 +615,24 @@ lda_tr$class.funs</code></pre></div>
 <div id="---" class="section level2">
 <h2>7) График классификации тестовых данных</h2>
 <p>Второй вариант представления графиков — отметить неправильно классифицированные случаи своим цветом</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">class_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(lda_test_pred$x, 
-                          <span class="dt">new =</span> lda_test_pred$class, 
-                          <span class="dt">real =</span> iris$Species[-in_train])
-class_df$Group &lt;-<span class="st"> </span><span class="kw">factor</span>(<span class="kw">paste</span>(class_df$real, class_df$new, <span class="dt">sep =</span> <span class="st">&quot; as &quot;</span>))
-
-<span class="kw">ggplot</span>(<span class="dt">data =</span> class_df, <span class="kw">aes</span>(<span class="dt">x =</span> LD1, <span class="dt">y =</span> LD2)) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> Group))</code></pre></div>
-<p><img src="08_da_files/figure-html/unnamed-chunk-9-1.pdf" width="739.2" /></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">class_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(lda_test_pred<span class="op">$</span>x, </a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">                          <span class="dt">new =</span> lda_test_pred<span class="op">$</span>class, </a>
+<a class="sourceLine" id="cb15-3" data-line-number="3">                          <span class="dt">real =</span> iris<span class="op">$</span>Species[<span class="op">-</span>in_train])</a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">class_df<span class="op">$</span>Group &lt;-<span class="st"> </span><span class="kw">factor</span>(<span class="kw">paste</span>(class_df<span class="op">$</span>real, class_df<span class="op">$</span>new, <span class="dt">sep =</span> <span class="st">&quot; as &quot;</span>))</a>
+<a class="sourceLine" id="cb15-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb15-6" data-line-number="6"><span class="kw">ggplot</span>(<span class="dt">data =</span> class_df, <span class="kw">aes</span>(<span class="dt">x =</span> LD1, <span class="dt">y =</span> LD2)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb15-7" data-line-number="7"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">colour =</span> Group))</a></code></pre></div>
+<embed src="08_da_files/figure-html/unnamed-chunk-9-1.pdf" width="739.2" type="application/pdf" />
 </div>
 </div>
 <div id="ii.----" class="section level1">
 <h1>II. Дискриминантный анализ с кроссвалидацией</h1>
 <div class="section level2">
 <h2>Кроссвалидация</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lda_cv &lt;-<span class="st"> </span><span class="kw">lda</span>(iris[, -<span class="dv">5</span>], iris$Species, <span class="dt">CV =</span> <span class="ot">TRUE</span>)
-<span class="kw">names</span>(lda_cv)</code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">lda_cv &lt;-<span class="st"> </span><span class="kw">lda</span>(iris[, <span class="dv">-5</span>], iris<span class="op">$</span>Species, <span class="dt">CV =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"><span class="kw">names</span>(lda_cv)</a></code></pre></div>
 <pre><code># [1] &quot;class&quot;     &quot;posterior&quot; &quot;call&quot;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(iris$Species, lda_cv$class)</code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">table</span>(iris<span class="op">$</span>Species, lda_cv<span class="op">$</span>class)</a></code></pre></div>
 <pre><code>#             
 #              setosa versicolor virginica
 #   setosa         50          0         0
@@ -613,13 +642,13 @@ class_df$Group &lt;-<span class="st"> </span><span class="kw">factor</span>(<spa
 </div>
 <div id="-" class="section level2">
 <h2>График классификации</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data =</span> iris, <span class="kw">aes</span>(<span class="dt">x =</span> Petal.Length,
-                        <span class="dt">y =</span> Sepal.Width,
-                        <span class="dt">colour =</span> Species,
-                        <span class="dt">shape =</span> lda_cv$class)) +
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">3</span>) +
-<span class="st">  </span><span class="kw">scale_shape_discrete</span>(<span class="st">&quot;Classified as&quot;</span>)</code></pre></div>
-<p><img src="08_da_files/figure-html/unnamed-chunk-11-1.pdf" width="739.2" /></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">ggplot</span>(<span class="dt">data =</span> iris, <span class="kw">aes</span>(<span class="dt">x =</span> Petal.Length,</a>
+<a class="sourceLine" id="cb20-2" data-line-number="2">                        <span class="dt">y =</span> Sepal.Width,</a>
+<a class="sourceLine" id="cb20-3" data-line-number="3">                        <span class="dt">colour =</span> Species,</a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">                        <span class="dt">shape =</span> lda_cv<span class="op">$</span>class)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">size =</span> <span class="dv">3</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb20-6" data-line-number="6"><span class="st">  </span><span class="kw">scale_shape_discrete</span>(<span class="st">&quot;Classified as&quot;</span>)</a></code></pre></div>
+<embed src="08_da_files/figure-html/unnamed-chunk-11-1.pdf" width="739.2" type="application/pdf" />
 </div>
 </div>
 <div id="---" class="section level1">
@@ -631,7 +660,7 @@ class_df$Group &lt;-<span class="st"> </span><span class="kw">factor</span>(<spa
 <li>внутригрупповые ковариации приблизительно равны</li>
 <li>распределение признаков — многомерное нормальное</li>
 </ul>
-<p></p>
+
 <p>Если условия применимости нарушены:</p>
 <ul>
 <li><p>В некоторых случаях, дискриминантный анализ дает хорошо работающие классификации.</p></li>
@@ -644,19 +673,19 @@ class_df$Group &lt;-<span class="st"> </span><span class="kw">factor</span>(<spa
 </div>
 <div id="m-" class="section level2">
 <h2>Mногомерная нормальность</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(iris[, -<span class="dv">5</span>])
-d &lt;-<span class="st"> </span><span class="kw">mahalanobis</span>(x, <span class="kw">colMeans</span>(x), <span class="kw">cov</span>(x))
-<span class="kw">qqplot</span>(<span class="kw">qchisq</span>(<span class="kw">ppoints</span>(<span class="kw">nrow</span>(x)), <span class="dt">df =</span> <span class="kw">ncol</span>(x)), d,
-  <span class="dt">main=</span><span class="st">&quot;QQ график для оценки многомерной нормальности&quot;</span>,
-  <span class="dt">ylab=</span><span class="st">&quot;Расстояние Махаланобиса&quot;</span>)
-<span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="dv">1</span>)</code></pre></div>
-<p><img src="08_da_files/figure-html/unnamed-chunk-12-1.pdf" width="739.2" /></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">x &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(iris[, <span class="dv">-5</span>])</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2">d &lt;-<span class="st"> </span><span class="kw">mahalanobis</span>(x, <span class="kw">colMeans</span>(x), <span class="kw">cov</span>(x))</a>
+<a class="sourceLine" id="cb21-3" data-line-number="3"><span class="kw">qqplot</span>(<span class="kw">qchisq</span>(<span class="kw">ppoints</span>(<span class="kw">nrow</span>(x)), <span class="dt">df =</span> <span class="kw">ncol</span>(x)), d,</a>
+<a class="sourceLine" id="cb21-4" data-line-number="4">  <span class="dt">main=</span><span class="st">&quot;QQ график для оценки многомерной нормальности&quot;</span>,</a>
+<a class="sourceLine" id="cb21-5" data-line-number="5">  <span class="dt">ylab=</span><span class="st">&quot;Расстояние Махаланобиса&quot;</span>)</a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"><span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="dv">1</span>)</a></code></pre></div>
+<embed src="08_da_files/figure-html/unnamed-chunk-12-1.pdf" width="739.2" type="application/pdf" />
 </div>
 <div id="--" class="section level2">
 <h2>Гомогенность ковариационных матриц</h2>
-<p></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;BoxMTest.R&quot;</span>)
-<span class="kw">BoxMTest</span>(<span class="kw">as.matrix</span>(iris[, -<span class="dv">5</span>]), iris$Species)</code></pre></div>
+
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&quot;BoxMTest.R&quot;</span>)</a>
+<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">BoxMTest</span>(<span class="kw">as.matrix</span>(iris[, <span class="dv">-5</span>]), iris<span class="op">$</span>Species)</a></code></pre></div>
 <pre><code># ------------------------------------------------
 #  MBox Chi-sqr. df P
 # ------------------------------------------------
@@ -683,16 +712,16 @@ d &lt;-<span class="st"> </span><span class="kw">mahalanobis</span>(x, <span cla
 <h1>Квадратичный дискриминантный анализ</h1>
 <div id="---1" class="section level2">
 <h2>Квадратичный дискриминантный анализ</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qda_tr &lt;-<span class="st"> </span><span class="kw">qda</span>(iris[in_train, -<span class="dv">5</span>], iris$Species[in_train])
-qda_tr_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(qda_tr)
-<span class="kw">table</span>(qda_tr_pred$class, iris$Species[in_train])</code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">qda_tr &lt;-<span class="st"> </span><span class="kw">qda</span>(iris[in_train, <span class="dv">-5</span>], iris<span class="op">$</span>Species[in_train])</a>
+<a class="sourceLine" id="cb25-2" data-line-number="2">qda_tr_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(qda_tr)</a>
+<a class="sourceLine" id="cb25-3" data-line-number="3"><span class="kw">table</span>(qda_tr_pred<span class="op">$</span>class, iris<span class="op">$</span>Species[in_train])</a></code></pre></div>
 <pre><code>#             
 #              setosa versicolor virginica
 #   setosa         38          0         0
 #   versicolor      0         39         0
 #   virginica       0          2        41</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qda_test_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(qda_tr, iris[-in_train, -<span class="dv">5</span>])
-<span class="kw">table</span>(qda_test_pred$class, iris$Species[-in_train])</code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">qda_test_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(qda_tr, iris[<span class="op">-</span>in_train, <span class="dv">-5</span>])</a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">table</span>(qda_test_pred<span class="op">$</span>class, iris<span class="op">$</span>Species[<span class="op">-</span>in_train])</a></code></pre></div>
 <pre><code>#             
 #              setosa versicolor virginica
 #   setosa         12          0         0
@@ -706,24 +735,26 @@ qda_tr_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(qda_tr
 <li>Хорошо ли работает классификация?</li>
 <li>Выполняются ли условия применимости?</li>
 </ul>
+
 <p></p>
-<p></p>
-<p></p>
-<p></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DAAG)
-<span class="kw">data</span>(possum)
-possum &lt;-<span class="st"> </span>
-<span class="st">  </span>possum[<span class="kw">complete.cases</span>(possum), ]</code></pre></div>
-<p></p>
-<p></p>
+
+
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="kw">library</span>(DAAG)</a>
+<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="kw">data</span>(possum)</a>
+<a class="sourceLine" id="cb29-3" data-line-number="3">possum &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb29-4" data-line-number="4"><span class="st">  </span>possum[<span class="kw">complete.cases</span>(possum), ]</a></code></pre></div>
+
+
 </div>
 <div id="take-home-messages" class="section level2">
 <h2>Take home messages</h2>
 <ul>
 <li><p>Дискриминантный анализ — метод классификации объектов по правилам, выработанным на выборке объектов с заранее известной принадлежностью</p></li>
-<li>Качество классификации можно оценить по числу неверно классифицированных объектов. Чтобы не было “переобучения” можно:</li>
+<li>Качество классификации можно оценить по числу неверно классифицированных объектов. Чтобы не было “переобучения” можно:
+<ul>
 <li>Подобрать классификацию на тренировочных данных и проверить на тестовых</li>
-<li><p>Использовать кроссвалидацию — классификацию объектов по правилам полученным по остальным данным (без учета этих объектов)</p></li>
+<li>Использовать кроссвалидацию — классификацию объектов по правилам полученным по остальным данным (без учета этих объектов)</li>
+</ul></li>
 <li><p>Для дискриминантного анализа нужно отбирать признаки, независимые друг от друга или создавать синтетические признаки при помощи анализа главных компонент.</p></li>
 <li><p>Если внутригрупповые ковариации признаков различаются, лучше применять квадратичный дискриминантный анализ.</p></li>
 </ul>
@@ -737,7 +768,9 @@ possum &lt;-<span class="st"> </span>
 </div>
 
 <p><small>
+<!--
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">mathmethr</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="varmara.github.io/mathmethr-course" property="cc:attributionName" rel="cc:attributionURL">Marina Varfolomeeva</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
+-->
 </small></p>
 
 
@@ -749,8 +782,11 @@ possum &lt;-<span class="st"> </span>
 <script>
 
 // add bootstrap table styles to pandoc tables
-$(document).ready(function () {
+function bootstrapStylePandocTables() {
   $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
 });
 
 
@@ -761,7 +797,7 @@ $(document).ready(function () {
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

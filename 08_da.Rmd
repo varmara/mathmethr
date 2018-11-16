@@ -2,21 +2,24 @@
 title: "Дискриминантный анализ"
 subtitle: "Математические методы в зоологии с использованием R"
 author: "Марина Варфоломеева"
+classoption: 't,xcolor=table'
+language: russian, english
 output:
   beamer_presentation:
     colortheme: seagull
     highlight: tango
     fonttheme: structurebold
+    latex_engine: xelatex
     includes:
       in_header: ./includes/header.tex
     pandoc_args:
-    - --latex-engine=xelatex
     - -V fontsize=10pt
-    - -V lang=russian
     slide_level: 2
+    fig_crop: false
     theme: CambridgeUS
-    toc: yes
+    toc: no
 ---
+
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 options(width = 70, scipen = 6)
@@ -31,7 +34,7 @@ opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE,
 - провести линейный и квадратичный дискриминантный анализ с использованием обучающей выборки и проверить качество классификации на тестовых данных или с использованием кроссвалидации
 - проверить условия применимости дискриминантного анализа
 
-# Дискриминантный анализ
+## Дискриминантный анализ
 
 ## Пример: Морфометрия ирисов
 
@@ -50,34 +53,19 @@ head(iris, 10)
 pairs(iris[, -5], col = iris$Species)
 ```
 
-Второй вариант --- получить похожий график при помощи ggplot2, и с большим числом настроек
-
-```{r ggpairs-plot, eval=FALSE}
-library(GGally)
-library(ggplot2)
-theme_set(theme_bw() + theme(legend.key = element_blank()))
-update_geom_defaults("point", list(shape = 19, size = 2))
-ggpairs(iris, aes(colour = Species, alpha = 0.5),
-        upper = list(continuous = "density", combo = "box", discrete =
-  "facetbar", na = "na"))
-```
-
-##
+---
 
 ```{r pairs-plot, echo=FALSE, fig.height=7, out.height='3.5in', purl=FALSE}
 ```
 
 Группы не различимы, если использовать любую из переменных отдельно, или даже какую-то пару переменных. Что делать?
 
-##
-
-```{r ggpairs-plot, echo=FALSE, fig.height=7, fig.width=9.8, out.height='3.5in', out.width='4.9in', purl=FALSE}
-```
-
 ## Дискриминантный анализ
 
 \blockbegin{Дискриминантный анализ}
+
 - метод классификации объектов с учителем (__supervised learning__), т.е. применяется, когда принадлежность объектов к группе заранее известна.
+
 \blockend
 
 \vfill
@@ -101,7 +89,7 @@ ggpairs(iris, aes(colour = Species, alpha = 0.5),
 
 Как она может проходить?
 
-\includegraphics{images/discrim0.jpg}
+\includegraphics[width=0.8\textwidth,keepaspectratio]{images/discrim0.jpg}
 
 
 ## Дискриминантные оси
@@ -147,7 +135,7 @@ $$LD _j = d _{1j} X _{1} + d _{2i} X _{2} + ... + d _p X _{p}$$
 
 \blockbegin{Функции классификации}
 
-- Описывают вероятность принадлежности объекта с заданными свойствами к группе согласно построенной классификации  (т.е. __правдоподобие__ того, что объект относится к данной группе при данных значениях признаков).
+- Описывают __правдоподобие__ того, что объект с заданными свойствами относится к данной группе при данных значениях признаков согласно построенной классификации.
 
 \blockend
 
@@ -176,7 +164,9 @@ $$C _{j} = c _{j0} + c _{j1} X _{1} + ... + c _{jp} X _{p}$$
 ## Оценка качества классификации
 
 \blockbegin{Таблица классификации}
+
 - число верно или неверно классифицированных объектов (__confusion matrix__)
+
 \blockend
 
 Было / Стало | Класс А | Класс Б |
@@ -196,7 +186,7 @@ $$C _{j} = c _{j0} + c _{j1} X _{1} + ... + c _{jp} X _{p}$$
 
 2. __Кроссвалидация__ --- разделение на тренировочное и тестовое подмножество повторяют многократно и усредняют оценки качества классификации между повторами.
 
-# I. Дискриминантный анализ на тренировочных и тестовых данных
+## I. Дискриминантный анализ на тренировочных и тестовых данных
 
 ## 1) Разделяем на тренировочные и тестовые данные
 
@@ -218,6 +208,7 @@ lda_tr_scaled <- lda(scale(iris[in_train, -5]), iris$Species[in_train])
 lda_tr_scaled$scaling
 ```
 
+По ним можно оценить вклады разных признаков в изменчивость вдоль дискриминантных осей.
 
 
 ## 3) На тренировочных данных получаем функции классификации
@@ -260,6 +251,7 @@ lda_tr <- lda.class(iris[in_train, -5], iris$Species[in_train])
 lda_tr$class.funs
 ```
 
+По ним можно классифицировать объекты.
 
 ## 4) Оцениваем качество классификации на тренировочных данных
 
@@ -270,20 +262,8 @@ table(lda_tr_pred$class, iris$Species[in_train])
 
 - Какова доля неправильно классифицированных случаев?
 
-## 5) График классификации тренировочных данных
 
-Один из вариантов представления --- текстом обозначить правильные группы, а цветом --- результат работы классификации
-
-```{r}
-class_df <- data.frame(lda_tr_pred$x, 
-                          gr = lda_tr_pred$class, 
-                          real_gr = iris$Species[in_train])
-ggplot(data = class_df, aes(x = LD1, y = LD2, colour = gr)) + 
-  geom_text(size = 3, aes(label = real_gr)) +
-  theme(legend.position = "none")
-```
-
-## 6) Оценка качества классификации на тестовых данных
+## 5) Оценка качества классификации на тестовых данных
 
 Самое важное, если мы хотим использовать классификацию для прогноза
 
@@ -294,21 +274,23 @@ table(lda_test_pred$class, iris$Species[-in_train])
 
 - Какова доля неправильно классифицированных случаев?
 
-## 7) График классификации тестовых данных
+## 6) График классификации тестовых данных
 
-Второй вариант представления графиков --- отметить неправильно классифицированные случаи своим цветом
+Можно отметить неправильно классифицированные случаи своим цветом
 
 ```{r}
+library(ggplot2)
+
 class_df <- data.frame(lda_test_pred$x, 
-                          new = lda_test_pred$class, 
-                          real = iris$Species[-in_train])
+                       new = lda_test_pred$class, 
+                       real = iris$Species[-in_train])
 class_df$Group <- factor(paste(class_df$real, class_df$new, sep = " as "))
 
 ggplot(data = class_df, aes(x = LD1, y = LD2)) + 
   geom_point(aes(colour = Group))
 ```
 
-# II. Дискриминантный анализ с кроссвалидацией
+## II. Дискриминантный анализ с кроссвалидацией
 
 ## Кроссвалидация
 
@@ -332,7 +314,7 @@ ggplot(data = iris, aes(x = Petal.Length,
 ```
 
 
-# Условия применимости дискриминантного анализа
+## Условия применимости дискриминантного анализа
 
 
 ## Условия применимости дискриминантного анализа
@@ -376,18 +358,18 @@ BoxMTest(as.matrix(iris[, -5]), iris$Species)
 ```
 
 
-# Квадратичный дискриминантный анализ
+<!-- ## Квадратичный дискриминантный анализ -->
 
 
-## Квадратичный дискриминантный анализ
+<!-- ## Квадратичный дискриминантный анализ -->
 
-```{r}
-qda_tr <- qda(iris[in_train, -5], iris$Species[in_train])
-qda_tr_pred <- predict(qda_tr)
-table(qda_tr_pred$class, iris$Species[in_train])
-qda_test_pred <- predict(qda_tr, iris[-in_train, -5])
-table(qda_test_pred$class, iris$Species[-in_train])
-```
+<!-- ```{r} -->
+<!-- qda_tr <- qda(iris[in_train, -5], iris$Species[in_train]) -->
+<!-- qda_tr_pred <- predict(qda_tr) -->
+<!-- table(qda_tr_pred$class, iris$Species[in_train]) -->
+<!-- qda_test_pred <- predict(qda_tr, iris[-in_train, -5]) -->
+<!-- table(qda_test_pred$class, iris$Species[-in_train]) -->
+<!-- ``` -->
 
 ## Задание: Поссумы
 

@@ -2,21 +2,24 @@
 title: "Ординация и классификация с использованием мер сходства-различия"
 subtitle: "Математические методы в зоологии с использованием R"
 author: "Марина Варфоломеева"
+classoption: 't,xcolor=table'
+language: russian, english
 output:
   beamer_presentation:
     colortheme: seagull
     highlight: tango
     fonttheme: structurebold
+    latex_engine: xelatex
     includes:
       in_header: ./includes/header.tex
     pandoc_args:
-    - --latex-engine=xelatex
     - -V fontsize=10pt
-    - -V lang=russian
     slide_level: 2
+    fig_crop: false
     theme: CambridgeUS
-    toc: yes
+    toc: no
 ---
+
 
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 options(width = 70, scipen = 6)
@@ -33,7 +36,7 @@ opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE,
 - Строить дендрограммы при помощи подходящего метода аггрегации
 
 
-# Коэффициенты сходства и различия
+## Коэффициенты сходства и различия
 
 ## Коэффициенты сходства и различия
 
@@ -132,7 +135,7 @@ $0 \le S \le 1$ или $-1 \le S \le 1$
 \centering
 \textbf{Нестандартные}
 
-$$-\inf \le d \le \inf$$
+$$-\infty \le d \le \infty$$
 
 \column{0.48\textwidth}
 
@@ -253,11 +256,11 @@ $$-1 \le S \le 1$$
 
 ## Если используются бинарные данные (присутствие-отсутствие признака)
 
-\includegraphics{images/qual.png}
+\includegraphics[width=0.8\textwidth,keepaspectratio]{images/qual.png}
 
 ## Примеры коэффициентов для качественных данных
 
-\includegraphics{images/jaccard.png}
+\includegraphics[width=0.8\textwidth,keepaspectratio]{images/jaccard.png}
 
 ## Если данные смешанные (качественные и количественные)
 
@@ -266,7 +269,7 @@ $$-1 \le S \le 1$$
 - расстояние Говера
 
 
-# Неметрическое многомерное шкалирование
+## Неметрическое многомерное шкалирование
 
 
 ## Неметрическое многомерное шкалирование визуализирует отношения между объектами на основе расстояний между ними
@@ -423,7 +426,7 @@ head(ord_euclid$points, 10)
 График ординации:
 
 ```{r fig-ugly-ord, fig.width = 4.5, fig.height = 5}
-ordiplot(ord_euclid, type = "t", cex = 0.5)
+ordiplot(ord_euclid, type = "t")
 ```
 
 \columnsend
@@ -434,22 +437,6 @@ ordiplot(ord_euclid, type = "t", cex = 0.5)
 Для графика используйте координаты точек `ord_euclid$points` и исходные данные.  
 Раскрасьте график по значениям переменной `Pop`.  
 Сделайте так, чтобы особи разного пола были изображены на разных панелях
-
-Дополните код
-
-```{r eval=FALSE, purl=TRUE}
-library()
-# Данные для графика
-points_euclid <- data.frame( , )
-# График nMDS ординации
-gg_euclid <- ggplot(, aes(x = , y = )) +
-  geom_point() + 
-  facet_wrap(~ )
-gg_euclid
-```
-
-
-## Решение: график ординации
 
 ```{r fig-ord, echo=FALSE, eval=TRUE, purl=FALSE}
 library(ggplot2)
@@ -462,9 +449,22 @@ gg_euclid <- ggplot(points_euclid, aes(x = MDS1, y = MDS2)) +
 gg_euclid
 ```
 
-## Код для графика
+## Дополните код
 
-```{r fig-ord, echo=TRUE, eval=FALSE, purl=FALSE}
+```{r eval=FALSE, purl=TRUE}
+library()
+# Данные для графика
+points_euclid <- data.frame( , )
+# График nMDS ординации
+gg_euclid <- ggplot(, aes(x = , y = )) +
+  geom_point() + 
+  facet_wrap(~ )
+gg_euclid
+```
+
+## Решение: график ординации
+
+```{r fig-ord, echo=TRUE, purl=FALSE}
 ```
 
 ## Задание 2
@@ -512,7 +512,7 @@ gg_scaled
 
 ## Видно, что графики ординации, полученные разными методами, различаются
 
-```{r gg-both, echo=FALSE, purl=TRUE, fig.height=6, purl=FALSE}
+```{r gg-both, echo=FALSE, purl=TRUE, fig.height=5, purl=FALSE}
 library(gridExtra)
 grid.arrange(gg_euclid + aes(size = age),
              gg_scaled + aes(size = age),
@@ -524,7 +524,7 @@ grid.arrange(gg_euclid + aes(size = age),
 ```{r gg-both, echo=TRUE, eval=FALSE, purl=TRUE}
 ```
 
-# Кластерный анализ
+## Кластерный анализ
 
 ## Пример: Морфометрия самок поссумов
 
@@ -584,7 +584,7 @@ fos <- fossum[complete.cases(fossum), 6:14]
 Со списком пакетов для филогенетического анализа в R можно познакомиться здесь:  
 https://cran.r-project.org/web/views/Phylogenetics.html
 
-# Методы класстеризации на основании расстояний
+## Методы класстеризации на основании расстояний
 
 ## От чего зависит результат кластеризации
 
@@ -783,7 +783,7 @@ plot(ph_w2, type = "phylogram", direction = "downwards", cex = 0.8)
 axisPhylo(side = 2)
 ```
 
-# Cравнение и интерпретация результатов кластеризации
+## Cравнение и интерпретация результатов кластеризации
 
 ## Кофенетическая корреляция
 
@@ -819,8 +819,7 @@ cor(d, c_w2)
 - Можно выбрать, глядя на распределение расстояний ветвления
 - Можно оценить вероятность разделения на кластеры при помощи бутстрепа
 
-
-## Бутстреп
+## Бутстреп-поддержка ветвей
 
 Функция `system.time` - покажет, сколько времени заняли рассчеты
 
@@ -857,7 +856,7 @@ cl_boot <- pvclust(scale(t(fos)),
 plot(cl_boot, cex.pv = 0.8, cex = 0.8)
 ```
 
-# Построение деревьев по генетическим данным
+## Построение деревьев по генетическим данным
 
 ## Teaser
 
