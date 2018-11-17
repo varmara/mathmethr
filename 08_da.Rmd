@@ -257,7 +257,7 @@ lda_tr$class.funs
 
 ```{r}
 lda_tr_pred <- predict(lda_tr)
-table(lda_tr_pred$class, iris$Species[in_train])
+table(iris$Species[in_train], lda_tr_pred$class)
 ```
 
 - Какова доля неправильно классифицированных случаев?
@@ -269,7 +269,7 @@ table(lda_tr_pred$class, iris$Species[in_train])
 
 ```{r}
 lda_test_pred <- predict(lda_tr, iris[-in_train, -5])
-table(lda_test_pred$class, iris$Species[-in_train])
+table(iris$Species[-in_train], lda_test_pred$class)
 ```
 
 - Какова доля неправильно классифицированных случаев?

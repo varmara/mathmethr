@@ -66,7 +66,7 @@ lda_tr$class.funs
 
 # ## 4) Оцениваем качество классификации на тренировочных данных ####
 lda_tr_pred <- predict(lda_tr)
-table(lda_tr_pred$class, iris$Species[in_train])
+table(iris$Species[in_train], lda_tr_pred$class)
 
 
 # ## 5) График классификации тренировочных данных ####
@@ -79,7 +79,7 @@ ggplot(data = class_df, aes(x = LD1, y = LD2, colour = gr)) +
 
 # ## 6) Оценка качества классификации на тестовых данных ####
 lda_test_pred <- predict(lda_tr, iris[-in_train, -5])
-table(lda_test_pred$class, iris$Species[-in_train])
+table(iris$Species[-in_train], lda_test_pred$class)
 
 # ## 7) График классификации тестовых данных ####
 class_df <- data.frame(lda_test_pred$x,
