@@ -25,70 +25,6 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 
 
-<style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
-}
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {  }
-@media screen {
-a.sourceLine::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; } /* Alert */
-code span.an { color: #008000; } /* Annotation */
-code span.at { } /* Attribute */
-code span.bu { } /* BuiltIn */
-code span.cf { color: #0000ff; } /* ControlFlow */
-code span.ch { color: #008080; } /* Char */
-code span.cn { } /* Constant */
-code span.co { color: #008000; } /* Comment */
-code span.cv { color: #008000; } /* CommentVar */
-code span.do { color: #008000; } /* Documentation */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.im { } /* Import */
-code span.in { color: #008000; } /* Information */
-code span.kw { color: #0000ff; } /* Keyword */
-code span.op { } /* Operator */
-code span.ot { color: #ff4000; } /* Other */
-code span.pp { color: #ff4000; } /* Preprocessor */
-code span.sc { color: #008080; } /* SpecialChar */
-code span.ss { color: #008080; } /* SpecialString */
-code span.st { color: #008080; } /* String */
-code span.va { } /* Variable */
-code span.vs { color: #008080; } /* VerbatimString */
-code span.wa { color: #008000; font-weight: bold; } /* Warning */
-</style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
 
 
 <style type="text/css">
@@ -120,9 +56,7 @@ h6 {
 
 <link rel="stylesheet" href="my_styles.css" type="text/css" />
 
-</head>
 
-<body>
 
 <style type = "text/css">
 .main-container {
@@ -147,6 +81,9 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
@@ -161,7 +98,6 @@ body {
   padding-top: 71px;
   margin-top: -71px;
 }
-
 .section h2 {
   padding-top: 71px;
   margin-top: -71px;
@@ -181,6 +117,43 @@ body {
 .section h6 {
   padding-top: 71px;
   margin-top: -71px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
 }
 </style>
 
@@ -202,18 +175,75 @@ $(document).ready(function () {
 });
 </script>
 
-
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
 <script>
 $(document).ready(function () {
   window.buildTabsets("TOC");
 });
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
 </script>
 
 <!-- code folding -->
-
 
 
 
@@ -308,6 +338,16 @@ div.tocify {
 
 </style>
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
 <!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
 <div class="col-xs-12 col-sm-4 col-md-3">
@@ -358,86 +398,74 @@ div.tocify {
 </div>
 
 
-<div id="--r" class="section level2">
-<h2>1. Знакомство с R</h2>
-<ul>
-<li>Конспект: <a href="01_intro_to_r.html">01_intro_to_r.html</a></li>
-<li>Код: <a href="01_intro_to_r.R">01_intro_to_r.R</a></li>
-</ul>
+<div id="--r-14.09-1-" class="section level2">
+<h2>1. Знакомство с R (14.09, 1 пара)</h2>
+<!-- - Конспект: [01_intro_to_r.html](01_intro_to_r.html) -->
+<!-- - Код: [01_intro_to_r.R](01_intro_to_r.R) -->
 </div>
-<div id="-.--" class="section level2">
-<h2>2. Тестирование гипотез. Анализ мощности</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;Hmisc&quot;</span>, <span class="st">&quot;Rcpp&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;readxl&quot;</span>, <span class="st">&quot;effsize&quot;</span>, <span class="st">&quot;pwr&quot;</span>))</a></code></pre></div>
-<ul>
-<li>Презентация: <a href="02_power.pdf">02_power.pdf</a></li>
-<li>Код: <a href="02_power_code.R">02_power_code.R</a></li>
-<li>Данные: <a href="data/fleabeetles-subset.xlsx">fleabeetles-subset.xlsx</a></li>
-</ul>
+<div id="-.---14.09-2-" class="section level2">
+<h2>2. Тестирование гипотез. Анализ мощности (14.09, 2 пара)</h2>
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("Hmisc", "Rcpp", "ggplot2", "readxl", "effsize", "pwr")) -->
+<!-- ``` -->
+<!-- - Презентация: [02_power.pdf](02_power.pdf) -->
+<!-- - Код: [02_power_code.R](02_power_code.R) -->
+<!-- - Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx) -->
 </div>
-<div id="--.1" class="section level2">
-<h2>3. Регрессионный анализ, ч.1</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;car&quot;</span>)</a></code></pre></div>
-<ul>
-<li>Презентация: <a href="03_regression1.pdf">03_regression1.pdf</a></li>
-<li>Код: <a href="03_regression1_code.R">03_regression1_code.R</a></li>
-<li>Данные:
-<ul>
-<li><a href="data/HybridPollenSterility.xlsx">HybridPollenSterility.xlsx</a></li>
-<li><a href="data/HybridPollenSterility.csv">HybridPollenSterility.csv</a></li>
-</ul></li>
-</ul>
+<div id="--.1-21.09-1-" class="section level2">
+<h2>3. Регрессионный анализ, ч.1 (21.09, 1 пара)</h2>
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("car") -->
+<!-- ``` -->
+<!-- - Презентация: [03_regression1.pdf](03_regression1.pdf) -->
+<!-- - Код: [03_regression1_code.R](03_regression1_code.R) -->
+<!-- - Данные:  -->
+<!--     - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx) -->
+<!--     - [HybridPollenSterility.csv](data/HybridPollenSterility.csv) -->
 </div>
-<div id="--.2" class="section level2">
-<h2>4. Регрессионный анализ, ч.2</h2>
-<ul>
-<li>Презентация: <a href="04_regression2.pdf">04_regression2.pdf</a></li>
-<li>Код: <a href="04_regression2_code.R">04_regression2_code.R</a></li>
-<li>Данные: <a href="data/loyn.xlsx">loyn.xlsx</a> | <a href="data/loyn.csv">loyn.csv</a></li>
-</ul>
+<div id="--.2-21.09-2-" class="section level2">
+<h2>4. Регрессионный анализ, ч.2 (21.09, 2 пара)</h2>
+<!-- - Презентация: [04_regression2.pdf](04_regression2.pdf) -->
+<!-- - Код: [04_regression2_code.R](04_regression2_code.R) -->
+<!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
 </div>
-<div id="--.1" class="section level2">
-<h2>5. Дисперсионный анализ, ч.1</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;multcomp&quot;</span>)</a></code></pre></div>
-<ul>
-<li>Презентация: <a href="05_anova1.pdf">05_anova1.pdf</a></li>
-<li>Код: <a href="05_anova1_code.R">05_anova1_code.R</a></li>
-<li>Данные: <a href="data/sleep.xlsx">sleep.xlsx</a> | <a href="data/sleep.csv">sleep.csv</a></li>
-</ul>
+<div id="--.1-28.09-1-" class="section level2">
+<h2>5. Дисперсионный анализ, ч.1 (28.09, 1 пара)</h2>
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("multcomp") -->
+<!-- ``` -->
+<!-- - Презентация: [05_anova1.pdf](05_anova1.pdf) -->
+<!-- - Код: [05_anova1_code.R](05_anova1_code.R) -->
+<!-- - Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv) -->
 </div>
-<div id="--.2" class="section level2">
-<h2>6. Дисперсионный анализ, ч.2</h2>
-<ul>
-<li>Презентация: <a href="06_anova2.pdf">06_anova2.pdf</a></li>
-<li>Код: <a href="06_anova2_code.R">06_anova2_code.R</a></li>
-<li>Данные: <a href="data/eysenck.csv">eysenck.csv</a></li>
-</ul>
+<div id="--.2-28.09-2-" class="section level2">
+<h2>6. Дисперсионный анализ, ч.2 (28.09, 2 пара)</h2>
+<!-- - Презентация: [06_anova2.pdf](06_anova2.pdf) -->
+<!-- - Код: [06_anova2_code.R](06_anova2_code.R) -->
+<!-- - Данные: [eysenck.csv](data/eysenck.csv) -->
 </div>
-<div id="--" class="section level2">
-<h2>7. Анализ главных компонент</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;DAAG&quot;</span>, <span class="st">&quot;RColorBrewer&quot;</span>, <span class="st">&quot;vegan&quot;</span>, <span class="st">&quot;grid&quot;</span>, <span class="st">&quot;cowplot&quot;</span>, <span class="st">&quot;HSAUR&quot;</span>, <span class="st">&quot;ggrepel&quot;</span>))</a></code></pre></div>
-<ul>
-<li>Презентация: <a href="07_pca.pdf">07_pca.pdf</a></li>
-<li>Код: <a href="07_pca_code.R">07_pca_code.R</a></li>
-</ul>
+<div id="---12.10-1-" class="section level2">
+<h2>7. Анализ главных компонент (12.10, 1 пара)</h2>
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", "ggrepel")) -->
+<!-- ``` -->
+<!-- - Презентация: [07_pca.pdf](07_pca.pdf) -->
+<!-- - Код: [07_pca_code.R](07_pca_code.R) -->
 </div>
-<div id="-" class="section level2">
-<h2>8. Дискриминантный анализ</h2>
-<ul>
-<li>Презентация: <a href="08_da.pdf">08_da.pdf</a></li>
-<li>Код:
-<ul>
-<li><a href="08_da_code.R">код R</a></li>
-<li><a href="BoxMTest.R">BoxMTest.R</a></li>
-</ul></li>
-</ul>
+<div id="--12.10-2-" class="section level2">
+<h2>8. Дискриминантный анализ (12.10, 2 пара)</h2>
+<!-- - Презентация: [08_da.pdf](08_da.pdf) -->
+<!-- - Код: -->
+<!--     + [код R](08_da_code.R) -->
+<!--     + [BoxMTest.R](BoxMTest.R) -->
 </div>
-<div id="-------" class="section level2">
-<h2>9. Ординация и классификация с использованием мер сходства-различия</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;ape&quot;</span>, <span class="st">&quot;pvclust&quot;</span>))</a></code></pre></div>
-<ul>
-<li>Презентация: <a href="09_dist.pdf">09_dist.pdf</a></li>
-<li>Код: <a href="09_dist_code.R">09_dist_code.R</a></li>
-</ul>
+<div id="--------26.10-1-" class="section level2">
+<h2>9. Ординация и классификация с использованием мер сходства-различия (26.10, 1 пара)</h2>
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("ape", "pvclust")) -->
+<!-- ``` -->
+<!-- - Презентация: [09_dist.pdf](09_dist.pdf) -->
+<!-- - Код: [09_dist_code.R](09_dist_code.R) -->
 </div>
 
 <p><small>

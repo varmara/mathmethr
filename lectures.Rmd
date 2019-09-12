@@ -2,77 +2,76 @@
 title: Презентации и данные
 ---
 
-## 1. Знакомство с R 
+## 1. Знакомство с R (14.09, 1 пара)
 
-- Конспект: [01_intro_to_r.html](01_intro_to_r.html)
-- Код: [01_intro_to_r.R](01_intro_to_r.R)
+<!-- - Конспект: [01_intro_to_r.html](01_intro_to_r.html) -->
+<!-- - Код: [01_intro_to_r.R](01_intro_to_r.R) -->
 
-## 2. Тестирование гипотез. Анализ мощности
+## 2. Тестирование гипотез. Анализ мощности (14.09, 2 пара)
 
-```{r eval=FALSE}
-install.packages(c("Hmisc", "Rcpp", "ggplot2", "readxl", "effsize", "pwr"))
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("Hmisc", "Rcpp", "ggplot2", "readxl", "effsize", "pwr")) -->
+<!-- ``` -->
 
-- Презентация: [02_power.pdf](02_power.pdf)
-- Код: [02_power_code.R](02_power_code.R)
-- Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx)
+<!-- - Презентация: [02_power.pdf](02_power.pdf) -->
+<!-- - Код: [02_power_code.R](02_power_code.R) -->
+<!-- - Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx) -->
 
-## 3. Регрессионный анализ, ч.1
+## 3. Регрессионный анализ, ч.1 (21.09, 1 пара)
 
-```{r eval=FALSE}
-install.packages("car")
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("car") -->
+<!-- ``` -->
 
-- Презентация: [03_regression1.pdf](03_regression1.pdf)
-- Код: [03_regression1_code.R](03_regression1_code.R)
-- Данные: 
-    - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx)
-    - [HybridPollenSterility.csv](data/HybridPollenSterility.csv)
+<!-- - Презентация: [03_regression1.pdf](03_regression1.pdf) -->
+<!-- - Код: [03_regression1_code.R](03_regression1_code.R) -->
+<!-- - Данные:  -->
+<!--     - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx) -->
+<!--     - [HybridPollenSterility.csv](data/HybridPollenSterility.csv) -->
 
-## 4. Регрессионный анализ, ч.2
+## 4. Регрессионный анализ, ч.2 (21.09, 2 пара)
 
-- Презентация: [04_regression2.pdf](04_regression2.pdf)
-- Код: [04_regression2_code.R](04_regression2_code.R)
-- Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv)
+<!-- - Презентация: [04_regression2.pdf](04_regression2.pdf) -->
+<!-- - Код: [04_regression2_code.R](04_regression2_code.R) -->
+<!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
 
-## 5. Дисперсионный анализ, ч.1 
+## 5. Дисперсионный анализ, ч.1 (28.09, 1 пара)
 
-```{r eval=FALSE}
-install.packages("multcomp")
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages("multcomp") -->
+<!-- ``` -->
 
-- Презентация: [05_anova1.pdf](05_anova1.pdf)
-- Код: [05_anova1_code.R](05_anova1_code.R)
-- Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv)
+<!-- - Презентация: [05_anova1.pdf](05_anova1.pdf) -->
+<!-- - Код: [05_anova1_code.R](05_anova1_code.R) -->
+<!-- - Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv) -->
 
-## 6. Дисперсионный анализ, ч.2
+## 6. Дисперсионный анализ, ч.2 (28.09, 2 пара)
 
-- Презентация: [06_anova2.pdf](06_anova2.pdf)
-- Код: [06_anova2_code.R](06_anova2_code.R)
-- Данные: [eysenck.csv](data/eysenck.csv)
+<!-- - Презентация: [06_anova2.pdf](06_anova2.pdf) -->
+<!-- - Код: [06_anova2_code.R](06_anova2_code.R) -->
+<!-- - Данные: [eysenck.csv](data/eysenck.csv) -->
 
-## 7. Анализ главных компонент
+## 7. Анализ главных компонент (12.10, 1 пара)
 
-```{r eval=FALSE}
-install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", "ggrepel"))
-```
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", "ggrepel")) -->
+<!-- ``` -->
 
-- Презентация: [07_pca.pdf](07_pca.pdf)
-- Код: [07_pca_code.R](07_pca_code.R)
+<!-- - Презентация: [07_pca.pdf](07_pca.pdf) -->
+<!-- - Код: [07_pca_code.R](07_pca_code.R) -->
 
-## 8. Дискриминантный анализ 
+## 8. Дискриминантный анализ (12.10, 2 пара)
 
+<!-- - Презентация: [08_da.pdf](08_da.pdf) -->
+<!-- - Код: -->
+<!--     + [код R](08_da_code.R) -->
+<!--     + [BoxMTest.R](BoxMTest.R) -->
 
-- Презентация: [08_da.pdf](08_da.pdf)
-- Код:
-    + [код R](08_da_code.R)
-    + [BoxMTest.R](BoxMTest.R)
+## 9. Ординация и классификация с использованием мер сходства-различия (26.10, 1 пара)
 
-## 9. Ординация и классификация с использованием мер сходства-различия
+<!-- ```{r eval=FALSE} -->
+<!-- install.packages(c("ape", "pvclust")) -->
+<!-- ``` -->
 
-```{r eval=FALSE}
-install.packages(c("ape", "pvclust"))
-```
-
-- Презентация: [09_dist.pdf](09_dist.pdf)
-- Код: [09_dist_code.R](09_dist_code.R)
+<!-- - Презентация: [09_dist.pdf](09_dist.pdf) -->
+<!-- - Код: [09_dist_code.R](09_dist_code.R) -->
