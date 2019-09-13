@@ -23,6 +23,9 @@
 library(MASS)
 data("Cushings")
 
+library(ggplot2)
+ggplot(data = Cushings, aes(x = Type, y = Tetrahydrocortisone)) +
+  stat_summary(fun.data = mean_cl_normal)
 
 tt <- t.test(formula = Tetrahydrocortisone ~ Type, data = Cushings,
              subset = Cushings$Type %in% c('a', 'b'))
@@ -127,9 +130,6 @@ table(flea$species)
 
 
 # График средних и стандартных отклонений
-library(ggplot2)
-theme_set(theme_bw())
-
 ggplot(data = flea, aes(x = species, y = fjft)) +
   stat_summary(geom = 'pointrange', fun.data = mean_sdl) +
   labs(y = 'Ширина первого членика первой лапки (мкм)',
@@ -140,6 +140,7 @@ ggplot(data = flea, aes(x = species, y = fjft)) +
 # Мы хотим выяснить, сколько нужно жуков, чтобы
 # показать, что ширина первого членика первой
 # лапки различается у этих двух видов
+
 
 ### Величина эффекта по данным пилотного исследования ##########
 
@@ -158,15 +159,5 @@ effect_size_flea <- abs(eff_flea$estimate)
 # значимости 0.05
 # Используйте функцию `pwr.t.test()`
 
-
-
-
-
-# ## Задание 6 -------------------------------------
-# Представьте, что в датасете `sleep` содержатся
-# данные пилотного исследования.
-# Оцените, какой объем выборки нужно взять, чтобы
-# показать, что число часов дополнительного сна
-# после применения двух препаратов различается?
 
 

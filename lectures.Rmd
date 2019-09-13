@@ -5,17 +5,17 @@ title: Презентации и данные
 ## 1. Знакомство с R (14.09, 1 пара)
 
 <!-- - Конспект: [01_intro_to_r.html](01_intro_to_r.html) -->
-<!-- - Код: [01_intro_to_r.R](01_intro_to_r.R) -->
+- Код: [01_intro_to_r.R](01_intro_to_r.R)
 
 ## 2. Тестирование гипотез. Анализ мощности (14.09, 2 пара)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("Hmisc", "Rcpp", "ggplot2", "readxl", "effsize", "pwr")) -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("Hmisc", "Rcpp", "ggplot2", "readxl", "effsize", "pwr"))
+```
 
 <!-- - Презентация: [02_power.pdf](02_power.pdf) -->
-<!-- - Код: [02_power_code.R](02_power_code.R) -->
-<!-- - Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx) -->
+- Код: [02_power_code.R](02_power_code.R)
+- Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx)
 
 ## 3. Регрессионный анализ, ч.1 (21.09, 1 пара)
 
