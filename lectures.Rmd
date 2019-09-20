@@ -19,21 +19,22 @@ install.packages(c("Hmisc", "Rcpp", "ggplot2", "readxl", "effsize", "pwr"))
 
 ## 3. Регрессионный анализ, ч.1 (21.09, 1 пара)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages("car") -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages("readxl")
+install.packages("car")
+```
 
 <!-- - Презентация: [03_regression1.pdf](03_regression1.pdf) -->
-<!-- - Код: [03_regression1_code.R](03_regression1_code.R) -->
-<!-- - Данные:  -->
-<!--     - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx) -->
-<!--     - [HybridPollenSterility.csv](data/HybridPollenSterility.csv) -->
+- Код: [03_regression1_code.R](03_regression1_code.R)
+- Данные:
+    - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx)
+    - [HybridPollenSterility.csv](data/HybridPollenSterility.csv)
 
 ## 4. Регрессионный анализ, ч.2 (21.09, 2 пара)
 
 <!-- - Презентация: [04_regression2.pdf](04_regression2.pdf) -->
-<!-- - Код: [04_regression2_code.R](04_regression2_code.R) -->
-<!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
+- Код: [04_regression2_code.R](04_regression2_code.R)
+- Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv)
 
 ## 5. Дисперсионный анализ, ч.1 (28.09, 1 пара)
 

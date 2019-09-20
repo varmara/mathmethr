@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -98,7 +99,7 @@ code span.wa { color: #008000; font-weight: bold; } /* Warning */
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -156,7 +157,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -317,48 +317,9 @@ $(document).ready(function () {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = false;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <style type="text/css">
 
@@ -407,8 +368,6 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
-  padding-left: 25px;
-  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -502,20 +461,25 @@ div.tocify {
 </div>
 <div id="--.1-21.09-1-" class="section level2">
 <h2>3. Регрессионный анализ, ч.1 (21.09, 1 пара)</h2>
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages("car") -->
-<!-- ``` -->
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw">install.packages</span>(<span class="st">&quot;car&quot;</span>)</a></code></pre></div>
 <!-- - Презентация: [03_regression1.pdf](03_regression1.pdf) -->
-<!-- - Код: [03_regression1_code.R](03_regression1_code.R) -->
-<!-- - Данные:  -->
-<!--     - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx) -->
-<!--     - [HybridPollenSterility.csv](data/HybridPollenSterility.csv) -->
+<ul>
+<li>Код: <a href="03_regression1_code.R">03_regression1_code.R</a></li>
+<li>Данные:
+<ul>
+<li><a href="data/HybridPollenSterility.xlsx">HybridPollenSterility.xlsx</a></li>
+<li><a href="data/HybridPollenSterility.csv">HybridPollenSterility.csv</a></li>
+</ul></li>
+</ul>
 </div>
 <div id="--.2-21.09-2-" class="section level2">
 <h2>4. Регрессионный анализ, ч.2 (21.09, 2 пара)</h2>
 <!-- - Презентация: [04_regression2.pdf](04_regression2.pdf) -->
-<!-- - Код: [04_regression2_code.R](04_regression2_code.R) -->
-<!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
+<ul>
+<li>Код: <a href="04_regression2_code.R">04_regression2_code.R</a></li>
+<li>Данные: <a href="data/loyn.xlsx">loyn.xlsx</a> | <a href="data/loyn.csv">loyn.csv</a></li>
+</ul>
 </div>
 <div id="--.1-28.09-1-" class="section level2">
 <h2>5. Дисперсионный анализ, ч.1 (28.09, 1 пара)</h2>
@@ -579,6 +543,49 @@ $(document).ready(function () {
 });
 
 
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = false;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
