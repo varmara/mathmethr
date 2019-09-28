@@ -42,21 +42,21 @@ install.packages("car")
 install.packages("multcomp")
 ```
 
-<!-- - Презентация: [05_anova1.pdf](05_anova1.pdf) -->
+- Презентация: [05_anova1.pdf](05_anova1.pdf)
 - Код: [05_anova1_code.R](05_anova1_code.R)
 - Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv)
 
 ## 6. Дисперсионный анализ, ч.2 (28.09, 2 пара)
 
-<!-- - Презентация: [06_anova2.pdf](06_anova2.pdf) -->
+- Презентация: [06_anova2.pdf](06_anova2.pdf)
 - Код: [06_anova2_code.R](06_anova2_code.R)
 - Данные: [eysenck.csv](data/eysenck.csv)
 
 ## 7. Анализ главных компонент (12.10, 1 пара)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", "ggrepel")) -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", "ggrepel"))
+```
 
 <!-- - Презентация: [07_pca.pdf](07_pca.pdf) -->
 <!-- - Код: [07_pca_code.R](07_pca_code.R) -->
