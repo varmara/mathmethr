@@ -23,14 +23,29 @@ table(pos$sex, pos$site, pos$Pop)
 # ## Как связаны признаки между собой?
 
 # Серия графиков с признаками во всех возможных комбинациях
-n_sites <- length(unique(pos$site))
-# цвета из Брюеровской палитры "Set1"
-library(RColorBrewer)
-cols <- brewer.pal(n = n_sites, name = "Set1")
-# график морфометрических переменных
-pairs(pos[, 6:14], col = cols[pos$site],
+pairs(pos[, 6:14],
       pch =  as.numeric(pos$sex))
 
+# поссумы из разных популяций раскрашены разными цветами
+pairs(pos[, 6:14],
+      col = pos$Pop,
+      pch =  as.numeric(pos$sex))
+
+# поссумы из разных точек раскрашены разными цветами
+pairs(pos[, 6:14],
+      col = pos$site,
+      pch =  as.numeric(pos$sex))
+
+
+# цвета для каждого сайта из Брюеровской палитры "Set1"
+library(RColorBrewer)
+n_sites <- length(unique(pos$site))
+cols <- brewer.pal(n = n_sites, name = "Set1")
+
+# график морфометрических переменных
+pairs(pos[, 6:14],
+      col = cols[pos$site],
+      pch =  as.numeric(pos$sex))
 
 
 #### Анализ главных компонент ####################
@@ -153,7 +168,8 @@ table(skulls$epoch)
 library(RColorBrewer)
 cols <- brewer.pal(n = length(levels(skulls$epoch)), name = "Set1")
 # график
-pairs(skulls[, -1], col = cols[skulls$epoch])
+pairs(skulls[, -1],
+      col = cols[skulls$epoch])
 
 
 #### Задание 1 ---------------------------------------------

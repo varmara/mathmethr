@@ -70,9 +70,10 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", 
 
 ## 9. Ординация и классификация с использованием мер сходства-различия (26.10, 1 пара)
 
-<!-- ```{r eval=FALSE} -->
-<!-- install.packages(c("ape", "pvclust")) -->
-<!-- ``` -->
+```{r eval=FALSE}
+install.packages("ape")
+install.packages("pvclust")
+```
 
 <!-- - Презентация: [09_dist.pdf](09_dist.pdf) -->
 <!-- - Код: [09_dist_code.R](09_dist_code.R) -->
