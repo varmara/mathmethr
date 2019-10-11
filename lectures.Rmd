@@ -59,14 +59,14 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", 
 ```
 
 <!-- - Презентация: [07_pca.pdf](07_pca.pdf) -->
-<!-- - Код: [07_pca_code.R](07_pca_code.R) -->
+- Код: [07_pca_code.R](07_pca_code.R)
 
 ## 8. Дискриминантный анализ (12.10, 2 пара)
 
 <!-- - Презентация: [08_da.pdf](08_da.pdf) -->
-<!-- - Код: -->
-<!--     + [код R](08_da_code.R) -->
-<!--     + [BoxMTest.R](BoxMTest.R) -->
+- Код:
+    + [код R](08_da_code.R)
+    + [BoxMTest.R](BoxMTest.R)
 
 ## 9. Ординация и классификация с использованием мер сходства-различия (26.10, 1 пара)
 
