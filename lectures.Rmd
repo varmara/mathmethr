@@ -58,12 +58,12 @@ install.packages("multcomp")
 install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", "ggrepel"))
 ```
 
-<!-- - Презентация: [07_pca.pdf](07_pca.pdf) -->
+- Презентация: [07_pca.pdf](07_pca.pdf)
 - Код: [07_pca_code.R](07_pca_code.R)
 
 ## 8. Дискриминантный анализ (12.10, 2 пара)
 
-<!-- - Презентация: [08_da.pdf](08_da.pdf) -->
+- Презентация: [08_da.pdf](08_da.pdf)
 - Код:
     + [код R](08_da_code.R)
     + [BoxMTest.R](BoxMTest.R)
