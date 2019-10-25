@@ -169,7 +169,7 @@ system.time({
 cl_boot <- pvclust(scale(t(fos)),
                    method.hclust = "average",
                    method.dist = "euclidean",
-                   nboot = 5000,
+                   nboot = 100,
                    parallel = TRUE,
                    iseed = 42)
 })
@@ -193,5 +193,3 @@ hc_pri <- hclust(d_pri, method = "average")
 ph_pri <- as.phylo(hc_pri)
 plot(ph_pri, cex = 0.8)
 axisPhylo()
-
-

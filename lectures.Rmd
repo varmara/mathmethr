@@ -76,4 +76,4 @@ install.packages("pvclust")
 ```
 
 <!-- - Презентация: [09_dist.pdf](09_dist.pdf) -->
-<!-- - Код: [09_dist_code.R](09_dist_code.R) -->
+- Код: [09_dist_code.R](09_dist_code.R)
