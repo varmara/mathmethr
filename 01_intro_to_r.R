@@ -168,7 +168,7 @@ txt
 txt
 # Первый элемент
 txt[1]
-# Первый и третьий элементы
+# Первый и третий элементы
 txt[c(1, 3)]
 
 # Задание 6 --------------------------------------------------------
@@ -300,7 +300,7 @@ beverage[sugar >= 3]
 # Векторы одинаковой длины можно хранить вместе в виде таблицы.
 # Создадим векторы, чтобы объединить их в датафрейм.
 len <- 1:9 # числовой
-col <- c(rep("green", 4), rep("red", 5)) # текстовый
+col <- c(rep("green", 2), rep("yellow", 2), rep("red", 5)) # текстовый
 wid <- seq(from = 2, by = 2, to = 18) # числовой
 
 # Создаем датафрейм
@@ -398,8 +398,9 @@ gg + labs(x = "Ширина", y = "Длина", colour = "Цвет")
 gg + facet_wrap(~Colour, nrow = 1)
 
 # (Чтобы изменить подписи цветов, нужно изменить уровни соотв. фактора)
-my_worms$col_rus <- factor(my_worms$Colour, levels = c("green", "red"), labels = c("Зеленый", "Красный"))
+my_worms$col_rus <- factor(my_worms$Colour, levels = c("green", "red", "yellow"), labels = c("Зеленый", "Красный", "Желтый"))
 ggplot(data = my_worms) +
   geom_point(aes(x = Width, y = Length, colour = col_rus)) +
   labs(x = "Ширина", y = "Длина", colour = "Цвет") +
   facet_wrap(~col_rus, nrow = 1)
+
