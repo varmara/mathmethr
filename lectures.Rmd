@@ -14,8 +14,8 @@ install.packages(c("Hmisc", "Rcpp", "ggplot2", "readxl", "effsize", "pwr"))
 ```
 
 <!-- - Презентация: [02_power.pdf](02_power.pdf) -->
-<!-- - Код: [02_power_code.R](02_power_code.R) -->
-<!-- - Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx) -->
+- Код: [02_power_code.R](02_power_code.R)
+- Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx)
 
 ## 3. Регрессионный анализ, ч.1
 
