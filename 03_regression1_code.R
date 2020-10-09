@@ -57,8 +57,6 @@ nrow(hybrid)
 # 5. Какую тему оформления нужно использовать?
 
 
-
-
 # Давайте поэтапно построим график
 library(ggplot2)
 
@@ -71,24 +69,24 @@ ggplot(data = hybrid)
 
 # 2. Какие переменные изображать на графике?
 # Эстетики --- это свойства будущих элементов графика, которые будут изображать данные
-
 ggplot(data = hybrid, aes(x = Distance, y = Sterile))
 
 # 3. В виде чего изображать?
 # Геомы --- графические элементы
-
 ggplot(data = hybrid, aes(x = Distance, y = Sterile)) +
   geom_point()
 
 # 4. Какие подписи нужны?
 ggplot(data = hybrid, aes(x = Distance, y = Sterile)) +
   geom_point() +
-  labs(x = 'Генетическое расстояние', y = 'Доля стерильных \nпыльцевых зерен')
+  labs(x = 'Генетическое расстояние',
+       y = 'Доля стерильных\nпыльцевых зерен')
 
 # Графики ggplot можно сохранять в переменные
 gg_hybrid <- ggplot(data = hybrid, aes(x = Distance, y = Sterile)) +
   geom_point() +
-  labs(x = 'Генетическое расстояние', y = 'Доля стерильных \nпыльцевых зерен')
+  labs(x = 'Генетическое расстояние',
+       y = 'Доля стерильных\nпыльцевых зерен')
 gg_hybrid
 
 # 5. Какую тему оформления нужно использовать?
@@ -106,7 +104,6 @@ ggsave(filename = 'hybrids_Sterile.pdf', plot = gg_hybrid)
 
 
 # # Корреляция ####################################################
-
 
 # ## Есть ли связь между переменными?
 gg_hybrid
@@ -181,9 +178,9 @@ newdata <- data.frame(Distance = c(50, 100)) # новые данные для п
 # Предсказанные значения для исходных данных
 # объединим с исходными данными в новом датафрейме
 # - для графиков
-(pr_all <- predict(hybrid_lm, interval = 'prediction'))
+pr_all <- predict(hybrid_lm, interval = 'prediction')
 hybrid_with_pred <- data.frame(hybrid, pr_all)
-
+head(hybrid_with_pred) # посмотрим, что получилось
 
 # ## Строим доверительную область значений и доверительный интервал одновременно
 gg_hybrid +
@@ -195,6 +192,7 @@ gg_hybrid +
                   fill = 'Доверительная \nобласть значений'),
               alpha = 0.2) +
   scale_fill_manual('Интервалы', values = c('green', 'blue'))
+
 
 
 

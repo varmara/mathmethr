@@ -39,7 +39,7 @@ source('support_mathmethr.R')
 
 Гибриды отдаленных видов часто бывают стерильны.  
 Но насколько они должны быть разными для этого?  
-Как зависит плодовитость гибридов [смолевок](http://ru.wikipedia.org/wiki/Смолёвка) _Silene vulgaris_ от генетической удаленности? 
+Как зависит плодовитость межвидовых гибридов [смолевок](http://ru.wikipedia.org/wiki/Смолёвка) рода _Silene_ от их генетической удаленности? 
 
 \vfill
 
@@ -187,7 +187,8 @@ ggplot(data = hybrid, aes(x = Distance, y = Sterile)) +
 ```{r gg-labs}
 ggplot(data = hybrid, aes(x = Distance, y = Sterile)) + 
   geom_point() + 
-  labs(x = 'Генетическое расстояние', y = 'Доля стерильных \nпыльцевых зерен')
+  labs(x = 'Генетическое расстояние', 
+       y = 'Доля стерильных\nпыльцевых зерен')
 ```
 
 ## Графики ggplot можно сохранять в переменные
@@ -195,7 +196,8 @@ ggplot(data = hybrid, aes(x = Distance, y = Sterile)) +
 ```{r gg-var}
 gg_hybrid <- ggplot(data = hybrid, aes(x = Distance, y = Sterile)) + 
   geom_point() + 
-  labs(x = 'Генетическое расстояние', y = 'Доля стерильных \nпыльцевых зерен')
+  labs(x = 'Генетическое расстояние', 
+       y = 'Доля стерильных\nпыльцевых зерен')
 gg_hybrid
 ```
 
@@ -376,6 +378,8 @@ $$y _i = \beta _0 + \beta _1 x _{1i} + \varepsilon_i$$
 gg_hybrid + geom_smooth(method = 'lm')
 ```
 
+>- В этой картинке есть подвох, но о нем мы поговорим позже...
+
 ## Линейная регрессия бывает простая и множественная
 
 - простая
@@ -538,8 +542,9 @@ $\hat y _i \pm t _{\alpha, n - 2} \cdot SE _{\hat y _i}$, $SE _{\hat y} = \sqrt{
 __Доверительная область значений регрессии__ --- это зона, в которую попадает $(1 - \alpha) \cdot 100\%$ всех предсказанных значений
 
 ```{r, hybrid-pr-all, echo=FALSE, results='hide', purl=FALSE}
-(pr_all <- predict(hybrid_lm, interval = 'prediction'))
+pr_all <- predict(hybrid_lm, interval = 'prediction')
 hybrid_with_pred <- data.frame(hybrid, pr_all)
+head(hybrid_with_pred)
 ```
 
 ```{r, hybrid-pred, echo=FALSE, fig.height=1.75, purl=FALSE}
@@ -646,7 +651,7 @@ $$\widehat{Sterile} _i  = 0.2 + 5.4 Distance _i$$
 
 $$t = \frac{b _1 - \theta}{SE _{b _1}}$$
 
-$H _0 : b _1 = \theta$, для $\theta = 0$
+$H _0 : b _1 = \theta$, для $\theta = 0$  
 $H _A : b _1 \ne \theta$
 
 $t$-статистика подчиняется $t$-распределению с числом степеней свободы $df = n - p$, где $p$ --- число параметров.
@@ -843,7 +848,7 @@ $$F = \frac{MS _{regression}}{MS _{error}}$$
 ar <- arrow(type = "closed", length = unit(0.15,"cm"))
 arb <- arrow(type = "closed", length = unit(0.15,"cm"), ends = "both")
 
-dfr <- data.frame(f = seq(-0.1, 2, 0.001))
+dfr <- data.frame(f = seq(-0.001, 2, 0.0001))
 ggplot(dfr, aes(x = f)) + 
   stat_function(fun = df, args = list(df1 = 1, df2 = 21), size = 1.3) + 
 labs(title = expression(bold(paste("F-распределение,", ~df[1]==1, ", ", ~ df[2]==21))),
@@ -892,19 +897,19 @@ df2 <- smr_f[3]
 
 ```{r eval=FALSE}
 gg_hybrid + geom_smooth(method = 'lm') + 
-  labs (title = '95% доверительная зона регрессии')
+  labs(title = '95% доверительная зона регрессии')
 
 gg_hybrid + geom_smooth(method = 'lm', level = 0.99) + 
-  labs (title = '99% доверительная зона регрессии')
+  labs(title = '99% доверительная зона регрессии')
 ```
 
 ```{r echo=FALSE, purl=FALSE}
 library(gridExtra)
 grid.arrange(
 gg_hybrid + geom_smooth(method = 'lm') + 
-  labs (title = '95% доверительная зона регрессии'),
+  labs(title = '95% доверительная зона регрессии'),
 gg_hybrid + geom_smooth(method = 'lm', level = 0.99) + 
-  labs (title = '99% доверительная зона регрессии'),
+  labs(title = '99% доверительная зона регрессии'),
 ncol = 2)
 ```
 
@@ -958,7 +963,8 @@ $R^2_{adj}$ учитывает число переменных в модели, 
 \fontsize{10pt}{10pt}
 
 ```{r fig.height = 7}
-newdata <- data.frame(Distance = c(0.07, 0.055)) # значения, для которых предсказываем
+# значения, для которых предсказываем
+newdata <- data.frame(Distance = c(0.07, 0.055)) 
 (pr1 <- predict(hybrid_lm, newdata, interval = 'confidence', se = TRUE))
 ```
 
@@ -972,7 +978,8 @@ newdata <- data.frame(Distance = c(0.07, 0.055)) # значения, для ко
 \fontsize{10pt}{10pt}
 
 ```{r}
-newdata <- data.frame(Distance = c(50, 100)) # новые данные для предсказания значений
+# значения, для которых предсказываем
+newdata <- data.frame(Distance = c(50, 100)) 
 (pr2 <- predict(hybrid_lm, newdata, interval = 'prediction', se = TRUE))
 ```
 
