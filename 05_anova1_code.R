@@ -203,6 +203,6 @@ gg_means
 # ## Достоверно различающиеся по пост-хок тесту
 # группы обозначим разными буквами
 gg_means +
-  geom_text(aes(label = c("A", "A", "A", "AB", "B"),
-                vjust = -0.3, hjust = 1.5), size = 6)
+  geom_text(aes(label = c("A", "A", "A", "AB", "B")),
+            vjust = -0.3, hjust = 1.4, size = 6)
 
