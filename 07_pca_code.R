@@ -68,7 +68,6 @@ eigenvals(ord)
 
 # График собственных чисел
 screeplot(ord, bstick = TRUE, type = "lines")
-abline(h = 1, lty = 2)
 
 #### 2. Сколько изменчивости объясняют компоненты? #########
 
@@ -80,7 +79,6 @@ eigenvals(ord) / sum(eigenvals(ord)) * 100
 # Факторные нагрузки
 scores(ord, display = "species", choices = c(1, 2, 3),
        scaling = "species", correlation = TRUE)
-
 
 
 # Можно нарисовать факторные нагрузки на графике
@@ -121,12 +119,9 @@ biplot(ord, scaling = "sites", display = "sites",
 
 # График ординации в ggplot2
 # данные для графика: факторные координаты и исходные переменные
-df_scores <- data.frame(pos,
-                        scores(ord, display = "sites", scaling = "sites",
-                               choices = c(1, 2, 3)))
+df_scores <- data.frame(pos, scores(ord, display = "sites", scaling = "sites", choices = c(1, 2, 3)))
 # график ординации
-ggscores <- ggplot(df_scores, aes(x = PC1, y = PC2,
-                                  colour = Pop, shape = sex)) +
+ggscores <- ggplot(df_scores, aes(x = PC1, y = PC2, colour = Pop, shape = sex)) +
   geom_point(size = 2) +
   coord_equal(xlim = c(-1, 1), ylim = c(-1, 1))
 ggscores
@@ -135,7 +130,7 @@ ggscores
 
 # Два графика рядом
 library(cowplot)
-plot_grid(ggloadings, ggscores, labels = c("A", "B"), align = 'vh', axis = 'r')
+plot_grid(ggloadings, ggscores, labels = 'AUTO', align = 'vh', axis = 'r')
 
 
 #### Пример: Морфометрия египетских черепов ###############
@@ -168,8 +163,7 @@ table(skulls$epoch)
 library(RColorBrewer)
 cols <- brewer.pal(n = length(levels(skulls$epoch)), name = "Set1")
 # график
-pairs(skulls[, -1],
-      col = cols[skulls$epoch])
+pairs(skulls[, -1], col = cols[skulls$epoch])
 
 
 #### Задание 1 ---------------------------------------------

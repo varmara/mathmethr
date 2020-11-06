@@ -44,85 +44,99 @@ opts_chunk$set(fig.show='hold', size='footnotesize', comment='#', warning=FALSE,
 ## Анализ главных компонент --- способ снижения размерности
 
 \columnsbegin
-\column{0.49\textwidth}
+\column{0.3\textwidth}
 
 \blockbegin {Многомерные исходные данные}
 
-В этом примере для простоты - двумерные
-
 ```{r ex-data, echo=FALSE, purl=FALSE}
-x1 <- c(0.5, 1.0, 1.1, 1.5, 1.9, 2.0, 2.2, 2.3, 2.5, 3.1)
-x2 <- c(2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9)
-df <- data.frame(x1, x2)
+library(vegan)
+library(dplyr)
 library(ggplot2)
+library(ggrepel)
 theme_set(theme_classic())
-p_raw <- ggplot(df) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(df)), hjust = -0.3) 
-df
+
+X <- trees %>% 
+  mutate(x1 = round(Girth * 2.54, 1), 
+         x2 = round(Height * 0.3048, 1)) %>% 
+  select(-Girth:-Volume) %>% 
+  arrange(x1, x2) %>% 
+  as.matrix()
+
+p_raw <- ggplot(as.data.frame(X)) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_text(aes(x = x1, y = x2, label = 1:nrow(X)), hjust = -0.3) + theme_classic() + coord_fixed(expand = FALSE, xlim = c(0, max(X[, 1]) + 1), ylim = c(0, max(X[, 2]) + 2))
+head(X)
 ```
 
 \blockend
 
-\column{0.49\textwidth}
+\column{0.7\textwidth}
 
-```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=4}
-p_raw + xlim(0, 3.2)
+```{r echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=3.5, out.width='0.99\\linewidth'}
+p_raw 
 ```
 
 \columnsend
+
+В этом примере для простоты используются двумерные данные, т.е. у каждого наблюдения (строки) есть два свойства (столбцы). Например, это могут быть свойства деревьев: x1 --- диаметр ствола, x2 --- высота ствола.
 
 ## Центрирование
 
 \blockbegin{Центрирование}
 
-Из каждого значения переменной нужно вычесть среднее значение этой переменной
+Из каждого значения переменной нужно вычесть среднее значение этой переменной.
+
+
 
 \blockend
 
-Если центрировать данные, то центр координат переместится в точку $(\bar x _{1}, \bar x _{2})$
 
 ```{r echo=FALSE, purl=FALSE}
-# normalize
-dfnorm <- data.frame(x1=x1-mean(x1), x2=x2-mean(x2))
-dfnorm <- dfnorm[order(x1), ]
-p_normalized <- ggplot(dfnorm) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = rownames(dfnorm)), hjust = -0.3)
+#centered
+X_cent <- scale(X, scale = FALSE)
+
+p_centered <- ggplot(as.data.frame(X_cent)) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text_repel(aes(x = x1, y = x2, label = 1:nrow(X_cent)), hjust = -0.3) + coord_fixed()
 ```
 
 \columnsbegin
-\column{0.49\textwidth}
+\column{0.25\textwidth}
 
 Центрированные данные:
 
 ```{r echo=FALSE, purl=FALSE}
-dfnorm
+head(round(X_cent, 1))
 ```
 
-\column{0.49\textwidth}
+\column{0.75\textwidth}
 
-```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=4}
-p_normalized  + xlim(-1.3, 1.3)
+```{r echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=2.5}
+p_centered
 ```
 
 \columnsend
 
+Если центрировать данные (вычесть `r paste("среднее ", colnames(X), " = ", round(colMeans(X), 1), collapse = ", ")`), то центр координат переместится в точку $(\bar x _{1}, \bar x _{2})$
+
 ## Матрица ковариаций между признаками
 
 \columnsbegin
-\column{0.49\textwidth}
+\column{0.3\textwidth}
 
 Исходные данные:
 
 ```{r echo=FALSE, purl=FALSE}
-dfnorm
+head(X)
 ```
 
-\column{0.49\textwidth}
+\column{0.7\textwidth}
 
-Матрица ковариаций:
+Из исходных данных получают матрицу ковариаций:
 
 ```{r echo=FALSE, purl=FALSE}
-xyCov <- cov(dfnorm)
-xyCov
+# X_cov <- cov(X)
+X_cov <- t(X_cent) %*% X_cent/(nrow(X_cent) - 1)
+X_cov
 ```
+
+\vspace{3\baselineskip}
 
 \blockbegin{Матрица ковариаций}
 
@@ -138,12 +152,11 @@ xyCov
 
 \small
 
-Матрица ковариаций:
+Матрица ковариаций
 
 ```{r echo=FALSE, purl=FALSE}
-xyCov
+X_cov
 ```
-
 
 \columnsbegin
 \column{0.49\textwidth}
@@ -160,8 +173,8 @@ xyCov
 
 ```{r echo=FALSE, purl=FALSE}
 #new axes
-eigen_values <- eigen(xyCov)$values
-eigen_values
+e_val <- eigen(X_cov)$values
+e_val
 ```
 
 \column{0.49\textwidth}
@@ -178,59 +191,50 @@ eigen_values
 \blockend
 
 ```{r echo=FALSE, purl=FALSE}
-eigen_vectors <- eigen(xyCov)$vectors
-eigen_vectors
+e_vec <- eigen(X_cov)$vectors
+e_vec
 ```
 
 \columnsend
 
 ## С помощью собственных векторов и собственных чисел можно найти в пространстве признаков новые оси, вдоль которых будет максимальный разброс точек.
 
-```{r echo=FALSE, purl=FALSE, fig.width=4, fig.height=4, out.height='2.5in', out.width='2.5in', fig.align='center'}
-dfnorm$pc1 <- eigen_vectors[2,1]/eigen_vectors[1,1] * dfnorm$x1
-dfnorm$pc2 <- eigen_vectors[2,2]/eigen_vectors[1,2] * dfnorm$x1
-# plot of future axes
-p_futureax <- p_normalized +
-  geom_line(data = dfnorm, aes(x = x1, y = pc1), linetype = 'dashed') +
-  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = 'dashed')
-p_futureax + xlim(-1.5, 1.5)
+```{r echo=FALSE, purl=FALSE, fig.width=9.5, fig.height=2.75, out.width='0.99\\linewidth'}
+e_vec_scaled <- e_vec %*% sqrt(diag(e_val))
+
+PC1 <- data.frame(x = c(mean(X_cent[, 1]), -e_vec_scaled[1, 1]),
+                  y = c(mean(X_cent[, 2]),  -e_vec_scaled[2, 1]))
+
+PC2 <- data.frame(x = c(mean(X_cent[, 1]),  -e_vec_scaled[1, 2]),
+                  y = c(mean(X_cent[, 2]),  -e_vec_scaled[2, 2]))
+
+p_futureax <- p_centered +
+  geom_line(data = PC1, aes(x = x, y = y), colour = "blue", size = 1.5)  +
+  geom_line(data = PC2, aes(x = x, y = y), colour = "blue", size = 1.5) +
+  coord_equal()
+p_futureax
 ```
 
 
 
 ## Можно найти новые координаты точек в получившемся новом пространстве
 
-\columnsbegin
-\column{0.49\textwidth}
-
-Объекты и оси в пространстве исходных признаков:
-
-```{r echo=FALSE, purl=FALSE, fig.height=4, fig.width=4}
-p_normalized +
-  geom_line(data = dfnorm, aes(x = x1, y = pc1), linetype = 'dashed') +
-  geom_line(data = dfnorm, aes(x = pc2, y = x1), linetype = 'dashed')
+```{r echo=FALSE, purl=FALSE, fig.width=9.5, fig.height=2.75, out.width='0.99\\linewidth'}
+p_futureax + labs(title = "До PCA: объекты и оси в пространстве исходных признаков")
 ```
 
-\column{0.49\textwidth}
+```{r echo=FALSE, purl=FALSE, fig.width=9.5, fig.height=2.75, out.width='0.95\\linewidth'}
+df_pca <- rda(X, scale = FALSE)
 
-Объекты в пространстве новых осей (главных компонент):
+df_scores <- data.frame(scores(df_pca, display = 'sites', choices = c(1, 2), scaling = 'sites'), Id = 1:nrow(X))
 
-```{r echo=FALSE, purl=FALSE, fig.height=4, fig.width=4}
-# rotation
-library(vegan)
-df_pca <- rda(df, scale = TRUE)
-
-df_scores <- data.frame(scores(df_pca, display = 'sites', choices = c(1, 2), scaling = 'sites'), Id = 1:10)
-library(ggrepel)
-pcaplot <- ggplot(df_scores, aes(x = PC1, y = PC2)) + geom_point() + geom_text_repel(aes(label = Id)) + coord_equal(xlim = c(-1.4, 1.4), ylim = c(-1.4, 1.4)) + geom_hline(yintercept = 0) + geom_vline(xintercept = 0)
-pcaplot
+pcaplot <- ggplot(data = df_scores, aes(x = PC1, y = PC2)) + geom_point() + geom_text_repel(aes(label = Id)) + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + coord_equal()
+pcaplot + labs(title = "После PCA: Объекты в пространстве новых осей (главных компонент)")
 ```
-
-\columnsend
 
 ## На графике ординации изображено новое пространство
 
-```{r echo=FALSE, purl=FALSE, fig.align='center', fig.height=4, fig.width=4}
+```{r echo=FALSE, purl=FALSE, fig.align='center', fig.height=2.75, fig.width=9.5, out.width='0.99\\linewidth'}
 pcaplot
 ```
 
@@ -261,10 +265,11 @@ pcaplot
 \columnsbegin
 \column{0.49\textwidth}
 
-\includegraphics{images/possum.jpg}
+\includegraphics[width=0.9\linewidth]{images/possum.jpg}
 
-\tiny{pos by Hasitha Tudugalle on Flickr
-https://www.flickr.com/photos/hasitha\_tudugalle/6037880962}
+\tiny
+pos by Hasitha Tudugalle on Flickr  
+\url{https://www.flickr.com/photos/hasitha\_tudugalle/6037880962}
 
 \column{0.49\textwidth}
 
@@ -272,7 +277,7 @@ https://www.flickr.com/photos/hasitha\_tudugalle/6037880962}
 
 \columnsend
 
-\tiny {Данные Lindenmayer et al. (1995)}
+\tiny Данные Lindenmayer et al. (1995)
 
 ## Знакомимся с данными
 
@@ -368,23 +373,15 @@ summary(ord)
 3. Что означают получившиеся компоненты?
 4. Как располагаются объекты в пространстве главных компонент?
 
-## 1А. Cколько компонент нужно оставить?
 
-Вариант А. Оставляем компоненты с соб. числами > 1 (правило Кайзера)
+## 1. Cколько компонент нужно оставить?
 
-```{r}
-eigenvals(ord) # собственные числа
-```
-
-## 1Б. Cколько компонент нужно оставить?
-
-Вариант Б. Оставляем компоненты, кот объясняют больше изменчивости, чем возможно случайно (по модели сломанной палки).
+Можно оставить только компоненты, которые объясняют больше изменчивости, чем возможно случайно (по модели сломанной палки), либо только компоненты, которые объясняют суммарно заданный процент общей изменчивости (см. далее).
 
 Строим график собственных чисел
 
 ```{r, fig.height=3}
 screeplot(ord, bstick = TRUE, type = 'lines')
-abline(h = 1, lty = 2)
 ```
 
 ## 2. Сколько изменчивости объясняют компоненты?
@@ -397,7 +394,7 @@ abline(h = 1, lty = 2)
 eigenvals(ord) / sum(eigenvals(ord)) * 100
 ```
 
-Первые две компоненты объясняют `r round(sum(eigenvals(ord)[1:2]/sum(eigenvals(ord))*100), 0)` % общей изменчивости
+Первые две компоненты объясняют `r round(sum(eigenvals(ord)[1:2]/sum(eigenvals(ord))*100), 0)` % общей изменчивости.
 
 
 ## 3. Что означают получившиеся компоненты?
@@ -506,7 +503,7 @@ biplot(ord, scaling = 'sites', display = 'sites',
 
 ## График факторных координат в ggplot2
 
-```{r ggscor-pos, out.width='2in', out.height='2in', fig.align='center'}
+```{r ggscor-pos, fig.height = 2.3, fig.width = 5, out.width='0.8\\linewidth', fig.align='center'}
 # данные для графика: факторные координаты и исходные переменные
 df_scores <- data.frame(pos, 
                         scores(ord, display = 'sites', scaling = 'sites', 
@@ -514,8 +511,7 @@ df_scores <- data.frame(pos,
 # график ординации
 ggscores <- ggplot(df_scores, aes(x = PC1, y = PC2, 
                                   colour = Pop, shape = sex)) + 
-  geom_point(size = 2) +
-  coord_equal(xlim = c(-1, 1), ylim = c(-1, 1))
+  geom_point(size = 2) + coord_equal()
 ggscores
 ```
 
@@ -523,14 +519,14 @@ ggscores
 
 ```{r out.height='1.8in'}
 library(cowplot)
-plot_grid(ggloadings, ggscores, labels = c('A', 'B'), align = 'hv', axis = 'r')
+plot_grid(ggloadings, ggscores, labels = 'AUTO', align = 'hv', axis = 'r')
 ```
 
 \pause
 
 \small
 
-Первые две компоненты объясняют 65% общей изменчивости. 44% общей изменчивости объясняет первая главная компонента, связанная с размером особей. Вторая компонента --- которую мы интерпретировали как пропорции ног, ушей и хвоста --- объясняет 21% общей изменчивости. Внутри популяций поссумы не сильно отличаются по этим параметрам (об этом говорит небольшой разброс точек вдоль второй компоненты). Зато поссумы из провинции Виктория не похожи на других: у них относительно более крупные уши, длинные ноги и короткие хвосты.
+Первые две компоненты объясняют 65% общей изменчивости. Первая компонента (44%) связана с размером особей. Вторая компонента (21%) описывает пропорции ног, ушей и хвоста. Внутри популяций поссумы мало различаются по этим параметрам (об этом говорит небольшой разброс точек вдоль второй компоненты). Зато поссумы из провинции Виктория не похожи на поссумов из других провинций: у них относительно более крупные уши, длинные ноги и короткие хвосты.
 
 ## Факторные координаты можно использовать для снижения размерности данных
 
@@ -574,7 +570,7 @@ plot_grid(ggloadings, ggscores, labels = c('A', 'B'), align = 'hv', axis = 'r')
 
 \column{0.4\textwidth}
 
-\includegraphics{images/skulls.png}
+\includegraphics[width=0.85\linewidth]{images/skulls.png}
 \columnsend
 
 \tiny {Данные Thompson, Randall-Maciver (1905). Источник Manly (1994).}
@@ -674,32 +670,25 @@ ggloadings1
 
 ## Что означают получившиеся компоненты?
 
-\columnsbegin
-
-\column{0.49\textwidth}
 
 ```{r loadings, purl=FALSE, fig.height=3.5, echo=FALSE, purl=FALSE, eval=TRUE}
 ```
 
-\column{0.49\textwidth}
 
 - Вдоль 1й компоненты уменьшается расстояние от основания черепа до края в. челюсти (bl) и высота от основания до макушки (bh)
 - Вдоль 2й компоненты уменьшается высота носа (nh) и максимальная ширина (mb)
 
-\columnsend
-
 
 ## Как располагаются объекты в пространстве главных компонент?
 
-```{r skull-ord, purl=FALSE, fig.width=4, fig.height=4,  out.height='1.8in'}
+```{r skull-ord, purl=FALSE, fig.width=4.5, fig.height=3,  out.height='1.8in'}
 # Данные для графика ординации
 df_scores1 <- data.frame(skulls, 
-                         scores(ord1, display = 'sites', choices = c(1, 2, 3), 
-                                scaling = 'sites'))
+                         scores(ord1, display = 'sites', 
+                                choices = c(1, 2), scaling = 'sites'))
 # График ординации
 ggscores1 <- ggplot(df_scores1, aes(x = PC1, y = PC2)) + 
-  geom_point(aes(colour = epoch)) +
-  coord_equal()
+  geom_point(aes(colour = epoch)) + coord_equal()
 ggscores1
 ```
 
@@ -707,7 +696,7 @@ ggscores1
 
 ```{r out.height='2in'}
 # library(cowplot)
-plot_grid(ggloadings1, ggscores1, labels = c('A', 'B'), align = 'vh', axis = 'r')
+plot_grid(ggloadings1, ggscores1, labels = 'auto', align = 'vh', axis = 'r')
 
 ```
 <!-- # ```{r} -->
@@ -726,7 +715,7 @@ plot_grid(ggloadings1, ggscores1, labels = c('A', 'B'), align = 'vh', axis = 'r'
 - С течением времени форма черепов древних египтян менялась. Размеры черепа постепенно увеличивались, а длина носа практически не изменялась.
 
 
-## Take home messages
+## Take-home messages
 
 - Метод главных компонент:
     - исследование связей между переменными
