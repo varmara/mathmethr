@@ -90,6 +90,7 @@ library(ggplot2)
 theme_set(theme_bw())
 library(ggrepel) # для подписей (geom_text_repel)
 library(grid) # для стрелочек
+
 # параметры стрелочек
 ar <- arrow(length = unit(0.1, "cm"))
 # датафрейм с факторными нагрузками
@@ -101,7 +102,8 @@ df_load <- data.frame(scores(ord,
 # график
 ggloadings <- ggplot(df_load) +
   geom_text_repel(aes(x = PC1, y = PC2,
-                      label = rownames(df_load)), segment.alpha = 0.5) +
+                      label = rownames(df_load)),
+                  segment.alpha = 0.5) +
   geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2),
                colour = "grey40", arrow = ar) +
   coord_equal(xlim = c(-0.8, 0.8), ylim = c(-0.8, 0.8))
@@ -125,7 +127,6 @@ ggscores <- ggplot(df_scores, aes(x = PC1, y = PC2, colour = Pop, shape = sex)) 
   geom_point(size = 2) +
   coord_equal(xlim = c(-1, 1), ylim = c(-1, 1))
 ggscores
-
 
 
 # Два графика рядом
@@ -163,7 +164,7 @@ table(skulls$epoch)
 library(RColorBrewer)
 cols <- brewer.pal(n = length(levels(skulls$epoch)), name = "Set1")
 # график
-pairs(skulls[, -1], col = cols[skulls$epoch])
+pairs(skulls[, -1], col = cols[skulls$epoch], pch = 19)
 
 
 #### Задание 1 ---------------------------------------------
