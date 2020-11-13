@@ -11,9 +11,9 @@ head(iris, 10)
 # ## По каким переменным легче всего различить группы?
 pairs(iris[, -5], col = iris$Species)
 
-#I. Дискриминантный анализ на тренировочных и тестовых данных #################
+#I. Дискриминантный анализ на тренировочных и тестовых данных #############
 
-# 1) Разделяем на тренировочные и тестовые данные ------------------------------
+# 1) Разделяем на тренировочные и тестовые данные -------------------------
 
 # доля от объема выборки, которая пойдет в тренировочный датасет
 smp_size <- floor(0.80 * nrow(iris))
@@ -33,8 +33,11 @@ lda_tr_scaled$scaling
 # функция, которая добавит функций классификации к результатам дискр. анализа
 lda.class <- function(x, groups){
   #   http://stackoverflow.com/q/5629550/2096842
-  #   This code follows the formulas in Legendre and Legendre's Numerical Ecology (1998), page 625, and matches the results of the worked example starting on page 626.
-# code slightly modified - colnames and varnames of classification functions are added
+  #   This code follows the formulas in Legendre and Legendre's
+  # Numerical Ecology (1998), page 625, and matches the results
+  # of the worked example starting on page 626.
+  # The code was slightly modified - colnames and varnames of
+  # classification functions were added.
   library(MASS)
   x.lda <- lda(groups ~ ., as.data.frame(x))
   gr <- length(unique(groups))   ## groups might be factors or numeric
@@ -61,19 +64,19 @@ lda.class <- function(x, groups){
   return(x.lda)
 }
 
-# 3) На тренировочных данных получаем функции классификации --------------------
+# 3) На тренировочных данных получаем функции классификации ---------------
 
 lda_tr <- lda.class(iris[in_train, -5], iris$Species[in_train])
 # Коэф. функций классификации
 lda_tr$class.funs
 
-# 4) Оцениваем качество классификации на тренировочных данных ------------------
+# 4) Оцениваем качество классификации на тренировочных данных -------------
 
 lda_tr_pred <- predict(lda_tr)
 table(iris$Species[in_train], lda_tr_pred$class)
 
 
-# 5) График классификации тренировочных данных  --------------------------------
+# 5) График классификации тренировочных данных  --------------------------
 
 class_df <- data.frame(lda_tr_pred$x,
                           gr = lda_tr_pred$class,
@@ -82,12 +85,12 @@ ggplot(data = class_df, aes(x = LD1, y = LD2, colour = gr)) +
   geom_text(size = 3, aes(label = real_gr)) +
   theme(legend.position = "none")
 
-# 6) Оценка качества классификации на тестовых данных --------------------------
+# 6) Оценка качества классификации на тестовых данных ---------------------
 
 lda_test_pred <- predict(lda_tr, iris[-in_train, -5])
 table(iris$Species[-in_train], lda_test_pred$class)
 
-# 7) График классификации тестовых данных --------------------------------------
+# 7) График классификации тестовых данных ---------------------------------
 
 class_df <- data.frame(lda_test_pred$x,
                           new = lda_test_pred$class,
@@ -97,7 +100,7 @@ class_df$Group <- factor(paste(class_df$real, class_df$new, sep = " as "))
 ggplot(data = class_df, aes(x = LD1, y = LD2)) +
   geom_point(aes(colour = Group))
 
-# II. Дискриминантный анализ с кросс-валидацией ################################
+# II. Дискриминантный анализ с кросс-валидацией ###########################
 
 # Кросс-валидация
 lda_cv <- lda(iris[, -5], iris$Species, CV = TRUE)
@@ -113,7 +116,7 @@ ggplot(data = iris, aes(x = Petal.Length,
   geom_point(size = 3) +
   scale_shape_discrete("Classified as")
 
-# Проверка условий применимости ################################################
+# Проверка условий применимости ###########################################
 
 # 1) Mногомерная нормальность
 x <- as.matrix(iris[, -5])
@@ -128,7 +131,7 @@ source("BoxMTest.R")
 BoxMTest(as.matrix(iris[, -5]), iris$Species)
 
 
-# Задание: Поссумы -------------------------------------------------------------
+# Задание: Поссумы --------------------------------------------------------
 
 # Данные Lindenmayer et al. (1995)
 # - При помощи дискриминантного анализа классифицируйте популяции поссумов
