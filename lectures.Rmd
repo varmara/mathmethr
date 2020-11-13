@@ -64,9 +64,9 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "grid", "cowplot", "HSAUR", 
 ## 8. Дискриминантный анализ
 
 <!-- - Презентация: [08_da.pdf](08_da.pdf) -->
-<!-- - Код: -->
-<!--     + [код R](08_da_code.R) -->
-<!--     + [BoxMTest.R](BoxMTest.R) -->
+- Код:
+    + [код R](08_da_code.R)
+    + [BoxMTest.R](BoxMTest.R)
 
 ## 9. Ординация и классификация с использованием мер сходства-различия
 
