@@ -256,11 +256,26 @@ $$-1 \le S \le 1$$
 
 ## Если используются бинарные данные (присутствие-отсутствие признака)
 
-\includegraphics[width=0.8\textwidth,keepaspectratio]{images/qual.png}
+\includegraphics[width=0.5\textwidth,keepaspectratio]{images/qual.png}
 
 ## Примеры коэффициентов для качественных данных
 
-\includegraphics[width=0.8\textwidth,keepaspectratio]{images/jaccard.png}
+\includegraphics[width=0.5\textwidth,keepaspectratio]{images/qual_head.png}
+
+\small
+
+|Коэффициент | Формула | Источник |
+|------|--------|--------|
+| Simple matching | $\frac{a + d} {a + b + c + d}$ | Sokal and Michener, 1958 |
+| Rogers and Tanimoto | $\frac{a + d} {a + 2b + 2c + d}$ | Rogers and Tanimoto, 1960 |
+| Anderberg | $\frac{a + d} {a + 2(b + c)}$ | Anderberg, 1973 |
+| Russel and Rao | $\frac{a} {a + b + c + d}$ | Russel and Rao, 1940 |
+| Jaccard | $\frac{a} {a + b + c}$ | Jaccard, 1901 |
+| Sorensen-__Dice__ | $\frac{2a} {2a + b + c}$ | Dice, 1945, Sorensen, 1948 |
+
+И т.д.
+
+
 
 ## Если данные смешанные (качественные и количественные)
 
@@ -605,7 +620,7 @@ d <- dist(x = fos, method = "euclidean")
 
 ## Методы кластеризации
 
-```{r gg-all, echo=FALSE, fig.height=6, purl=FALSE}
+```{r gg-all, echo=FALSE, fig.height=5, purl=FALSE}
 cl_dat <- data.frame(cl = c(rep("A", 5), rep("B", 4)), 
            x = c(1, 2.7, 2, 1.5, 2, 5, 6, 5.5, 5.8),
            y = c(1, 1.2, 3, 2, 1.5, 1.2, 1, 3, 2))
@@ -737,11 +752,9 @@ gg_average
 
 \columnsend
 
-\textbf{Особенности:}
+\textbf{Особенности:} UPGMA и WUPGMС иногда могут приводить к инверсиям на дендрограммах
 
-- UPGMA и WUPGMС иногда могут приводить к инверсиям на дендрограммах
-
-\includegraphics{images/clust-revert.png}
+\includegraphics[width=0.5\linewidth]{images/clust-revert.png}
 
 \tiny{из Borcard et al., 2011}
 
