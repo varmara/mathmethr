@@ -1,5 +1,7 @@
 ---
 title: Знакомство с R (молниеносное и поверхностное).
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Загружаем, устанавливаем...
@@ -11,13 +13,6 @@ Cобственно, сам [R](https://cran.r-project.org/)
 Онлайн IDE для R --- на тот случай, если у вас не установлен R:
 
 - https://rstudio.cloud
-- https://www.tutorialspoint.com/r_terminal_online.php
-- http://rextester.com/l/r_online_compiler
-
-Упражнения для начинающих:
-
-- https://www.datacamp.com/courses
-
 
 # Комментарии
 
@@ -616,7 +611,7 @@ plot(x = my_worms$Width, y = my_worms$Length)
 Боксплот --- по оси х дискретная величина, по оси y  значение непрерывной величины. Черта - медиана, коробка - 25 и 75 персентили, усы - либо размах варьирования, либо 1.5 интерквартильных расстояния (1.5 высоты коробки), если есть "выбросы".
 
 ```{r p-box}
-plot(x = my_worms$Colour, y = my_worms$Length)
+plot(x = as.factor(my_worms$Colour), y = my_worms$Length)
 ```
 
 Для настройки внешнего вида см graphical parameters в help
@@ -629,7 +624,7 @@ plot(x = my_worms$Colour, y = my_worms$Length)
 Чтобы использовать функции из пакета ggplot2, нужно его сначала установить.
 
 Установка пакета в локальную библиотеку делается один раз. Поэтому строку с `install.packages()` не нужно включать в финальную версию кода.
-```{r}
+```{r eval=FALSE}
 install.packages('ggplot2')
 ```
 
