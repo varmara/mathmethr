@@ -56,11 +56,25 @@ library(gridExtra) # to rescale legend
 
 ## Тест Стьюдента (t-критерий)
 
-Гипотезы: $H_0: \mu_1 - \mu_2 = 0$, $H_A: \mu_1 - \mu_2 \ne 0$
+Гипотезы: $H_0: \mu_1 - \mu_2 = 0$, $H_A: \mu_1 - \mu_2 \ne 0$  
+
+\begin{columns}
+\begin{column}{0.7\textwidth}
 
 Двухвыборочный тест Стьюдента (Student, 1908) используется для проверки значимости различий между средними значениями двух величин.
 
 $$t= \frac{\bar{x}_1 - \bar{x}_2}{SE_{\bar{x}_1 - \bar{x}_2}}$$
+
+\end{column}
+
+\begin{column}{0.3\textwidth}
+
+\includegraphics[height=5cm, keepaspectratio]{images/William_Sealy_Gosset.jpg}
+
+\tiny William Sealy Gosset. Photo: Wikipedia
+
+\end{column}
+\end{columns}
 
 Условия применимости:
 
@@ -73,15 +87,34 @@ $SE = \sqrt{\frac{s_1^2(n_1-1) +s_2^2(n_2-1)}{n_1+n_2-2}\Big(\frac{1}{n_1} + \fr
 
 $df = (n_1 - 1) + (n_2 - 1) = n_1 + n_2 - 2$
 
-## t-тест Уэлча --- это модификация теста Стьюдента __для случая разных дисперсий__
+## t-тест Уэлча (Welch, 1938, 1947) --- это модификация теста Стьюдента __для случая разных дисперсий__
+
+\begin{columns}
+\begin{column}{0.7\textwidth}
+
 
 $$t= \frac{\bar{x}_1 - \bar{x}_2}{SE_{\bar{x}_1 - \bar{x}_2}}$$
 
 Условия применимости:
 
 - Наблюдения случайны и независимы друг от друга
+
 - Выборки случайны и независимы друг от друга
+
 - Величины нормально распределены или большая выборка (> 30 наблюдений в группе)
+
+\end{column}
+
+\begin{column}{0.3\textwidth}
+
+\includegraphics[height=2cm, keepaspectratio]{images/BernardLewisWelch.jpg}
+
+\tiny Bernard Lewis Welch. Photo scanned by GeneralBurgoyne on Reddit 
+
+\end{column}
+\end{columns}
+
+
 
 
 $SE = \sqrt{{s_1^2}/ {n_1} + {s_2^2}/{n_2}}$
@@ -90,6 +123,12 @@ $SE = \sqrt{{s_1^2}/ {n_1} + {s_2^2}/{n_2}}$
 
 $df_{ Welch-Satterthwaite} \approx \cfrac {({s^2_{1}}/{n_{1}} + {s^2_{x_2}}/{n_{2}})^2}
 {\frac{1}{n_{1} - 1}\bigg(\frac {s_{1}^2} {n_{1}}\bigg)^2 + \frac{1}{n_{2} - 1}\bigg(\frac {s_{2}^2} {n_{2}}\bigg)^2}$
+
+\note{Welch, B.L. (1938). The significance of the difference between two means when the population variances are unequal. Biometrika, 29, 350-362.
+
+Welch, B.L. (1947). The generalization of Student's problem when several different population variances are involved. Biometrika, 34, 29-35.
+
+Photo: https://i.redd.it/aewf0dm8hcu11.png}
 
 ## t-распределение --- распределение разницы средних для выборок из одной совокупности
 
@@ -166,7 +205,14 @@ gg_t +
 
 ## Пример: Гормоны и артериальная гипертензия
 
-Синдром Кушинга --- это нарушения уровня артериального давления, вызванные гиперсекрецией кортизола надпочечниками.
+Синдром Кушинга --- это нарушения уровня артериального давления и целый комплекс других симптомов, вызванных гиперсекрецией кортизола надпочечниками.
+
+\centering
+\includegraphics[width=0.6\textwidth, keepaspectratio]{images/700px-Cushing-s-syndrome.png}
+
+\tiny Cushing’s syndrome. Photo: Wikipedia
+
+## Пример: Гормоны и артериальная гипертензия
 
 В датасете `Cushings` (пакет `MASS`) записаны данные о секреции двух метаболитов при разных типах синдрома (данные из кн. Aitchison, Dunsmore, 1975).
 
@@ -192,7 +238,8 @@ data("Cushings")
 Формат вызова функции, если в данных две группы
 
 ```
-t.test(formula = зависимая_переменная ~ группирующая_переменная, data = данные, ...)
+t.test(formula = зависимая_переменная ~ группирующая_переменная, 
+       data = данные, ...)
 ```
 
 Если групп больше двух --- другой формат
@@ -216,6 +263,32 @@ tt
 
 - Секреция тетрагидрокортизона значимо различается у пациентов с аденомой и двусторонней гиперплазией надпочечников ($t_{`r round(tt$parameter, 2)`} = `r round(tt$statistic, 2)`$, $p = `r format.pval(tt$p.value, eps = 0.05)`$)
 
+## Задания 1-3
+
+__Задание 1__
+
+Перепишите вызов функции `t.test()` с использованием другого шаблона вызова (с параметрами `x` и `y`)
+
+__Задание 2__
+
+Как называются отдельные элементы результатов можно узнать посмотрев их структуру при помощи функции `str()`
+
+__Задание 3__
+
+Получите отдельные элементы результатов из объекта `tt` при помощи оператора `$`
+  
+- значение t-критерия
+- число степеней свободы
+- уровень значимости
+
+## Другой шаблон вызова функции `t.test()`
+
+```{r}
+tt <- t.test(x = Cushings$Tetrahydrocortisone[Cushings$Type == 'a'],
+             y = Cushings$Tetrahydrocortisone[Cushings$Type == 'b'])
+tt
+
+```
 
 ## Что спрятано в результатах?
 
@@ -351,9 +424,7 @@ gg_power <- gg_beta +
 gg_power
 ```
 
-__Мощность теста - вероятность отвергнуть $H_0$, когда верна__ $H_A$
-
-$$Power = 1 - \beta$$
+__Мощность теста - вероятность отвергнуть $H_0$, когда верна__ $H_A$: $Power = 1 - \beta$
 
 ## Мощность теста
 
@@ -416,6 +487,10 @@ $$Power = 1 - \beta$$
 
 ## Величина эффекта
 
+\begin{columns}
+
+\begin{column}{0.65\textwidth}
+
 $d$ Коэна (Cohen's d)
 
 
@@ -423,7 +498,18 @@ $$d = \frac{\bar x_1 - \bar x_2}{SD_{pooled}}$$
 
 где $SD_{pooled}$ --- обобщенное стандартное отклонение
 
-$SD_{pooled} = {\sqrt{\frac {(n _1 - 1)s_1^2 + (n _2 - 1)s_2^2 }  {n _1 + n _2 - 2} } }$
+$$SD_{pooled} = {\sqrt{\frac {(n _1 - 1)s_1^2 + (n _2 - 1)s_2^2 }  {n _1 + n _2 - 2} } }$$
+
+\end{column}
+
+\begin{column}{0.3\textwidth}
+
+\includegraphics[height=4cm, keepaspectratio]{images/Jacob-Cohen.jpg}
+
+\tiny Jacob Cohen
+
+\end{column}
+\end{columns}
 
 
 ## Величина эффекта
@@ -449,7 +535,7 @@ pwr.t.test(n = NULL, d = 0.8, power = 0.8, sig.level = 0.01,
            type = 'two.sample', alternative = 'two.sided')
 ```
 
-## Задание
+## Задание 4
 
 Какая нужна выборка, чтобы обнаружить _слабый эффект_ с вероятностью 0.8 при уровне значимости 0.05?
 
@@ -472,15 +558,29 @@ pwr.t.test(n = NULL, d = 0.2, power = 0.8, sig.level = 0.05,
 
 ## Пример: Морфометрия жуков-листоедов
 
-Измерения 43 самцов жуков-листоедов двух видов жуков из подсемейства козявок (Galerucinae) в семействе листоедов (Chrysomelidae): _Chaetocnema concinna_, _Ch. heptapotamica_.
+Измерения 43 самцов жуков-листоедов двух видов жуков из подсемейства козявок (Galerucinae) в семействе листоедов (Chrysomelidae): _Chaetocnema concinna_ (на фото), _Ch. heptapotamica_.
+
+\begin{columns}
+
+\begin{column}{0.3\textwidth}
+
+\includegraphics[height=3cm, keepaspectratio]{images/Chaetocnema_concinna_by_Udo_Shmidt_on_Flickr.jpg}
+
+\tiny \textit{Chaetocnema concinna}. Photo: Udo Shmidt on Flickr 
+
+\end{column}
+\begin{column}{0.7\textwidth}
 
 Переменные
 
-- fjft --- ширина первого членика первой лапки в микронах (сумма измерений для обеих лапок)
+- fjft --- ширина первого членика первой лапки в микронах (сумма измерений для обеих лапок)  
+
 - species --- вид жуков (1=Ch. concinna, 2= Ch. heptapotamica)
 
-Есть ли морфологические различия между видами?
+\end{column}
+\end{columns}
 
+Есть ли морфологические различия между видами?
 
 ```{r}
 library(readxl)
@@ -547,7 +647,7 @@ eff_flea
 effect_size_flea <- abs(eff_flea$estimate)
 ```
 
-## Задание
+## Задание 5
 
 Рассчитайте объем выборки, чтобы показать различия размеров с вероятностью 0.8 на уровне значимости 0.05
 
