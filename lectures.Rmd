@@ -10,17 +10,17 @@ title: Презентации и данные
 ## 2. Тестирование гипотез. Анализ мощности
 
 ```{r eval=FALSE}
+install.packages("readxl")
 install.packages(c("Hmisc", "ggplot2", "effsize", "pwr"))
 ```
 
-<!-- - Презентация: [02_power.pdf](02_power.pdf) -->
+- Презентация: [02_power.pdf](02_power.pdf)
 - Код: [02_power_code.R](02_power_code.R)
 - Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx)
 
 ## 3. Регрессионный анализ, ч.1
 
 ```{r eval=FALSE}
-install.packages("readxl")
 install.packages("car")
 ```
 
