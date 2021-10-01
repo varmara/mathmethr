@@ -108,21 +108,41 @@ ggsave(filename = 'hybrids_Sterile.pdf', plot = gg_hybrid)
 # ## Есть ли связь между переменными?
 gg_hybrid
 
-# ## Можно посчитать корреляцию между долей стерильной пыльцы и генетическим расстоянием
-p_cor <- cor.test(hybrid$Distance, hybrid$Sterile)
+## Задание 1 ---------------------------------
+
+# Дополните код, чтобы вычислить корреляцию Пирсона между долей стерильной пыльцы и генетическим расстоянием.
+# Используйте нужные переменные из датасета `hybrid` и функцию `cor.test()`
+
+p_cor <- cor.test(x = , y = ,
+                  alternative =  , method =  )
 p_cor
-
-
 
 
 # # Линейная регрессия ##############################################
 
+## Задание 2 ---------------------------------
 
-# ## Подбираем параметры линейной модели
-hybrid_lm <- lm(Sterile ~ Distance, hybrid)
-summary(hybrid_lm)
+# 1) Используя данные из датасета `hybrid` подберите
+# модель линейной регрессии, описывающую
+# зависимость доли стерильной пыльцы `Sterile`
+# от генетического расстояния `Distance`.
+#
+# 2) Запишите коэффициенты модели
+# и уравнение линейной регрессии.
+#
+# Подсказки:
+# - `lm(formula = формула_модели, data = данные)`
+# --- функция для подбора регрессионных моделей
+# - Формат формулы модели:
+# `зависимая_переменная ~ независимые_переменные`
+# - `summary(модель)` --- функция, показывающая
+# краткую информацию о модели в виде таблицы
+# - coef(модель)` --- функция, показывающая
+# только коэффициенты модели
 
-# ## Записываем уравнение линейной регрессии
+# Решение
+hybrid_lm <- lm(formula = , data = )
+
 
 
 
@@ -136,6 +156,7 @@ summary(hybrid_lm)
 
 
 # ## Тестируем значимость модели целиком при помощи F-критерия
+# options(scipen = 6)
 library(car)
 Anova(hybrid_lm)
 
@@ -143,9 +164,25 @@ Anova(hybrid_lm)
 
 # # График линейной регрессии ##################################
 
-# ## Строим доверительную зону регрессии
-gg_hybrid + geom_smooth(method = 'lm') +
-  labs(title = '95% доверительная зона регрессии')
+
+## Задание 3 ----------------------------------
+
+# Дополните график `gg_hybrid`, чтобы построить
+# - 95% доверительную зону регрессии
+# - 99% доверительную зону регрессии
+# Используйте `geom_smooth()` и его аргументы `method` и `level`
+
+
+gg1 <- gg_hybrid +
+  labs(title = '95% доверительная зона')
+gg1
+
+gg2 <- gg_hybrid +
+  labs(title = '99% доверительная зона')
+gg2
+
+library(cowplot)
+plot_grid(gg1, gg2, nrow = 1, labels = 'AUTO')
 
 # # Оценка качества подгонки модели #############################
 
@@ -161,8 +198,12 @@ summary(hybrid_lm)
 # Какова доля стерильной пыльцы межвидового
 # гибрида, если генетическое расстояние между
 # родителями 0.07 или 0.055?
-newdata <- data.frame(Distance = c(0.07, 0.055)) # значения, для которых предсказываем
-(pr1 <- predict(hybrid_lm, newdata, interval = 'confidence', se = TRUE))
+
+# Значения, для которых предсказываем
+new_data1 <- data.frame(Distance = c(0.07, 0.055))
+# Предсказания
+(pr1 <- predict(hybrid_lm, newdata = new_data1,
+                interval = 'confidence', se = TRUE))
 
 
 # ## Предсказываем изменение Y для 95% наблюдений при заданном X
@@ -170,8 +211,9 @@ newdata <- data.frame(Distance = c(0.07, 0.055)) # значения, для ко
 # В каких пределах находится доля стерильной
 # пыльцы, если генетическое расстояние между
 # родителями 0.07 или 0.055?
-newdata <- data.frame(Distance = c(50, 100)) # новые данные для предсказания значений
-(pr2 <- predict(hybrid_lm, newdata, interval = 'prediction', se = TRUE))
+new_data1 <- data.frame(Distance = c(0.07, 0.055))
+(pr2 <- predict(hybrid_lm, newdata = new_data1,
+                interval = 'prediction', se = TRUE))
 
 
 # ## Данные для доверительной области значений
@@ -187,7 +229,9 @@ gg_hybrid +
   geom_smooth(method = 'lm',
               aes(fill = 'Доверительный \nинтервал'),
               alpha = 0.4) +
-  geom_ribbon(data = hybrid_with_pred,   # внимание, в этом слое используются данные предсказаний.
+  # Внимание, в следующем слое используются данные предсказаний.
+  geom_ribbon(data = hybrid_with_pred,
+
               aes(y = fit, ymin = lwr, ymax = upr,
                   fill = 'Доверительная \nобласть значений'),
               alpha = 0.2) +
@@ -195,12 +239,10 @@ gg_hybrid +
 
 
 
-
-
 #  ####################
 # gg_hybrid +
 #   geom_smooth(method = 'lm', aes(fill = 'Доверительный \nинтервал'), alpha = 0.4) +
-#   geom_ribbon(data = hybrid_with_pred, aes(ymin = lwr, ymax = upr, fill = 'Доверительная \nобласть значений'), alpha = 0.2) +
+#   geom_ribbon(data = hybrid_with_pred,  aes(ymin = lwr, ymax = upr, fill = 'Доверительная \nобласть значений'), alpha = 0.2) +
 #   scale_fill_manual('Интервалы', values = c('green', 'blue')) +
 #   geom_hline(yintercept = 1, linetype = 'dashed', colour = 'red3') +
 #   geom_hline(yintercept = 0, linetype = 'dashed', colour = 'red3') +
