@@ -26,6 +26,10 @@ memory <- read.table(file = "data/eysenck.csv", header = TRUE, sep = "\t")
 str(memory) # Структура данных
 head(memory, 2) # Первые несколько строк файла
 
+# Делаем факторы факторами
+memory$Process <- factor(memory$Process)
+memory$Age <- factor(memory$Age)
+
 # Есть ли пропущенные значения
 # (особенно, в переменных, которые нас интересуют)?
 colSums(is.na(memory))
@@ -93,29 +97,37 @@ contrasts = list(Age = contr.sum, Process = contr.sum))
 
 
 # ## Проверка условий применимости #####################
+
+# ## Задание 3 -----------------------------------------------------------
+
+# Дополните код (1-5) и ответьте на вопросы:
 # - Есть ли гомогенность дисперсий?
 # - Не видно ли паттернов в остатках?
 # - Нормальное ли у остатков распределение?
 
-# ## Данные для анализа остатков
-mem_diag <- fortify(mem_mod)
-head(mem_diag)
+# 1) Данные для анализа остатков
+mem_diag <- fortify()
+head()
 
-# ## График расстояния Кука
-ggplot(data = mem_diag, aes(x = 1:nrow(mem_diag), y = .cooksd)) +
-  geom_bar(stat = "identity")
+# 2) График расстояния Кука
+ggplot(data = , aes(x = 1:nrow(), y = )) + geom_bar(stat = "identity")
 
-# ## Графики остатков от предикторов в модели (и не в модели, если есть)
-ggplot(data = mem_diag, aes(x = Age, y = .stdresid)) +
-  geom_boxplot()
-ggplot(data = mem_diag, aes(x = Process, y = .stdresid)) +
-  geom_boxplot()
-ggplot(data = mem_diag, aes(x = Process, y = .stdresid, colour = Age)) +
-  geom_boxplot()
+# 3) Графики остатков от предикторов, включенных в модель
 
-# ## Квантильный график остатков
-library(car)
-qqPlot(mem_mod)
+ggplot(data = mem_diag, aes(x = , y = )) + geom_boxplot()
+ggplot(data = mem_diag, aes(x = , y = )) + geom_boxplot()
+
+# Если есть два категориальных предиктора, можно их изобразить одновременно
+ggplot(data = mem_diag, aes(x = , y = ,  = Age)) + geom_boxplot()
+
+# 4) Графики остатков от предикторов, не вошедших в модель (если есть)
+# Таких нет
+
+# 5) Квантильный график остатков
+library()
+ (mem_mod)
+
+
 
 
 # ## Результаты дисперсионного анализа
@@ -123,23 +135,22 @@ Anova(mem_mod, type = 3)
 
 
 
-
 # Пост хок тест для взаимодействия факторов ##############################
 # Делается легче всего "обходным путем".
 
-# ## Задание 3 -----------------------------------------------------------
+# ## Задание 4 -----------------------------------------------------------
 #
 # Дополните этот код, чтобы посчитать пост хок
 # тест Тьюки по взаимодействию факторов.
 
-# 1. Создаем переменную-взаимодействие
-memory$AgeProc <- interaction(memory$Age, memory$)
+# 1) Создаем переменную-взаимодействие
+memory$AgeProcess <- interaction(memory$, memory$)
 
-# 2. Подбираем линейную модель зависимости переменной-отклика
+# 2) Подбираем линейную модель зависимости переменной-отклика
 # от переменной-взаимодействия, но без свободного члена
-cell_means <- (Words ~ AgeProc - 1, data = )
+cell_means <- (, data = )
 
-# 3. Делаем пост хок тест для этой модели
+# 3) Делаем пост хок тест для этой модели
 library(multcomp)
 memory_tukey <- glht(model = , linfct = mcp())
 summary(memory_tukey)
@@ -152,7 +163,8 @@ summary(memory_tukey)
 # Создаем все сочетания значений факторов при помощи expand.grid()
 MyData <- expand.grid(
   Age = levels(memory$Age),
-  # т.к. мы меняли порядок уровней для фактора Process, нужно это сохранить:
+  # т.к. мы меняли порядок уровней для фактора Process,
+  # нужно это сохранить:
   Process = factor(levels(memory$Process), levels = levels(memory$Process)))
 # Получаем предсказания для всех сочетаний значений факторов:
 MyData <- data.frame(

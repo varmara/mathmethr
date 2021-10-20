@@ -64,6 +64,9 @@ memory <- read.table(file = "data/eysenck.csv", header = TRUE, sep = "\t")
 # Все ли правильно открылось?
 str(memory) # Структура данных
 head(memory, 2) # Первые несколько строк файла
+# Делаем факторы факторами
+memory$Process <- factor(memory$Process)
+memory$Age <- factor(memory$Age)
 ```
 
 ## Знакомимся с данными
@@ -328,25 +331,48 @@ mem_mod <- lm(formula = Words ~ Age * Process, data = memory,
 contrasts = list(Age = contr.sum, Process = contr.sum))
 ```
 
-## Решение
+## Решение 2
 
 ```{r interaction-model, tidy=FALSE, eval=TRUE, purl=FALSE}
 ```
 
-## Проверим, выполняются ли условия применимости дисперсионного анализа
+## Задание 3
+
+Проверим выполнение условий применимости дисперсионного анализа
+
+Дополните код (1-5) и ответьте на вопросы:
 
 - Есть ли гомогенность дисперсий?
 - Не видно ли паттернов в остатках?
 - Нормальное ли у остатков распределение?
 
-## Данные для анализа остатков
+```{r eval=FALSE, purl=TRUE}
+# 1) Данные для анализа остатков
+mem_diag <- fortify()
+head()
+# 2) График расстояния Кука
+ggplot(data = , aes(x = 1:nrow(), y = )) + geom_col()
+# 3) Графики остатков от предикторов, включенных в модель
+ggplot(data = mem_diag, aes(x = , y = )) + geom_boxplot()
+ggplot(data = mem_diag, aes(x = , y = )) + geom_boxplot()
+# Если есть два категориальных предиктора, можно их изобразить одновременно
+ggplot(data = mem_diag, aes(x = , y = ,  = Age)) + geom_boxplot()
+# 4) Графики остатков от предикторов, не вошедших в модель (если есть)
+
+# 5) Квантильный график остатков
+library()
+ (mem_mod)
+```
+
+
+## Решение 3: 1) Данные для анализа остатков
 
 ```{r}
 mem_diag <- fortify(mem_mod)
 head(mem_diag)
 ```
 
-## График расстояния Кука
+## Решение 3: 2) График расстояния Кука
 
 ```{r}
 ggplot(data = mem_diag, aes(x = 1:nrow(mem_diag), y = .cooksd)) + 
@@ -357,7 +383,7 @@ ggplot(data = mem_diag, aes(x = 1:nrow(mem_diag), y = .cooksd)) +
 
 - Влиятельных наблюдений нет
 
-## Графики остатков от предикторов в модели
+## 3) Решение 3: Графики остатков от предикторов в модели
 
 ```{r eval=FALSE}
 ggplot(data = mem_diag, aes(x = Age, y = .stdresid)) + 
@@ -368,21 +394,26 @@ ggplot(data = mem_diag, aes(x = Process, y = .stdresid, colour = Age)) +
   geom_boxplot()
 ```
 
+
 ```{r purl=FALSE, echo=FALSE, fig.width=10}
-library(gridExtra)
-grid.arrange(
+library(cowplot)
+plot_grid(
 ggplot(data = mem_diag, aes(x = Age, y = .stdresid)) + 
   geom_boxplot(),
 ggplot(data = mem_diag, aes(x = Process, y = .stdresid)) + 
   geom_boxplot(),
 ggplot(data = mem_diag, aes(x = Process, y = .stdresid, colour = Age)) + 
   geom_boxplot(),
-ncol = 3, widths = c(0.2, 0.36, 0.44))
+ncol = 3, rel_widths = c(0.2, 0.36, 0.44))
 ```
 
 - маленький разброс остатков в группах `Counting` и `Rhyming` у обоих возрастов
 
-## Квантильный график остатков
+## 4) Решение 3: Графики остатков от предикторов, не вошедших в модель
+
+Таких нет
+
+## 5) Решение 3: Квантильный график остатков
 
 ```{r fig.height=4}
 library(car)
@@ -414,18 +445,18 @@ Anova(mem_mod, type = 3)
 2. Подбираем линейную модель зависимости переменной-отклика от переменной-взаимодействия, но без свободного члена. Коэффициенты такой модели будут кодировать средние значения отклика в группах, заданных переменной-взаимодействием, т.е. именно те средние значения, которые нам нужно сравнить.
 3. Делаем пост хок тест для этой модели.
 
-## Задание 3
+## Задание 4
 
 Дополните этот код, чтобы посчитать пост хок тест Тьюки по взаимодействию факторов.
 
 
 ```{r eval=FALSE, purl=TRUE}
-# Создаем переменную-взаимодействие
-memory$AgeProc <- interaction(memory$Age, memory$)
-# Подбираем линейную модель зависимости переменной-отклика 
+# 1) Создаем переменную-взаимодействие
+memory$AgeProcess <- interaction(memory$, memory$)
+# 2) Подбираем линейную модель зависимости переменной-отклика 
 # от переменной-взаимодействия, но без свободного члена
-cell_means <- (Words ~ AgeProc - 1, data = )
-# Делаем пост хок тест для этой модели
+cell_means <- (, data = )
+# 3) Делаем пост хок тест для этой модели
 library(multcomp)
 memory_tukey <- glht(model = , 
                      linfct = mcp())
@@ -433,18 +464,18 @@ summary(memory_tukey)
 ```
 
 
-## Решение
+## Решение 4
 
 ```{r phoc, eval=FALSE, purl=FALSE}
-# Создаем переменную-взаимодействие
-memory$AgeProc <- interaction(memory$Age, memory$Process)
-# Подбираем линейную модель зависимости переменной-отклика 
+# 1) Создаем переменную-взаимодействие
+memory$AgeProcess <- interaction(memory$Age, memory$Process)
+# 2) Подбираем линейную модель зависимости переменной-отклика 
 # от переменной-взаимодействия, но без свободного члена
-cell_means <- lm(Words ~ AgeProc - 1, data = memory)
-# Делаем пост хок тест для этой модели
+cell_means <- lm(Words ~ AgeProcess - 1, data = memory)
+# 3) Делаем пост хок тест для этой модели
 library(multcomp)
 memory_tukey <- glht(model = cell_means, 
-                     linfct = mcp(AgeProc = "Tukey"))
+                     linfct = mcp(AgeProcess = "Tukey"))
 summary(memory_tukey)
 ```
 
