@@ -44,7 +44,7 @@ opts_chunk$set(fig.show='hold', size='footnotesize', comment='#', warning=FALSE,
 ## Анализ главных компонент --- способ снижения размерности
 
 \columnsbegin
-\column{0.3\textwidth}
+\column{0.25\textwidth}
 
 \blockbegin {Многомерные исходные данные}
 
@@ -62,13 +62,13 @@ X <- trees %>%
   arrange(x1, x2) %>% 
   as.matrix()
 
-p_raw <- ggplot(as.data.frame(X)) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_text(aes(x = x1, y = x2, label = 1:nrow(X)), hjust = -0.3) + theme_classic() + coord_fixed(expand = FALSE, xlim = c(0, max(X[, 1]) + 1), ylim = c(0, max(X[, 2]) + 2))
+p_raw <- ggplot(as.data.frame(X)) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_text(aes(x = x1, y = x2, label = 1:nrow(X)), hjust = -0.3, size = 3) + theme_classic() + coord_fixed(expand = FALSE, xlim = c(0, max(X[, 1]) + 3), ylim = c(0, max(X[, 2]) + 2))
 head(X)
 ```
 
 \blockend
 
-\column{0.7\textwidth}
+\column{0.75\textwidth}
 
 ```{r echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=3.5, out.width='0.99\\linewidth'}
 p_raw 
@@ -93,7 +93,7 @@ p_raw
 #centered
 X_cent <- scale(X, scale = FALSE)
 
-p_centered <- ggplot(as.data.frame(X_cent)) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text_repel(aes(x = x1, y = x2, label = 1:nrow(X_cent)), hjust = -0.3) + coord_fixed()
+p_centered <- ggplot(as.data.frame(X_cent)) + geom_point(aes(x = x1, y = x2), colour = 'black') + geom_hline(yintercept = 0) + geom_vline(xintercept = 0) + geom_text(aes(x = x1, y = x2, label = 1:nrow(X_cent)), hjust = -0.4, size = 3) + coord_fixed()
 ```
 
 \columnsbegin
@@ -456,8 +456,8 @@ df_load <- data.frame(scores(ord, display = 'species',
          choices = c(1, 2), scaling = 'species', correlation = TRUE))
 # график
 ggloadings <- ggplot(df_load) + 
-  geom_text_repel(aes(x = PC1, y = PC2, 
-    label = rownames(df_load)), segment.alpha = 0.5) + 
+  geom_text_repel(aes(x = PC1, y = PC2,
+    label = rownames(df_load)), segment.alpha = 0.5, size = 3) + 
   geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), 
     colour = 'grey40', arrow = ar) + 
   coord_equal(xlim = c(-0.8, 0.8), ylim = c(-0.8, 0.8))
@@ -466,7 +466,7 @@ ggloadings
 
 ## График факторных нагрузок в ggplot2
 
-```{r ggload-pos, eval=TRUE, echo=FALSE, purl=FALSE, fig.align='center'}
+```{r ggload-pos, eval=TRUE, echo=FALSE, purl=FALSE, fig.align='center', out.width='3in'}
 ```
 
 
@@ -517,14 +517,14 @@ ggscores
 
 ## Для удобства интерпретации ординации, располагаем ее рядом с графиком факторных нагрузок
 
-```{r out.height='1.8in'}
+\footnotesize
+
+```{r out.height='3.5in'}
 library(cowplot)
 plot_grid(ggloadings, ggscores, labels = 'AUTO', align = 'hv', axis = 'r')
 ```
 
 \pause
-
-\small
 
 Первые две компоненты объясняют 65% общей изменчивости. Первая компонента (44%) связана с размером особей. Вторая компонента (21%) описывает пропорции ног, ушей и хвоста. Внутри популяций поссумы мало различаются по этим параметрам (об этом говорит небольшой разброс точек вдоль второй компоненты). Зато поссумы из провинции Виктория не похожи на поссумов из других провинций: у них относительно более крупные уши, длинные ноги и короткие хвосты.
 
