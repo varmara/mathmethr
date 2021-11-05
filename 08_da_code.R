@@ -121,9 +121,10 @@ ggplot(data = iris, aes(x = Petal.Length,
 # 1) Mногомерная нормальность
 x <- as.matrix(iris[, -5])
 d <- mahalanobis(x, colMeans(x), cov(x))
-qqplot(qchisq(ppoints(nrow(x)), df = ncol(x)), d,
-  main="QQ график для оценки многомерной нормальности",
-  ylab="Расстояние Махаланобиса")
+qqplot(x = qchisq(p = ppoints(nrow(x)), df = ncol(x)),
+       y = d,
+       main="QQ график для оценки многомерной нормальности",
+       ylab="Расстояние Махаланобиса")
 abline(a = 0, b = 1)
 
 # 2) Гомогенность ковариационных матриц
