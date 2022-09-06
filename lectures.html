@@ -13,7 +13,7 @@
 
 <title>Презентации и данные</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
@@ -42,6 +42,7 @@
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -120,13 +121,20 @@ code span.wa { color: #008000; font-weight: bold; } /* Warning */
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -162,6 +170,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -219,11 +230,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -431,8 +446,8 @@ div.tocify {
 
 <div id="знакомство-с-r" class="section level2">
 <h2>1. Знакомство с R</h2>
+<!-- - Конспект: [01_intro_to_r.html](01_intro_to_r.html) -->
 <ul>
-<li>Конспект: <a href="01_intro_to_r.html">01_intro_to_r.html</a></li>
 <li>Код: <a href="01_intro_to_r.R">01_intro_to_r.R</a></li>
 </ul>
 </div>
@@ -440,78 +455,61 @@ div.tocify {
 <h2>2. Тестирование гипотез. Анализ мощности</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;readxl&quot;</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;Hmisc&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;effsize&quot;</span>, <span class="st">&quot;pwr&quot;</span>))</span></code></pre></div>
-<ul>
-<li>Презентация: <a href="02_power.pdf">02_power.pdf</a></li>
-<li>Код: <a href="02_power_code.R">02_power_code.R</a></li>
-<li>Данные: <a href="data/fleabeetles-subset.xlsx">fleabeetles-subset.xlsx</a></li>
-</ul>
+<!-- - Презентация: [02_power.pdf](02_power.pdf) -->
+<!-- - Код: [02_power_code.R](02_power_code.R) -->
+<!-- - Данные: [fleabeetles-subset.xlsx](data/fleabeetles-subset.xlsx) -->
 </div>
 <div id="регрессионный-анализ-ч.1" class="section level2">
 <h2>3. Регрессионный анализ, ч.1</h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;car&quot;</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;cowplot&quot;</span>)</span></code></pre></div>
-<ul>
-<li>Презентация: <a href="03_regression1.pdf">03_regression1.pdf</a></li>
-<li>Код: <a href="03_regression1_code.R">03_regression1_code.R</a></li>
-<li>Данные:
-<ul>
-<li><a href="data/HybridPollenSterility.xlsx">HybridPollenSterility.xlsx</a></li>
-<li><a href="data/HybridPollenSterility.csv">HybridPollenSterility.csv</a></li>
-</ul></li>
-</ul>
+<!-- - Презентация: [03_regression1.pdf](03_regression1.pdf) -->
+<!-- - Код: [03_regression1_code.R](03_regression1_code.R) -->
+<!-- - Данные: -->
+<!--     - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx) -->
+<!--     - [HybridPollenSterility.csv](data/HybridPollenSterility.csv) -->
 </div>
 <div id="регрессионный-анализ-ч.2" class="section level2">
 <h2>4. Регрессионный анализ, ч.2</h2>
-<ul>
-<li>Презентация: <a href="04_regression2.pdf">04_regression2.pdf</a></li>
-<li>Код: <a href="04_regression2_code.R">04_regression2_code.R</a></li>
-<li>Данные: <a href="data/loyn.xlsx">loyn.xlsx</a> | <a href="data/loyn.csv">loyn.csv</a></li>
-</ul>
+<!-- - Презентация: [04_regression2.pdf](04_regression2.pdf) -->
+<!-- - Код: [04_regression2_code.R](04_regression2_code.R) -->
+<!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
 </div>
 <div id="дисперсионный-анализ-ч.1" class="section level2">
 <h2>5. Дисперсионный анализ, ч.1</h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;multcomp&quot;</span>)</span></code></pre></div>
-<ul>
-<li>Презентация: <a href="05_anova1.pdf">05_anova1.pdf</a></li>
-<li>Код: <a href="05_anova1_code.R">05_anova1_code.R</a></li>
-<li>Данные: <a href="data/sleep.xlsx">sleep.xlsx</a> | <a href="data/sleep.csv">sleep.csv</a></li>
-</ul>
+<!-- - Презентация: [05_anova1.pdf](05_anova1.pdf) -->
+<!-- - Код: [05_anova1_code.R](05_anova1_code.R) -->
+<!-- - Данные: [sleep.xlsx](data/sleep.xlsx) | [sleep.csv](data/sleep.csv) -->
 </div>
 <div id="дисперсионный-анализ-ч.2" class="section level2">
 <h2>6. Дисперсионный анализ, ч.2</h2>
-<ul>
-<li>Презентация: <a href="06_anova2.pdf">06_anova2.pdf</a></li>
-<li>Код: <a href="06_anova2_code.R">06_anova2_code.R</a></li>
-<li>Данные: <a href="data/eysenck.csv">eysenck.csv</a></li>
-</ul>
+<!-- - Презентация: [06_anova2.pdf](06_anova2.pdf) -->
+<!-- - Код: [06_anova2_code.R](06_anova2_code.R) -->
+<!-- - Данные: [eysenck.csv](data/eysenck.csv) -->
 </div>
 <div id="анализ-главных-компонент" class="section level2">
 <h2>7. Анализ главных компонент</h2>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&quot;DAAG&quot;</span>, <span class="st">&quot;RColorBrewer&quot;</span>, <span class="st">&quot;vegan&quot;</span>, <span class="st">&quot;HSAUR&quot;</span>, <span class="st">&quot;ggrepel&quot;</span>))</span></code></pre></div>
-<ul>
-<li>Презентация: <a href="07_pca.pdf">07_pca.pdf</a></li>
-<li>Код: <a href="07_pca_code.R">07_pca_code.R</a></li>
-</ul>
+<!-- - Презентация: [07_pca.pdf](07_pca.pdf) -->
+<!-- - Код: [07_pca_code.R](07_pca_code.R) -->
 </div>
 <div id="дискриминантный-анализ" class="section level2">
 <h2>8. Дискриминантный анализ</h2>
-<ul>
-<li>Презентация: <a href="08_da.pdf">08_da.pdf</a></li>
-<li>Код:
-<ul>
-<li><a href="08_da_code.R">код R</a></li>
-<li><a href="BoxMTest.R">BoxMTest.R</a></li>
-</ul></li>
-</ul>
+<!-- - Презентация: [08_da.pdf](08_da.pdf) -->
+<!-- - Код: -->
+<!--     + [код R](08_da_code.R) -->
+<!--     + [BoxMTest.R](BoxMTest.R) -->
 </div>
-<div id="ординация-и-классификация-с-использованием-мер-сходства-различия" class="section level2">
-<h2>9. Ординация и классификация с использованием мер сходства-различия</h2>
+<div
+id="ординация-и-классификация-с-использованием-мер-сходства-различия"
+class="section level2">
+<h2>9. Ординация и классификация с использованием мер
+сходства-различия</h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ape&quot;</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;pvclust&quot;</span>)</span></code></pre></div>
-<ul>
-<li>Презентация: <a href="09_dist.pdf">09_dist.pdf</a></li>
-<li>Код: <a href="09_dist_code.R">09_dist_code.R</a></li>
-</ul>
+<!-- - Презентация: [09_dist.pdf](09_dist.pdf) -->
+<!-- - Код: [09_dist_code.R](09_dist_code.R) -->
 </div>
 
 <p><small>

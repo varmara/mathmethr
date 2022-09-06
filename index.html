@@ -13,7 +13,7 @@
 
 <title>Математические методы в зоологии с использованием R</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.15/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
@@ -48,6 +48,7 @@
 
 
 
+
 <link rel="stylesheet" href="my_styles.css" type="text/css" />
 
 
@@ -72,6 +73,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -129,11 +133,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -334,7 +342,8 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Математические методы в зоологии с использованием R</h1>
+<h1 class="title toc-ignore">Математические методы в зоологии с
+использованием R</h1>
 
 </div>
 
@@ -343,19 +352,30 @@ div.tocify {
 <h2>О курсе</h2>
 <div id="цель-и-задачи-курса" class="section level3">
 <h3>Цель и задачи курса</h3>
-<p>Цели этого курса: познакомить с применением различных математических методов в биологии (анализ мощности, регрессионный и дисперсионный анализ, анализ главных компонент, многомерное шкалирование, кластерный анализ), и научить самостоятельно анализировать данные с использованием скриптов на языке статистического программирования R, представлять в наглядном виде результаты анализов, интерпретировать их и представлять в виде научного отчета.</p>
+<p>Цели этого курса: познакомить с применением различных математических
+методов в биологии (анализ мощности, регрессионный и дисперсионный
+анализ, анализ главных компонент, многомерное шкалирование, кластерный
+анализ), и научить самостоятельно анализировать данные с использованием
+скриптов на языке статистического программирования R, представлять в
+наглядном виде результаты анализов, интерпретировать их и представлять в
+виде научного отчета.</p>
 </div>
 <div id="расписание-и-контакты" class="section level3">
 <h3>Расписание и контакты</h3>
 <p>1-я пара по субботам.</p>
-<p>Варфоломеева Марина Александровна - marina.varfolomeeva[]gmail.com, <code>@varmara</code> в Телеграм</p>
+<p>Варфоломеева Марина Александровна - marina.varfolomeeva[]gmail.com,
+<code>@varmara</code> в Телеграм</p>
 </div>
 <div id="задания-дедлайны-и-оценки" class="section level3">
 <h3>Задания, дедлайны и оценки</h3>
-<p>Тесты по каждой теме (79), финальный тест (45 баллов) и пересдача (45 баллов) будут проходить на платформе Stepik.</p>
-<p>Итоговая оценка по результатам выполнения тестов (&gt;50% или 62 баллов зачет, далее баллы будут пересчитаны по системе ECTS).</p>
-<p><span class="math inline">\(62.0 \le E &lt; 74.4 \le D &lt; 86.8 \le C &lt; 99.2 \le B &lt; 111.6 \le A\)</span></p>
-<p>Итоговое количество баллов может измениться, если по ходу курса я добавлю еще задания.</p>
+<p>Тесты по каждой теме (79), финальный тест (45 баллов) и пересдача (45
+баллов) будут проходить на платформе Stepik.</p>
+<p>Итоговая оценка по результатам выполнения тестов (&gt;50% или 62
+баллов зачет, далее баллы будут пересчитаны по системе ECTS).</p>
+<p><span class="math inline">\(62.0 \le E &lt; 74.4 \le D &lt; 86.8 \le
+C &lt; 99.2 \le B &lt; 111.6 \le A\)</span></p>
+<p>Итоговое количество баллов может измениться, если по ходу курса я
+добавлю еще задания.</p>
 <!--
 
 - [Как и где можно найти помощь с R и статистикой](more_help.html)
