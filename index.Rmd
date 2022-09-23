@@ -1,6 +1,16 @@
 ---
 title: Математические методы в зоологии с использованием R
 description: Презентации к курсу Математические методы в зоологии с использованием R
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: flatly
+    highlight: haddock
+    include:
+      after_body: _footer.html
+    css: page_styles.css
 ---
  
 ## О курсе

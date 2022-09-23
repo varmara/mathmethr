@@ -1,5 +1,15 @@
 ---
 title: Ресурсы по R и статистике
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: flatly
+    highlight: haddock
+    include:
+      after_body: _footer.html
+    css: page_styles.css
 ---
 
 <!-- - [Исходный код сайта в RMarkdown](http://github.com/varmara/mathmethr) -->
