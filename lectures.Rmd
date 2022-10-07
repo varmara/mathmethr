@@ -37,13 +37,10 @@ install.packages("cowplot")
 
 <!-- - Презентация: [03_regression1.pdf](03_regression1.pdf) -->
 
-<!-- - Код: [03_regression1_code.R](03_regression1_code.R) -->
-
-<!-- - Данные: -->
-
-<!--     - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx) -->
-
-<!--     - [HybridPollenSterility.csv](data/HybridPollenSterility.csv) -->
+- Код: [03_regression1_code.R](03_regression1_code.R)
+- Данные:
+    - [HybridPollenSterility.xlsx](data/HybridPollenSterility.xlsx)
+    - [HybridPollenSterility.csv](data/HybridPollenSterility.csv)
 
 ## 4. Регрессионный анализ, ч.2
 
