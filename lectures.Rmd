@@ -35,7 +35,7 @@ install.packages("car")
 install.packages("cowplot")
 ```
 
-<!-- - Презентация: [03_regression1.pdf](03_regression1.pdf) -->
+- Презентация: [03_regression1.pdf](03_regression1.pdf)
 
 - Код: [03_regression1_code.R](03_regression1_code.R)
 - Данные:
