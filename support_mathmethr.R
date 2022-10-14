@@ -84,14 +84,15 @@ lm_equation <- function(fit, strict = TRUE, digits = 2, trim = TRUE){
   coeffs <- format(abs(coef(fit)), digits = digits, trim = trim)
   if(strict == TRUE){
     i <- 1:(length(coeffs) - 1)
-    vars <- c("Y", paste0(" X", i))
+    vars <- c("Y_i", paste0(" X_{", i, "i}"))
 
   } else {
     # extract vector of variable names
     vars <- unlist(strsplit(frml, "[~+]"))
+    vars <- paste0(vars, "_i")
     # combine everything
   }
   start <- ifelse(coef(fit)[1] > 0, paste(vars[1], coeffs[1], sep = " = "), paste(vars[1], coeffs[1], sep = " = - "))
   end <- paste(sign, coeffs[-1], vars[-1], sep = "", collapse = "")
-  return(cat(start, end, sep = ""))
+  return(paste(start, end, sep = ""))
 }

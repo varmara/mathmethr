@@ -23,10 +23,9 @@ output:
 ```{r setup, include = FALSE, cache = FALSE, purl = FALSE}
 options(width = 70, scipen = 6)
 library(knitr)
-opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
-source("support_mathmethr.R")
+opts_chunk$set(fig.show='hold', size='footnotesize', comment='#', warning=FALSE, message=FALSE, dev='cairo_pdf', fig.height=2.5, fig.width=7.7)
+source('support_mathmethr.R')
 ```
-
 
 ### Вы сможете
 
@@ -371,21 +370,30 @@ nrow(river)
 
 ## Парные графики для всех числовых переменных
 
-```{r fig.width = 9, fig.height=5.5}
+```{r eval=FALSE}
 pairs(river[, -1])
+```
+
+```{r fig.width = 9, fig.height=4.4, echo=FALSE, purl=FALSE}
+pairs(river[, -1], gap = 0.25, oma=rep(1.75, 4))
 ```
 
 \pause
 
-Похоже, что есть одно сильно отскакивающее значение в столбце `Rsdntial`.
+__Выброс__ — сильно отскакивающее значение. 
 
-Варианты действий:
+Похоже, что в этих данных есть выброс в столбце `Rsdntial`.
+
+## Варианты действий с выбросами
 
 - удалить это наблюдение, т.к. рек с таким большим уровнем застройки территории больше нет в датасете.
 - трансформировать `Rsdntial` (извлечь логарифм), чтобы "растянуть" начало шкалы и "сплющить" ее конец.
 
-Мы пока продолжим, чтобы посмотреть как будет выглядеть это значение при анализе остатков.
+\pause
 
+\vfill
+
+Мы пока продолжим, чтобы посмотреть как будет выглядеть это значение при анализе остатков.
 
 ## Задача
 
@@ -394,20 +402,6 @@ pairs(river[, -1])
 $Nitrogen_i = b_0 + b_1 Agr_i + b_2 Forest_i + b_3 Rsdntial_i + b_4 ComIndl_i + e_i$
 
 1. Запишите уравнение этой линейной модели с коэффициентами.
-
-\vfill
-Предикторы:
-
-- `Agr` - процент сельскохозяйственных земель
-- `Forest` - процент земли, занятой лесом
-- `Rsdntial` - процент земель, занятых поселениями
-- `ComIndl`	- процент земель, занятых коммерцией и промышленностью
-
-\vfill
-Отклик:
-
-- `Nitrogen` - средняя концентрация азота в воде, мг/л
-
 
 ## Решение
 
@@ -425,16 +419,15 @@ coef(river_lm1)
 
 Уравнение регрессии:
 
-```{r results='asis', echo=FALSE, purl=FALSE}
-lm_equation(river_lm1, strict=FALSE, digits = 1)
-```
+$`r lm_equation(river_lm1, strict=FALSE, digits = 1)`$
+
+
+\pause
 
 Более формальная запись  
 (и та и другая запись требует расшифровки обозначений):  
 
-```{r results='asis', echo=FALSE, purl=FALSE}
-lm_equation(river_lm1, digits = 1)
-```
+$`r lm_equation(river_lm1, digits = 1)`$
 
 \pause
 
@@ -519,7 +512,7 @@ ggplot(data = river_diag3, aes(x = 1:nrow(river_diag3), y = .cooksd)) +
 
 ## Новая модель, на очищенных данных
 
-```{r}
+```{r fig.height=2.25}
 # данные без выброса
 river_subset <- river[river$Rsdntial < 25, ]
 # новая модель
@@ -672,14 +665,16 @@ $R^2_{adj}$ учитывает число переменных в модели, 
 Используйте $R^2 _{adj}$ для сравнения моделей с разным числом параметров.
 
 
-## Можно привести  результаты t-теста для коэффициентов в виде таблицы
+## Описание результатов
 
-Концентрация азота в воде статистически значимо увеличивалась с ростом процента застройки и процента сельскохозяйственных земель в бассейнах рек (Табл. \autoref{tab:mreg-coef}). Линейная модель с этими двумя предикторами описывала `r round(summary(river_lm1)$adj.r.squared * 100, 1)` \% общей изменчивости в данных.
+\small
+
+Для описания зависимости концентрации азота в речной воде от особенностей землепользования была подобрана линейная модель: $`r lm_equation(river_lm4, strict=FALSE, digits = 1)`$, где $Agr$ — процент сельскохозяйственных земель, $Rsdntial$ — процент земель, занятых поселениями. Эта модель объяснила `r round(summary(river_lm1)$adj.r.squared * 100, 1)`\% общей изменчивости концентрации азота в речной воде. С увеличением процента застройки и процента сельскохозяйственных земель в бассейнах рек концентрация азота статистически значимо увеличивалась (Табл. \autoref{tab:mreg-coef}). 
 
 ```{r echo=FALSE, results='asis', purl=FALSE}
 library(xtable)
 library(tidyr)
-smr <- coef(summary(river_lm4)) %>% data.frame() %>% round(., 3)
+smr <- coef(summary(river_lm4)) %>% data.frame()
 # %>% format.data.frame(., digits = 2, nsmall = 1)
 smr$Pr...t.. <- format.pval(smr$Pr...t.., eps = 0.01)
 rownames(smr)[1] <- "Отрезок"
@@ -687,7 +682,7 @@ colnames(smr) <- c("Оценка", "Ст.ошибка", "t", "P")
 
 xtb <- xtable(
   smr,
-  caption = "Коэффициенты линейной регрессии, описывающей зависимость средней концентрации азота в воде (мг/л) от характеристик землепользования: `Agr` - процент сельскохозяйственных земель, Rsdntial - процент земель, занятых поселениями. t --- значение t-критерия, P --- уровень значимости.",
+  caption = "Коэффициенты линейной регрессии, описывающей зависимость средней концентрации азота в воде (мг/л) от характеристик землепользования: Agr — процент сельскохозяйственных земель, Rsdntial — процент земель, занятых поселениями. t --- значение t-критерия, P --- уровень значимости.", digits = c(0, 2, 3, 2, 2),
   label = "tab:mreg-coef")
 
 print.xtable(xtb, comment = F, caption.placement = "top")

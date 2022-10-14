@@ -145,15 +145,13 @@ coef(bird_lm)
 
 Уравнение регрессии:  
 
-```{r results='asis', echo=FALSE, purl=FALSE}
-lm_equation(bird_lm, strict=FALSE)
-```
+$`r lm_equation(bird_lm, strict=FALSE)`$
+
 
 Более формальная запись:  
 
-```{r results='asis', echo=FALSE, purl=FALSE}
-lm_equation(bird_lm)
-```
+$`r lm_equation(bird_lm)`$
+
 
 ## Интерпретация коэффициентов регрессии
 
