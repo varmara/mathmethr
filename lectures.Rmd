@@ -46,9 +46,8 @@ install.packages("cowplot")
 
 <!-- - Презентация: [04_regression2.pdf](04_regression2.pdf) -->
 
-<!-- - Код: [04_regression2_code.R](04_regression2_code.R) -->
-
-<!-- - Данные: [loyn.xlsx](data/loyn.xlsx) | [loyn.csv](data/loyn.csv) -->
+- Код: [04_regression2_code.R](04_regression2_code.R)
+- Данные: [river.xlsx](data/river.xlsx) | [river.csv](data/river.csv)
 
 ## 5. Дисперсионный анализ, ч.1
 
