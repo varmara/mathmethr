@@ -456,7 +456,7 @@ vif(river_lm1) # variance inflation factors
 \pause
 
 ```{r}
-river_lm2 <- update(river_lm1, .~.-Forest)
+river_lm2 <- lm(Nitrogen ~ Agr + Rsdntial + ComIndl, data = river)
 vif(river_lm2) # variance inflation factors
 ```
 
@@ -469,7 +469,7 @@ vif(river_lm2) # variance inflation factors
 Удаляем `ComIndl`
 
 ```{r}
-river_lm3 <- update(river_lm2, .~.-ComIndl)
+river_lm3 <- lm(Nitrogen ~ Agr + Rsdntial, data = river)
 vif(river_lm3) # variance inflation factors
 ```
 
@@ -643,7 +643,7 @@ summary(scaled_river_lm4)
 ## Оценка качества подгонки модели
 
 ```{r}
-summary(river_lm1)$adj.r.squared
+summary(river_lm4)$adj.r.squared
 ```
 
 ### Обычный $R^2$ --- доля объясненной изменчивости
@@ -669,7 +669,7 @@ $R^2_{adj}$ учитывает число переменных в модели, 
 
 \small
 
-Для описания зависимости концентрации азота в речной воде от особенностей землепользования была подобрана линейная модель: $`r lm_equation(river_lm4, strict=FALSE, digits = 1)`$, где $Agr$ — процент сельскохозяйственных земель, $Rsdntial$ — процент земель, занятых поселениями. Эта модель объяснила `r round(summary(river_lm1)$adj.r.squared * 100, 1)`\% общей изменчивости концентрации азота в речной воде. С увеличением процента застройки и процента сельскохозяйственных земель в бассейнах рек концентрация азота статистически значимо увеличивалась (Табл. \autoref{tab:mreg-coef}). 
+Для описания зависимости концентрации азота в речной воде от особенностей землепользования была подобрана линейная модель: $`r lm_equation(river_lm4, strict=FALSE, digits = 1)`$, где $Agr$ — процент сельскохозяйственных земель, $Rsdntial$ — процент земель, занятых поселениями. Эта модель объяснила `r round(summary(river_lm4)$adj.r.squared * 100, 1)`\% общей изменчивости концентрации азота в речной воде. С увеличением процента застройки и процента сельскохозяйственных земель в бассейнах рек концентрация азота статистически значимо увеличивалась (Табл. \autoref{tab:mreg-coef}). 
 
 ```{r echo=FALSE, results='asis', purl=FALSE}
 library(xtable)
