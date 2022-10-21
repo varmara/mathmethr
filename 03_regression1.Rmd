@@ -794,7 +794,7 @@ pl_tot + ggtitle('Общая')
 ```
 \centering
 
-$SS_{t}= \sum{(\bar{y}-y_i)^2}$  
+$SS_{t}= \sum{(y_i - \bar{y})^2}$  
 $df_{t} = n - 1$  
 
 $MS_{t} = \frac {SS_{t}}{df_{t}}$
@@ -818,7 +818,7 @@ pl_res
 ```
 \centering
 
-$SS_{e}= \sum{(\hat{y}-y_i)^2}$  
+$SS_{e}= \sum{(y_i - \hat{y})^2}$  
 $df_{e} = n - p$
 
 $MS_{e} = \frac{SS_{e}}{df_{e}}$
@@ -844,7 +844,7 @@ pl_tot + ggtitle('Общая')
 ```
 \centering
 
-$SS_{t}= \sum{(\bar{y}-y_i)^2}$  
+$SS_{t}= \sum{(y_i - \bar{y})^2}$  
 $df_{t} = n - 1$  
 
 $MS_{t} = \frac {SS_{t}}{df_{t}}$
@@ -868,7 +868,7 @@ pl_res
 ```
 \centering
 
-$SS_{e}= \sum{(\hat{y}-y_i)^2}$  
+$SS_{e}= \sum{(y_i - \hat{y})^2}$  
 $df_{e} = n - p$
 
 $MS_{e} = \frac{SS_{e}}{df_{e}}$
@@ -878,10 +878,10 @@ $MS_{e} = \frac{SS_{e}}{df_{e}}$
 
 ## F-критерий и распределение F-статистики
 
-Если $b _1 = 0$, тогда $\hat y _i = \bar y _i$ и $MS _{r} \approx MS _{e}$
+Если $b _1 = 0$, тогда $\hat y_i = \bar y_i$ и $MS _{r} \approx MS _{e}$
 
 F - соотношение объясненной и не объясненной изменчивости:
-$$F = \frac{MS _{regression}}{MS _{error}}$$
+$$F = \frac{MS_{regression}}{MS_{error}}$$
 
 Подчиняется F-распределению с параметрами $df _{r}$ и $df _{e}$.
 
@@ -907,9 +907,9 @@ labs(title = expression(bold(paste("F-распределение,", ~df[1]==1, "
 \hline\noalign{\smallskip}
 Источник \linebreak[2] изменчивости  & df & SS & MS & F & P \\
 \hline\noalign{\smallskip}
-Регрессия & $df _r = 1$ & $SS _r = \sum{(\bar y - \hat y _i)^2}$ & $MS _r = \frac{SS _r}{df _r}$ & $F _{df _r, df _e} = \frac{MS _r}{MS _e}$ & $p$ \\
-Остаточная & $df _e = n - 2$ & $SS _e = \sum{(y _i - \hat y _i)^2}$ & $MS _e = \frac{SS _e}{df _e}$ & \\
-Общая & $df _t = n - 1$ & $SS _t = \sum {(\bar y - y _i)^2}$ & & & \\
+Регрессия & $df _r = 1$ & $SS_r = \sum{(\hat y_i - \bar y)^2}$ & $MS _r = \frac{SS_r}{df_r}$ & $F_{df_r, df_e} = \frac{MS_r}{MS_e}$ & $p$ \\
+Остаточная & $df_e = n - 2$ & $SS_e = \sum{(y _i - \hat y _i)^2}$ & $MS _e = \frac{SS_e}{df_e}$ & \\
+Общая & $df_t = n - 1$ & $SS_t = \sum {(y_i - \bar y)^2}$ & & & \\
 \hline\noalign{\smallskip}
 \end{tabular}
 }

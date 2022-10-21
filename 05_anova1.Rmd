@@ -55,13 +55,13 @@ opts_chunk$set(fig.show='hold', size='footnotesize', comment="#", warning=FALSE,
 ### Чтение из xlsx
 ```{r}
 library(readxl)
-sleep <- read_excel(path = "data/sleep.xlsx", sheet = 1)
+sleep <- read_excel(path = 'data/sleep.xlsx', sheet = 1)
 ```
 
 ### Чтение из csv
 
 ```{r}
-sleep <- read.table("data/sleep.csv", header = TRUE, sep = "\t")
+sleep <- read.table('data/sleep.csv', header = TRUE, sep = '\t')
 ```
 
 ## Все ли правильно открылось?
@@ -74,7 +74,7 @@ head(sleep, 2)     # Первые несколько строк файла
 
 ```{r}
 # Сделаем sleep$Danger фактором
-sleep$Danger <- factor(sleep$Danger, levels = 1:5, labels = c("очень низкий", "низкий", "средний", "высокий", "очень высокий"))
+sleep$Danger <- factor(sleep$Danger, levels = 1:5, labels = c('очень низкий', 'низкий', 'средний', 'высокий', 'очень высокий'))
 ```
 
 
@@ -116,6 +116,8 @@ table(sl$Danger)
 
 ## Задание 1
 
+А теперь хорошо бы посмотреть на данные...
+
 Дополните код, чтобы построить точечный график зависимости общей продолжительности сна (`TotalSleep`) от уровня опасности среды (`Danger`).
 
 
@@ -139,13 +141,13 @@ ggplot(data = sl, aes(x = Danger, y = TotalSleep)) +
 ```{r gg-points, echo=TRUE, purl=FALSE}
 ```
 
-Точечный график --- не самый удобный способ представления таких данных.
+Точечный график --- не самый удобный способ представления таких данных, хотя он показывает их все.
 
 ## Задание 2
 
 Точечный график --- не самый удобный способ представления таких данных. Лучше было бы изобразить средние значения и их 95% доверительные интервалы.
 
-Замените в графике из прошлого задания геом на этот стат:
+Замените в графике из прошлого задания все геомы на этот стат:
 
 ```{r eval=FALSE}
   stat_summary(geom = 'pointrange', fun.data = mean_cl_normal) 
@@ -180,16 +182,16 @@ ggplot(data = sl, aes(x = Danger, y = TotalSleep, colour = Danger)) +
 Создайте подписи к осям и легенде, при помощи слоя подписей labs(). Отредактируйте этот код и добавьте его к графику с предыдущего шага
 
 ```{r eval=FALSE}
-  labs(x = ,  = "Продолжительность сна", colour = )
+  labs(x = ,  = 'Продолжительность сна', colour = )
 ```
 
 
 ```{r gg-mean-conf-limit-coloured-labs, echo=FALSE, purl=FALSE}
 ggplot(data = sl, aes(x = Danger, y = TotalSleep, colour = Danger)) + 
   stat_summary(geom = 'pointrange', fun.data = mean_cl_normal) +
-  labs(x = "Уровень опасности", 
-       y = "Продолжительность сна",
-       colour = "Уровень опасности")
+  labs(x = 'Уровень опасности', 
+       y = 'Продолжительность сна',
+       colour = 'Уровень опасности')
 ```
 
 ## Решение 4
@@ -253,7 +255,7 @@ library(dplyr)
 dat_smr <- sl %>% group_by(Danger) %>% summarise(mean = mean(TotalSleep)) 
 dat <- merge(sl, dat_smr)
 dat$Danger <- as.numeric(dat$Danger) + runif(nrow(dat), -0.15, 0.15)
-d_lev <- c("очень низкий", "низкий", "средний", "высокий", "очень высокий")
+d_lev <- c('очень низкий', 'низкий', 'средний', 'высокий', 'очень высокий')
 dat_smr$Danger <- as.numeric(dat_smr$Danger)
 
 lims <- range(sl$TotalSleep) + c(-1, 1)
@@ -269,57 +271,57 @@ X <- dat$Danger[id]
 
 
 
-pl <- ggplot(data = dat, aes(x = Danger, y = TotalSleep)) + theme(legend.position = "none", axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8)) + ylim(lims[1], lims[2]) + scale_x_continuous(breaks = 1:5, labels = d_lev)
+pl <- ggplot(data = dat, aes(x = Danger, y = TotalSleep)) + theme(legend.position = 'none', axis.text.x = element_text(angle = 30, vjust = .8, hjust = .8)) + ylim(lims[1], lims[2]) + scale_x_continuous(breaks = 1:5, labels = d_lev)
 
 # # Общая изменчивость (отклонения от общего среднего)
 pl_tot <- pl + 
-  geom_segment(aes(xend = Danger, yend = gmean), colour = "grey70") +
-    geom_hline(yintercept = gmean, linetype = "dashed") + 
+  geom_segment(aes(xend = Danger, yend = gmean), colour = 'grey70') +
+    geom_hline(yintercept = gmean, linetype = 'dashed') + 
     geom_point() +
-  ggtitle("Общая изменчивость\n(отклонения от общего среднего)") +
-    annotate("text", label = "Общее\nсреднее", 
+  ggtitle('Общая изменчивость\n(отклонения от общего среднего)') +
+    annotate('text', label = 'Общее\nсреднее', 
            x = 0,  y = gmean, hjust = -0.1, size = 4) + 
-  annotate("text", label = "SS[t] == sum((bar(y) - y[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6) 
+  annotate('text', label = 'SS[t] == sum((y[i] - bar(y)))^2', parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6) 
 
 pl_all <- pl + 
-  geom_segment(aes(xend = Danger, yend = gmean), colour = "grey70") +
-  geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = "dodgerblue1") + 
-  geom_hline(yintercept = gmean, linetype = "dashed") + 
-  # annotate("segment", x = X, y = Y, xend = X, yend = gmean, colour = "grey70", size = 2) + 
-  annotate("segment", x = X, y = Y, xend = X, yend = Y_hat, colour = "#009E73", size = 2) +
-  annotate("segment", x = X, y = Y_hat, xend = X, yend = gmean, colour = "#E69F00", size = 2) +
+  geom_segment(aes(xend = Danger, yend = gmean), colour = 'grey70') +
+  geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = 'dodgerblue1') + 
+  geom_hline(yintercept = gmean, linetype = 'dashed') + 
+  # annotate('segment', x = X, y = Y, xend = X, yend = gmean, colour = 'grey70', size = 2) + 
+  annotate('segment', x = X, y = Y, xend = X, yend = Y_hat, colour = '#009E73', size = 2) +
+  annotate('segment', x = X, y = Y_hat, xend = X, yend = gmean, colour = '#E69F00', size = 2) +
   geom_point() +
-  annotate("text", label = "Общее\nсреднее", 
+  annotate('text', label = 'Общее\nсреднее', 
            x = 0,  y = gmean, hjust = -0.1, size = 4)
 
 pl_no <- pl + 
-  geom_hline(yintercept = gmean, linetype = "dashed") + 
-  geom_point(data = dat_smr, y = gmean, size = 20, shape = 45, colour = "dodgerblue1") +
-    annotate("segment", x = X, y = Y, xend = X, yend = gmean, colour = "grey70", size = 2) + 
-  annotate("segment", x = X + 0.05, y = Y, xend = X + 0.05, yend = gmean, colour = "#009E73", size = 2) +
+  geom_hline(yintercept = gmean, linetype = 'dashed') + 
+  geom_point(data = dat_smr, y = gmean, size = 20, shape = 45, colour = 'dodgerblue1') +
+    annotate('segment', x = X, y = Y, xend = X, yend = gmean, colour = 'grey70', size = 2) + 
+  annotate('segment', x = X + 0.05, y = Y, xend = X + 0.05, yend = gmean, colour = '#009E73', size = 2) +
     geom_point() +
-  annotate("text", label = "Общее\nсреднее", 
+  annotate('text', label = 'Общее\nсреднее', 
            x = 0,  y = gmean, hjust = -0.1, size = 4)
 
 
 # library(plyr)
 # Межгрупповая изменчивость (связанная с фактором)
 pl_x <- pl + 
-  geom_hline(aes(yintercept = gmean), linetype = "dashed") + 
-  geom_segment(data = dat_smr, aes(x = Danger, y = mean, xend = Danger, yend = gmean), colour = "#E69F00", size = 2) +
-  geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = "dodgerblue1") + 
+  geom_hline(aes(yintercept = gmean), linetype = 'dashed') + 
+  geom_segment(data = dat_smr, aes(x = Danger, y = mean, xend = Danger, yend = gmean), colour = '#E69F00', size = 2) +
+  geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = 'dodgerblue1') + 
     geom_point() +
-  ggtitle("Факторная изменчивость\n(межгрупповая)")+
-    annotate("text", label = "SS[x] == sum((bar(y) - hat(y)[i]))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
+  ggtitle('Факторная изменчивость\n(межгрупповая)')+
+    annotate('text', label = 'SS[x] == sum((hat(y)[i] - bar(y)))^2', parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
 
 # Внутригрупповая изменчивость (случайная)
 pl_res <- pl + 
-  geom_segment(data = dat, aes(xend = Danger, yend = mean), colour = "#009E73") +
-    geom_hline(yintercept = gmean, linetype = "dashed") + 
-    geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = "dodgerblue1") + 
+  geom_segment(data = dat, aes(xend = Danger, yend = mean), colour = '#009E73') +
+    geom_hline(yintercept = gmean, linetype = 'dashed') + 
+    geom_point(data = dat_smr, aes(y = mean), size = 20, shape = 45, colour = 'dodgerblue1') + 
     geom_point() +
-  ggtitle("Случайная изменчивость\n(внутригрупповая)")+
-    annotate("text", label = "SS[e] == sum(sum((y [i] - hat(y)[i])))^2", parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
+  ggtitle('Случайная изменчивость\n(внутригрупповая)')+
+    annotate('text', label = 'SS[e] == sum(sum((y [i] - hat(y)[i])))^2', parse = TRUE, x = 0,  y = yannot, hjust = -0.1, size = 6)
 ```
 
 ## Общая изменчивость
@@ -335,7 +337,7 @@ pl_tot
 Отклонения от общего среднего складываются из двух составляющих:
 
 - Внутригрупповые отклонения --- отклонения наблюдаемых значений от внутригрупповых средних
-- Межгрупповые отклонения --- отклонения внутригрупповых средних от общего среднего ("эффекты" групп)
+- Межгрупповые отклонения --- отклонения внутригрупповых средних от общего среднего ('эффекты' групп)
 
 ```{r gg-all, echo=FALSE, fig.height=3, purl=FALSE}
 pl_all
@@ -354,27 +356,48 @@ grid.arrange(pl_tot, pl_x, pl_res, nrow = 1)
 
 ## Средние квадраты отклонений
 
+\centering
+$SS_t = SS_r + SS_e$ \qquad $MS_t \ne MS_r + MS_e$
+
 ```{r gg-ss, echo=FALSE, fig.height=3, fig.width=10, purl=FALSE}
 ```
 
+\columnsbegin
+\column{0.31\textwidth}
+\centering
 
-\resizebox{1\textwidth}{!}{
-{\small
-\begin{tabular}{c c c}
-\hline\noalign{\smallskip}
-$MS_t$ полная дисперсия  & 
-$MS_x$ факторная дисперсия & 
-$MS_e$ остаточная дисперсия  \\
-\hline\noalign{\smallskip}
-$MS_{t} =\frac{SS_{t}}{df_{t}}$ & $MS_{x} =\frac{SS_{x}}{df_{x}}$ & $MS_{e} =\frac{SS_{e}}{df_{e}}$ \\
-$SS_{t}=\sum{(\bar{y}-y_i)^2}$ & $SS_{x}=\sum{(\hat{y}-\bar{y})^2}$ & $SS_{e}=\sum{(\hat{y}-y_i)^2}$ \\
-$df_{t} = n - 1$ & $df_{x} = a - 1$ & $df_{e} = n - a$  \\
-\hline\noalign{\smallskip}
-\end{tabular}
-}
-}
+Общая  
+изменчивость  
+$SS_{t}= \sum{(y_i - \bar{y})^2}$  
 
+$df_{t} = n - 1$  
 
+Общая дисперсия  
+$MS_{t} = \frac {SS_{t}}{df_{t}}$
+
+\column{0.31\textwidth}
+\centering
+Факторная изменчивость  
+$SS_{x}=\sum{(\hat{y}-\bar{y})^2}$  
+
+$df_{x} = a - 1$  
+
+Факторная дисперсия
+$MS_{x} = \frac {SS_{x}}{df_{x}}$
+
+\column{0.31\textwidth}
+\centering
+Остаточная изменчивость  
+$SS_{e}= \sum{(y_i - \hat{y})^2}$  
+
+$df_{e} = n - a$
+
+Остаточная дисперсия  
+$MS_{e} = \frac{SS_{e}}{df_{e}}$
+
+\columnsend
+
+- $a$ — количество уровней фактора
 
 ##  Если выборки из одной совокупности, то  
 
@@ -403,11 +426,11 @@ dfr <- data.frame(f = seq(-0.01, 9, 0.01))
 ggplot(dfr, aes(x = f)) + 
   stat_function(fun = df, args = list(df1 = 4, df2 = 53), size = 1.3, n = 200) + 
   geom_hline(yintercept = 0) +
-  geom_vline(xintercept = qf(p = 0.95, df1 = 4, df2 = 53), color = "red", linetype = "dashed") + 
-  annotate("text", label = "F при α = 0.05", x = qf(p = 0.95, df1 = 4, df2 = 53), y = 1, hjust = 1.1, vjust = 1) +
-  geom_vline(xintercept = 8.0523, linetype = "dashed") +
-  annotate("text", label = "F", x = 8.0523, y = 1, hjust = -1, vjust = 1) +
-  labs(title = "F-распределение, df1 = 4, df2 = 53", x = "F", y = "Плотность вероятности") + theme_bw(base_size = 10)
+  geom_vline(xintercept = qf(p = 0.95, df1 = 4, df2 = 53), color = 'red', linetype = 'dashed') + 
+  annotate('text', label = 'F при α = 0.05', x = qf(p = 0.95, df1 = 4, df2 = 53), y = 1, hjust = 1.1, vjust = 1) +
+  geom_vline(xintercept = 8.0523, linetype = 'dashed') +
+  annotate('text', label = 'F', x = 8.0523, y = 1, hjust = -1, vjust = 1) +
+  labs(title = 'F-распределение, df1 = 4, df2 = 53', x = 'F', y = 'Плотность вероятности') + theme_bw(base_size = 10)
 ```
 
 
@@ -418,9 +441,9 @@ ggplot(dfr, aes(x = f)) +
 \hline\noalign{\smallskip}
 Источник \linebreak[2] изменчивости  & SS & df & MS & F  \\
 \hline\noalign{\smallskip}
-Название фактора & $SS _x = \sum{(\bar y - \hat y _i)^2}$ & $df _x = a - 1$ & $MS _x = \frac{SS _x}{df _x}$ & $F _{df _x df _e} = \frac{MS _x}{MS _e}$ \\
+Название фактора & $SS _x = \sum{(\hat y_i - \bar y)^2}$ & $df _x = a - 1$ & $MS _x = \frac{SS _x}{df _x}$ & $F _{df _x df _e} = \frac{MS _x}{MS _e}$ \\
 Случайная & $SS _e = \sum{(y _i - \hat y _i)^2}$ & $df _e = n - a$ & $MS _e = \frac{SS _e}{df _e}$ \\
-Общая & $SS _t = \sum {(\bar y - y _i)^2}$ & $df _t = n - 1$ & & \\
+Общая & $SS _t = \sum {(y _i - \bar y)^2}$ & $df _t = n - 1$ & & \\
 \hline\noalign{\smallskip}
 \end{tabular}
 }
@@ -448,9 +471,9 @@ sl_anova
 
 ```{r purl=FALSE, echo=FALSE}
 result <- sl_anova
-dfs <- paste0(result$Df, collapse= ",")
+dfs <- paste0(result$Df, collapse= ',')
 fval <- round(result$'F value'[1], 2)
-sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[1] <= 0.05, "$p < 0.05$", ""))
+sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, '$p < 0.01$', ifelse(result$'Pr(>F)'[1] <= 0.05, '$p < 0.05$', ''))
 ```
 
 >- Уровень опасности среды обитания видов животных влияет на их общую продолжительность сна ($F _{`r dfs`} = `r fval`$, `r sign`).
@@ -464,15 +487,15 @@ sign <- ifelse(result$'Pr(>F)'[1] <= 0.01, "$p < 0.01$", ifelse(result$'Pr(>F)'[
 
 ```{r purl=FALSE, echo=FALSE, results='asis'}
 library(xtable)
-source("support_mathmethr.R")
+source('support_mathmethr.R')
 smr <- fix_Anova(sl_anova,
-                 rown = c("Уровень опасности", "Остаточная"), 
-                 coln = c("SS", "df", "F", "P"))
+                 rown = c('Уровень опасности', 'Остаточная'), 
+                 coln = c('SS', 'df', 'F', 'P'))
 xtb <- xtable(
   smr,
-  caption = "Результаты дисперсионного анализа продолжительности сна млекопитающих в зависимости от уровня опасностей, которым они подвергаются в течении жизни. SS --- суммы квадратов отклонений, df --- число степеней свободы, F --- значение F-критерия, P --- уровень значимости",
-  label = "tab:one-anova-sl")
-print.xtable(xtb, comment = F, caption.placement = "top")
+  caption = 'Результаты дисперсионного анализа продолжительности сна млекопитающих в зависимости от уровня опасностей, которым они подвергаются в течении жизни. SS --- суммы квадратов отклонений, df --- число степеней свободы, F --- значение F-критерия, P --- уровень значимости',
+  label = 'tab:one-anova-sl')
+print.xtable(xtb, comment = F, caption.placement = 'top')
 ```
 
 
@@ -509,7 +532,7 @@ sl_diag <- fortify()
 head(sl_diag)
 # График расстояния Кука
 ggplot(data = , aes(x = 1:nrow(   ), y = )) + 
-  geom_bar(stat = "identity")
+  geom_bar(stat = 'identity')
 # График остатков от предсказанных значений
 ggplot(data = , aes(x = , y = .stdresid)) + 
   geom_
@@ -531,7 +554,7 @@ head(sl_diag)
 ```{r purl=FALSE}
 # График расстояния Кука
 ggplot(data = sl_diag, aes(x = 1:nrow(sl_diag), y = .cooksd)) + 
-  geom_bar(stat = "identity")
+  geom_bar(stat = 'identity')
 ```
 
 \pause
@@ -640,15 +663,15 @@ gg_other + geom_point(aes(x = Exposure)), nrow = 2)
 
 ## Пост-хок тест Тьюки в R
 
-- `glht()` - "general linear hypotheses testing"
+- `glht()` - 'general linear hypotheses testing'
 - `linfct` - аргумент, задающий гипотезу для тестирования
 
 - `mcp()` - функция, чтобы задавать множественные сравнения (обычные пост-хоки)
-- `Danger` = "Tukey" - тест Тьюки по фактору `Danger`
+- `Danger` = 'Tukey' - тест Тьюки по фактору `Danger`
 
 ```{r, warning=FALSE, message=FALSE}
 library(multcomp)
-sl_pht <- glht(sl_mod, linfct = mcp(Danger = "Tukey"))
+sl_pht <- glht(sl_mod, linfct = mcp(Danger = 'Tukey'))
 ```
 
 ## Результаты попарных сравнений (тест Тьюки)
@@ -674,7 +697,7 @@ MyData <- data.frame(Danger = levels(sl$Danger))
 MyData$Danger <- factor(MyData$Danger, levels = levels(sl$Danger), 
                         labels = levels(sl$Danger))
 Predictions <- predict(sl_mod, newdata = MyData, 
-                      interval = "confidence")
+                      interval = 'confidence')
 MyData <- data.frame(MyData, Predictions)
 MyData
 ```
@@ -685,15 +708,15 @@ MyData
 
 ```{r gg-means, echo=FALSE, eval=TRUE, purl=FALSE}
 gg_means <- ggplot(data = MyData, aes(x = Danger, y = fit)) + 
-  geom_bar(stat = "identity", fill = "orange", width = 0.5) + 
+  geom_bar(stat = 'identity', fill = 'orange', width = 0.5) + 
   geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
-  labs(x = "Уровень опасности", y = "Продолжительность сна")
+  labs(x = 'Уровень опасности', y = 'Продолжительность сна')
 gg_means
 ```
 
 ```{r eval=FALSE}
 gg_means <- ggplot(data = , aes(x = , y = )) + 
-  geom_bar(stat = "", width = 0.5) + 
+  geom_bar(stat = '', width = 0.5) + 
   geom_errorbar(aes(ymin = , ymax = ), width = 0.1) +
   labs()
 gg_means
@@ -712,8 +735,28 @@ gg_means
 
 ```{r}
 gg_means +
-  geom_text(aes(label = c("A", "A", "A", "AB", "B")), 
+  geom_text(aes(label = c('A', 'A', 'A', 'AB', 'B')), 
             vjust = -0.3, hjust = 1.4, size = 6)
+```
+
+## Другой вариант - обозначить 'гомогенные группы'
+
+```{r}
+gg_means +
+  annotate(geom = 'segment', x = 0.5, y = 16, xend = 4.5, yend = 16) +
+  annotate(geom = 'segment', x = 3.5, y = 13, xend = 5.5, yend = 13)
+```
+
+## Наконец, можно показать все значимые различия
+
+```{r}
+gg_means +
+  annotate(geom = 'segment', x = 1, y = 15.3, xend = 5, yend = 15.3) +
+  annotate(geom = 'segment', x = 2, y = 14.2, xend = 5, yend = 14.2) +
+  annotate(geom = 'segment', x = 3, y = 13, xend = 5, yend = 13) +
+  annotate(geom = 'text', x = 5, y = 15.3, hjust = 0, label = '< 0.001') +
+  annotate(geom = 'text', x = 5, y = 14.2, hjust = 0, label = '< 0.001') +
+  annotate(geom = 'text', x = 5, y = 13, hjust = 0, label = '   0.012')
 ```
 
 ## Take home messages
