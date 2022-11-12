@@ -58,8 +58,7 @@ install.packages("multcomp")
 
 ## 6. Дисперсионный анализ, ч.2
 
-<!-- - Презентация: [06_anova2.pdf](06_anova2.pdf) -->
-
+- Презентация: [06_anova2.pdf](06_anova2.pdf)
 - Код: [06_anova2_code.R](06_anova2_code.R)
 - Данные: [eysenck.csv](data/eysenck.csv)
 
@@ -70,7 +69,6 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "HSAUR", "ggrepel"))
 ```
 
 <!-- - Презентация: [07_pca.pdf](07_pca.pdf) -->
-
 <!-- - Код: [07_pca_code.R](07_pca_code.R) -->
 
 ## 8. Дискриминантный анализ
@@ -78,9 +76,7 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "HSAUR", "ggrepel"))
 <!-- - Презентация: [08_da.pdf](08_da.pdf) -->
 
 <!-- - Код: -->
-
 <!--     + [код R](08_da_code.R) -->
-
 <!--     + [BoxMTest.R](BoxMTest.R) -->
 
 ## 9. Ординация и классификация с использованием мер сходства-различия
