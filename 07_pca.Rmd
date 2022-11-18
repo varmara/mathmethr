@@ -27,7 +27,7 @@ opts_chunk$set(fig.show='hold', size='footnotesize', comment='#', warning=FALSE,
 ```
 
 
-## Знакомимся с ординацией на примере метода главных компонент
+## Ординация на примере метода главных компонент
 
 ### Вы сможете
 
@@ -70,7 +70,7 @@ head(X)
 
 \column{0.75\textwidth}
 
-```{r echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=3.5, out.width='0.99\\linewidth'}
+```{r echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=3.75, out.width='0.99\\linewidth'}
 p_raw 
 ```
 
@@ -82,7 +82,7 @@ p_raw
 
 \blockbegin{Центрирование}
 
-Из каждого значения переменной нужно вычесть среднее значение этой переменной.
+Из каждого значения переменной вычитают ее среднее значение.
 
 
 
@@ -107,7 +107,7 @@ head(round(X_cent, 1))
 
 \column{0.75\textwidth}
 
-```{r echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=2.5}
+```{r echo=FALSE, purl=FALSE, fig.width=5.5, fig.height=3}
 p_centered
 ```
 
@@ -197,9 +197,11 @@ e_vec
 
 \columnsend
 
-## С помощью собственных векторов и собственных чисел можно найти в пространстве признаков новые оси, вдоль которых будет максимальный разброс точек.
+## Новые оси в многомерном пространстве
 
-```{r echo=FALSE, purl=FALSE, fig.width=9.5, fig.height=2.75, out.width='0.99\\linewidth'}
+С помощью собственных векторов и собственных чисел можно найти в пространстве признаков новые оси, вдоль которых будет максимальный разброс точек.
+
+```{r echo=FALSE, purl=FALSE, fig.width=9.5, fig.height=3.5, out.width='0.99\\linewidth'}
 e_vec_scaled <- e_vec %*% sqrt(diag(e_val))
 
 PC1 <- data.frame(x = c(mean(X_cent[, 1]), -e_vec_scaled[1, 1]),
@@ -217,7 +219,7 @@ p_futureax
 
 
 
-## Можно найти новые координаты точек в получившемся новом пространстве
+## Координаты точек в новом пространстве
 
 ```{r echo=FALSE, purl=FALSE, fig.width=9.5, fig.height=2.75, out.width='0.99\\linewidth'}
 p_futureax + labs(title = "До PCA: объекты и оси в пространстве исходных признаков")
@@ -232,7 +234,9 @@ pcaplot <- ggplot(data = df_scores, aes(x = PC1, y = PC2)) + geom_point() + geom
 pcaplot + labs(title = "После PCA: Объекты в пространстве новых осей (главных компонент)")
 ```
 
-## На графике ординации изображено новое пространство
+## График ординации
+
+На графике ординации изображено новое пространство
 
 ```{r echo=FALSE, purl=FALSE, fig.align='center', fig.height=2.75, fig.width=9.5, out.width='0.99\\linewidth'}
 pcaplot

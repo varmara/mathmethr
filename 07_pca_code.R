@@ -37,16 +37,6 @@ pairs(pos[, 6:14],
       pch =  as.numeric(pos$sex))
 
 
-# цвета для каждого сайта из Брюеровской палитры "Set1"
-library(RColorBrewer)
-n_sites <- length(unique(pos$site))
-cols <- brewer.pal(n = n_sites, name = "Set1")
-
-# график морфометрических переменных
-pairs(pos[, 6:14],
-      col = cols[pos$site],
-      pch =  as.numeric(pos$sex))
-
 
 #### Анализ главных компонент ####################
 library(vegan)
