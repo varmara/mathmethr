@@ -167,6 +167,20 @@ $$C _{j} = c _{j0} + c _{j1} X _{1} + ... + c _{jp} X _{p}$$
 
 Кроме того, должны выполняться некоторые условия применимости (см. далее).
 
+## Нужные пакеты и функции
+
+```{r}
+# Для дискриминантного анализа
+library(MASS)
+source("LDA_helper_functions.R")
+# Графики
+library(ggplot2)
+# Чтение данных
+library(readxl)
+```
+
+
+
 ## Пример: Морфометрия ирисов
 
 Сверхзадача --- научиться классифицировать ирисы по нескольким измерениям цветка
@@ -208,7 +222,6 @@ in_train <- sample(sample(1:nrow(iris), size = smp_size))
 ## 2) На тренировочных данных получаем стандартизованные коэффициенты дискриминантных функций
 
 ```{r}
-library(MASS)
 lda_tr_scaled <- lda(scale(iris[in_train, -5]), iris$Species[in_train])
 # коэффициенты дискриминантных функций
 lda_tr_scaled$scaling
@@ -219,38 +232,6 @@ lda_tr_scaled$scaling
 
 ## 3) На тренировочных данных получаем функции классификации
 
-```{r echo=FALSE, purl=TRUE}
-# функция, которая добавит функций классификации к результатам дискр. анализа
-lda.class <- function(x, groups){
-  #   http://stackoverflow.com/q/5629550/2096842
-  #   This code follows the formulas in Legendre and Legendre's Numerical Ecology (1998), page 625, and matches the results of the worked example starting on page 626.
-# code slightly modified - colnames and varnames of classification functions are added
-  library(MASS)
-  x.lda <- lda(groups ~ ., as.data.frame(x))
-  gr <- length(unique(groups))   ## groups might be factors or numeric
-  v <- ncol(x) ## variables
-  m <- x.lda$means ## group means
-  w <- array(NA, dim = c(v, v, gr))
-  for(i in 1:gr){
-    tmp <- scale(subset(x, groups == unique(groups)[i]), scale = FALSE)
-    w[,,i] <- t(tmp) %*% tmp
-  }
-  W <- w[,,1]
-  for(i in 2:gr)
-    W <- W + w[,,i]
-  V <- W/(nrow(x) - gr)
-  iV <- solve(V)
-  class.funs <- matrix(NA, nrow = v + 1, ncol = gr)
-  colnames(class.funs) <- unique(groups)
-  rownames(class.funs) <- c("constant", colnames(x))
-  for(i in 1:gr) {
-    class.funs[1, i] <- -0.5 * t(m[i,]) %*% iV %*% (m[i,])
-    class.funs[2:(v+1) ,i] <- iV %*% (m[i,])
-  }
-  x.lda$class.funs <- class.funs
-  return(x.lda)
-}
-```
 ```{r}
 lda_tr <- lda.class(iris[in_train, -5], iris$Species[in_train])
 # Коэф. функций классификации
@@ -285,8 +266,6 @@ table(iris$Species[-in_train], lda_test_pred$class)
 Можно отметить неправильно классифицированные случаи своим цветом
 
 ```{r}
-library(ggplot2)
-
 class_df <- data.frame(lda_test_pred$x, 
                        new = lda_test_pred$class, 
                        real = iris$Species[-in_train])
@@ -359,7 +338,7 @@ abline(a = 0, b = 1)
 \small
 
 ```{r}
-source("BoxMTest.R")
+
 BoxMTest(as.matrix(iris[, -5]), iris$Species)
 ```
 
@@ -377,33 +356,59 @@ BoxMTest(as.matrix(iris[, -5]), iris$Species)
 <!-- table(qda_test_pred$class, iris$Species[-in_train]) -->
 <!-- ``` -->
 
-## Задание: Поссумы
+<!-- ## Задание: Поссумы -->
 
-- При помощи дискриминантного анализа классифицируйте популяции поссумов
-- Хорошо ли работает классификация?
-- Выполняются ли условия применимости?
+<!-- - При помощи дискриминантного анализа классифицируйте популяции поссумов -->
+<!-- - Хорошо ли работает классификация? -->
+<!-- - Выполняются ли условия применимости? -->
+
+<!-- \columnsbegin -->
+<!-- \column{0.48\textwidth} -->
+
+<!-- \includegraphics{images/possum.jpg} -->
+
+<!-- \tiny{possum by Hasitha Tudugalle on Flickr -->
+<!-- https://www.flickr.com/photos/hasitha\_tudugalle/6037880962} -->
+
+<!-- \column{0.48\textwidth} -->
+
+<!-- ```{r} -->
+<!-- data(possum) # данные из пакета DAAG -->
+<!-- possum <-  -->
+<!--   possum[complete.cases(possum), ] -->
+<!-- ``` -->
+
+<!-- \columnsend -->
+
+<!-- \tiny {Данные Lindenmayer et al. (1995)} -->
+
+## Задание: Пингвины
 
 \columnsbegin
 \column{0.48\textwidth}
 
-\includegraphics{images/possum.jpg}
+\includegraphics{images/palmerpenguins.jpg}
 
-\tiny{Possum by Hasitha Tudugalle on Flickr
-https://www.flickr.com/photos/hasitha\_tudugalle/6037880962}
+\tiny{bluegio at deviantart.com}
 
 \column{0.48\textwidth}
 
-```{r}
-library(DAAG)
-data(possum)
-possum <- 
-  possum[complete.cases(possum), ]
-```
+Морфометрия пингвинов Адели, Генту и Чинстрап (данные `penguins`, Horst et al. 2020).
+
+- При помощи дискриминантного анализа классифицируйте виды пингвинов по морфологическим признакам
+- Хорошо ли работает классификация?
+- Выполняются ли условия применимости?
 
 \columnsend
 
-\tiny {Данные Lindenmayer et al. (1995)}
-
+\small
+```{r echo=TRUE}
+# library(palmerpenguins)
+# data(penguins)
+penguins <- read_xlsx(path = "data/penguins.xlsx", sheet = "penguin data")
+head(penguins, 2)
+colnames(penguins)
+```
 
 ## Take-home messages
 

@@ -75,9 +75,10 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "HSAUR", "ggrepel"))
 
 <!-- - Презентация: [08_da.pdf](08_da.pdf) -->
 
-<!-- - Код: -->
-<!--     + [код R](08_da_code.R) -->
-<!--     + [BoxMTest.R](BoxMTest.R) -->
+- Код:
+  + [код R](08_da_code.R)
+  + [LDA_helper_functions.R](LDA_helper_functions.R)
+- Данные: [penguins.xlsx](data/penguins.xlsx)
 
 ## 9. Ординация и классификация с использованием мер сходства-различия
 

@@ -3,7 +3,16 @@
 # subtitle: "Математические методы в зоологии с использованием R"
 # author: "Марина Варфоломеева"
 
-# ## Пример: Морфометрия ирисов #####
+# Пакеты и функции ======================================================
+# Для дискриминантного анализа
+library(MASS)
+source("LDA_helper_functions.R")
+# Графики
+library(ggplot2)
+# Чтение данных
+library(readxl)
+
+# ## Пример: Морфометрия ирисов ==========================================
 # Сверхзадача --- научиться классифицировать ирисы по нескольким измерениям цветка
 data(iris)
 head(iris, 10)
@@ -24,45 +33,13 @@ in_train <- sample(1:nrow(iris), size = smp_size)
 
 # 2) На тренировочных данных получаем стандартизованные коэффициенты дискриминантных функций -----
 
-library(MASS)
 lda_tr_scaled <- lda(scale(iris[in_train, -5]), iris$Species[in_train])
 # коэффициенты дискриминантных функций
 lda_tr_scaled$scaling
 
 # Для следующего этапа понадобится
 # функция, которая добавит функций классификации к результатам дискр. анализа
-lda.class <- function(x, groups){
-  #   http://stackoverflow.com/q/5629550/2096842
-  #   This code follows the formulas in Legendre and Legendre's
-  # Numerical Ecology (1998), page 625, and matches the results
-  # of the worked example starting on page 626.
-  # The code was slightly modified - colnames and varnames of
-  # classification functions were added.
-  library(MASS)
-  x.lda <- lda(groups ~ ., as.data.frame(x))
-  gr <- length(unique(groups))   ## groups might be factors or numeric
-  v <- ncol(x) ## variables
-  m <- x.lda$means ## group means
-  w <- array(NA, dim = c(v, v, gr))
-  for(i in 1:gr){
-    tmp <- scale(subset(x, groups == unique(groups)[i]), scale = FALSE)
-    w[,,i] <- t(tmp) %*% tmp
-  }
-  W <- w[,,1]
-  for(i in 2:gr)
-    W <- W + w[,,i]
-  V <- W/(nrow(x) - gr)
-  iV <- solve(V)
-  class.funs <- matrix(NA, nrow = v + 1, ncol = gr)
-  colnames(class.funs) <- unique(groups)
-  rownames(class.funs) <- c("constant", colnames(x))
-  for(i in 1:gr) {
-    class.funs[1, i] <- -0.5 * t(m[i,]) %*% iV %*% (m[i,])
-    class.funs[2:(v+1) ,i] <- iV %*% (m[i,])
-  }
-  x.lda$class.funs <- class.funs
-  return(x.lda)
-}
+# lda.class() из файла LDA_helper_functions.R
 
 # 3) На тренировочных данных получаем функции классификации ---------------
 
@@ -108,7 +85,6 @@ names(lda_cv)
 table(iris$Species, lda_cv$class)
 
 # График классификации
-library(ggplot2)
 ggplot(data = iris, aes(x = Petal.Length,
                         y = Sepal.Width,
                         colour = Species,
@@ -128,19 +104,23 @@ qqplot(x = qchisq(p = ppoints(nrow(x)), df = ncol(x)),
 abline(a = 0, b = 1)
 
 # 2) Гомогенность ковариационных матриц
-source("BoxMTest.R")
+# функция из файла LDA_helper_functions.R
 BoxMTest(as.matrix(iris[, -5]), iris$Species)
 
 
-# Задание: Поссумы --------------------------------------------------------
+# Задание: Пингвины --------------------------------------------------------
 
-# Данные Lindenmayer et al. (1995)
-# - При помощи дискриминантного анализа классифицируйте популяции поссумов
-# (Vic и other), используя морфометрические данные
+# Морфометрия пингвинов Адели, Генту и Чинстрап
+# (данные `penguins`, Horst et al. 2020).
+#
+# - При помощи дискриминантного анализа классифицируйте виды пингвинов,
+# используя морфометрические данные
 # - Хорошо ли работает классификация?
 # - Выполняются ли условия применимости?
-library(DAAG)
-data(possum)
-possum <- possum[complete.cases(possum), ]
 
+# library(palmerpenguins)
+# data(penguins)
+penguins <- read_xlsx(path = "data/penguins.xlsx", sheet = "penguin data")
+head(penguins, 2)
+colnames(penguins)
 

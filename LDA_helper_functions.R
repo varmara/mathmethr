@@ -1,3 +1,39 @@
+# функция, которая добавит функций классификации к результатам дискр. анализа
+lda.class <- function(x, groups){
+  #   http://stackoverflow.com/q/5629550/2096842
+  #   This code follows the formulas in Legendre and Legendre's
+  # Numerical Ecology (1998), page 625, and matches the results
+  # of the worked example starting on page 626.
+  # The code was slightly modified - colnames and varnames of
+  # classification functions were added.
+  library(MASS)
+  x.lda <- lda(groups ~ ., as.data.frame(x))
+  gr <- length(unique(groups))   ## groups might be factors or numeric
+  v <- ncol(x) ## variables
+  m <- x.lda$means ## group means
+  w <- array(NA, dim = c(v, v, gr))
+  for(i in 1:gr){
+    tmp <- scale(subset(x, groups == unique(groups)[i]), scale = FALSE)
+    w[,,i] <- t(tmp) %*% tmp
+  }
+  W <- w[,,1]
+  for(i in 2:gr)
+    W <- W + w[,,i]
+  V <- W/(nrow(x) - gr)
+  iV <- solve(V)
+  class.funs <- matrix(NA, nrow = v + 1, ncol = gr)
+  colnames(class.funs) <- unique(groups)
+  rownames(class.funs) <- c("constant", colnames(x))
+  for(i in 1:gr) {
+    class.funs[1, i] <- -0.5 * t(m[i,]) %*% iV %*% (m[i,])
+    class.funs[2:(v+1) ,i] <- iV %*% (m[i,])
+  }
+  x.lda$class.funs <- class.funs
+  return(x.lda)
+}
+
+
+
 # Box's M-test for testing homogeneity of covariance matrices
 #
 # Written by Andy Liaw (2004) converted from Matlab
