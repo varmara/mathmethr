@@ -73,8 +73,7 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "HSAUR", "ggrepel"))
 
 ## 8. Дискриминантный анализ
 
-<!-- - Презентация: [08_da.pdf](08_da.pdf) -->
-
+- Презентация: [08_da.pdf](08_da.pdf)
 - Код:
   + [код R](08_da_code.R)
   + [LDA_helper_functions.R](LDA_helper_functions.R)
