@@ -337,7 +337,7 @@ as.dist(as.matrix(eurodist)[1:5, 1:5])
 library(vegan)
 euro <- metaMDS(eurodist, trace = 0)
 op <- par(mar = c(3, 3, 0.1, 0.1), mgp = c(2, 1, 0), cex = 0.8)
-ordiplot(euro, type = "t", cex = 1.2)
+invisible(tryCatch(ordiplot(euro, type = "t", cex = 1.2), error = function(er){}))
 par(op)
 ```
 
@@ -391,7 +391,6 @@ colnames(possum)
 colSums(is.na(possum))
 # оставим только строки с полными наблюдениями
 pos <- possum[complete.cases(possum), ]
-
 # поссумы из разных сайтов из 2 популяций
 table(pos$Pop, pos$site)
 ```
@@ -459,7 +458,7 @@ library(ggplot2)
 points_euclid <- data.frame(pos, ord_euclid$points)
 # График nMDS ординации
 gg_euclid <- ggplot(points_euclid, aes(x = MDS1, y = MDS2)) +
-  geom_point(aes(colour = Pop)) + 
+  geom_point(aes(colour = Pop), alpha = 0.5) + 
   facet_wrap(~sex)
 gg_euclid
 ```
