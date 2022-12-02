@@ -84,6 +84,7 @@ install.packages(c("DAAG", "RColorBrewer", "vegan", "HSAUR", "ggrepel"))
 ```{r eval=FALSE}
 install.packages("ape")
 install.packages("pvclust")
+install.packages("phangorn")
 ```
 
 <!-- - Презентация: [09_dist.pdf](09_dist.pdf) -->
