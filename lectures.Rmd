@@ -87,6 +87,5 @@ install.packages("pvclust")
 install.packages("phangorn")
 ```
 
-<!-- - Презентация: [09_dist.pdf](09_dist.pdf) -->
-
+- Презентация: [09_dist.pdf](09_dist.pdf)
 - Код: [09_dist_code.R](09_dist_code.R)
